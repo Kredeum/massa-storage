@@ -13,13 +13,9 @@
 		try {
 			let wallets;
 
-			// Check if we're in test environment
-			if (typeof window !== 'undefined' && window.massa) {
-				wallets = await window.massa.wallet.getWallets();
-			} else {
-				const walletProvider = (await import('@massalabs/wallet-provider')).default;
-				wallets = await walletProvider.getWallets();
-			}
+			if (!('bearby' in globalThis.window)) return;
+
+			wallets = await window.massa.wallet.account;
 
 			const wallet = wallets[0];
 

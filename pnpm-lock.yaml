@@ -21,6 +21,9 @@ importers:
       '@eslint/compat':
         specifier: ^1.2.4
         version: 1.2.4(eslint@9.17.0(jiti@1.21.7))
+      '@hicaru/bearby.js':
+        specifier: ^0.5.9
+        version: 0.5.9
       '@playwright/test':
         specifier: ^1.49.1
         version: 1.49.1
