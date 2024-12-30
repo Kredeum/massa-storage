@@ -1,38 +1,32 @@
 <!-- Header.svelte -->
 <script lang="ts">
-  import { page } from '$app/stores';
+	import { base } from '$app/paths';
+	import WalletConnect from './WalletConnect.svelte';
 </script>
 
-<header>
-  <div class="header-content">
-    <h1>Massa Counter</h1>
-    <p>A simple counter DApp on Massa blockchain</p>
-  </div>
+<header class="flex h-16 w-full items-center border-b border-gray-200 bg-white px-4 shadow-sm">
+	<nav class="container mx-auto flex items-center justify-between">
+		<div class="flex items-center gap-8">
+			<a href="{base}/" class="text-lg font-semibold text-gray-900">Massa Storage</a>
+			<a
+				href="https://github.com/kredeum/massa-storage"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-sm text-gray-600 hover:text-gray-900"
+			>
+				GitHub
+			</a>
+		</div>
+		<div class="flex items-center">
+			<WalletConnect />
+		</div>
+	</nav>
 </header>
 
 <style>
-  header {
-    width: 100%;
-    padding: 2rem 0;
-    background-color: #fafafa;
-    border-bottom: 1px solid #eaeaea;
-  }
-
-  .header-content {
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-  }
-
-  h1 {
-    margin: 0;
-    font-size: 2.5rem;
-    color: #0070f3;
-  }
-
-  p {
-    margin: 1rem 0 0;
-    font-size: 1.25rem;
-    color: #666;
-  }
+	.nav-left, .nav-right {
+		display: flex;
+		gap: 1rem;
+		align-items: center;
+	}
 </style>

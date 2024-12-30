@@ -1,40 +1,13 @@
 <!-- Footer.svelte -->
-<footer>
-  <span>© 2024 Massa Counter</span>
-  <a
-    href="https://massa.net/"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    <img src="/logo_massa.svg" alt="Massa Logo" />
-  </a>
+<footer class="flex h-[100px] w-full items-center justify-center gap-2 border-t border-gray-200">
+	<span class="text-sm"> @2025 Kredeum</span>
+	<a
+		href="https://labs.kredeum.com/"
+		target="_blank"
+		rel="noopener noreferrer"
+		class="flex items-center justify-center"
+	>
+		<img src="/logo-kredeum.svg" alt="Kredeum labs" class="h-10 w-10" data-testid="kredeum-logo" />
+	</a>
+	<span class="text-sm"> Massa Counter </span>
 </footer>
-
-<style>
-  footer {
-    width: 100%;
-    height: 100px;
-    border-top: 1px solid #eaeaea;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 3em;
-  }
-
-  footer img {
-    width: 5em;
-    height: 5em;
-  }
-
-  footer span {
-    font-size: 0.8em;
-  }
-
-  footer a {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-decoration: none;
-    color: inherit;
-  }
-</style>

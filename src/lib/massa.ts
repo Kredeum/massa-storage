@@ -1,16 +1,7 @@
-// @ts-ignore
-import massaWeb3 from '@massalabs/massa-web3';
-// @ts-ignore
-import walletProvider from '@massalabs/wallet-provider';
+import * as massaWeb3 from '@massalabs/massa-web3';
+import * as walletProvider from '@massalabs/wallet-provider';
 
-const { Args, EventPoller, Provider } = massaWeb3;
+const { Args, EventPoller } = massaWeb3;
 const { getWallets } = walletProvider;
-type Wallet = walletProvider.Wallet;
 
-export {
-    Args,
-    EventPoller,
-    Provider,
-    getWallets,
-    type Wallet
-};
+export { Args, EventPoller, getWallets };
