@@ -1,7 +1,7 @@
 <!-- Header.svelte -->
 <script lang="ts">
 	import { base } from '$app/paths';
-	import WalletConnect from './WalletConnect.svelte';
+	import Connect from './Connect.svelte';
 </script>
 
 <header class="flex h-16 w-full items-center border-b border-gray-200 bg-white px-4 shadow-sm">
@@ -16,17 +16,10 @@
 			>
 				GitHub
 			</a>
+			<a href="{base}/tests" class="text-sm text-gray-600 hover:text-gray-900">Tests</a>
 		</div>
 		<div class="flex items-center">
-			<WalletConnect />
+			<Connect />
 		</div>
 	</nav>
 </header>
-
-<style>
-	.nav-left, .nav-right {
-		display: flex;
-		gap: 1rem;
-		align-items: center;
-	}
-</style>

@@ -1,19 +1,15 @@
-<!-- WalletConnect.svelte -->
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { toast } from '@zerodevx/svelte-toast';
-	import type { Client } from '@massalabs/massa-web3';
-	import type { IAccount } from '@massalabs/wallet-provider';
 
-	let client: Client | undefined;
-	let account: IAccount | undefined;
-	let connected: boolean = false;
+	let account: { address: string } | undefined = $state();
+	let connected: boolean = $state(false);
 
-	$: shortenedAccount = account?.address
-		? `${account.address.slice(0, 6)}...${account.address.slice(-6)}`
-		: '';
+	const shortenedAccount = $derived(
+		account?.address ? `${account.address.slice(0, 6)}...${account.address.slice(-6)}` : ''
+	);
 
-	async function initProvider() {
+	const initProvider = async () => {
 		try {
 			let wallets;
 
@@ -39,17 +35,15 @@
 			}
 
 			account = accounts[0];
-			client = await wallet.getClient();
+			// client = await wallet.getClient();
 			connected = true;
 		} catch (error) {
 			toast.push('Error connecting to wallet');
 			console.error('Error:', error);
 		}
-	}
+	};
 
-	onMount(() => {
-		initProvider();
-	});
+	onMount(initProvider);
 </script>
 
 {#if connected}
@@ -59,7 +53,7 @@
 	</div>
 {:else}
 	<button
-		on:click={initProvider}
+		onclick={initProvider}
 		class="rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
 	>
 		Connect Wallet
