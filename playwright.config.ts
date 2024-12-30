@@ -2,9 +2,19 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
 	webServer: {
-		command: 'npm run build && npm run preview',
-		port: 4173
+		command: 'pnpm dev',
+		port: 5173,
+		reuseExistingServer: !process.env.CI,
+		timeout: 120 * 1000
 	},
-
-	testDir: 'e2e'
+	testDir: 'e2e',
+	testMatch: /(.+\.)?(test|spec)\.[jt]s/,
+	use: {
+		trace: 'on-first-retry',
+		video: 'on-first-retry'
+	},
+	timeout: 60000,
+	expect: {
+		timeout: 10000
+	}
 });
