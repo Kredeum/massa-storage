@@ -7,8 +7,8 @@ export default defineConfig({
 		reuseExistingServer: !process.env.CI,
 		timeout: 120 * 1000
 	},
-	testDir: 'e2e',
-	testMatch: /(.+\.)?(test|spec)\.[jt]s/,
+	testDir: 'test/e2e',
+	testMatch: /(.+\.)?(t|spec)\.[jt]s/,
 	use: {
 		trace: 'on-first-retry',
 		video: 'on-first-retry'
