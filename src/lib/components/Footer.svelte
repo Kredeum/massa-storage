@@ -9,5 +9,5 @@
 	>
 		<img src="/logo-kredeum.svg" alt="Kredeum labs" class="h-10 w-10" data-testid="kredeum-logo" />
 	</a>
-	<span class="text-sm"> Massa Counter </span>
+	<span class="text-sm"> Massa Storage </span>
 </footer>
