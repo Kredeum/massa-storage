@@ -36,5 +36,10 @@
 		"typescript-eslint": "^8.0.0",
 		"vite": "^5.4.11",
 		"vitest": "^2.0.4"
+	},
+	"dependencies": {
+		"@massalabs/massa-web3": "^5.0.0",
+		"@massalabs/wallet-provider": "^3.0.0",
+		"@zerodevx/svelte-toast": "^0.9.6"
 	}
 }
