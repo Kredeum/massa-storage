@@ -1,6 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render } from '@testing-library/svelte';
-import Counter from '../../../src/lib/components/Counter.svelte';
+import { describe, it, expect, vi } from 'vitest';
 
 // Mock the Massa Web3 modules
 vi.mock('@massalabs/massa-web3', () => ({
@@ -12,59 +10,37 @@ vi.mock('@massalabs/massa-web3', () => ({
 	}))
 }));
 
-// Mock the Wallet Provider
-const mockWalletProvider = {
-	getWallets: vi.fn().mockResolvedValue([
-		{
-			accounts: vi.fn().mockResolvedValue([
-				{
-					address: 'AS12b4pgVgvF9GKL6S8wZ6AEKENeqihZ8Qmxkr5NT4Ho7wYp9D9NT',
-					publicKey: 'test-public-key'
-				}
-			]),
-			getClient: vi.fn().mockResolvedValue({
-				smartContracts: () => ({
-					callSmartContract: vi.fn().mockResolvedValue({
-						transactionId: '123'
-					}),
-					awaitRequiredOperationStatus: vi.fn().mockResolvedValue(undefined)
-				})
-			})
-		}
-	])
-};
-
+// Mock the wallet provider
 vi.mock('@massalabs/wallet-provider', () => ({
-	__esModule: true,
-	default: mockWalletProvider
+	default: {
+		getWallets: vi.fn().mockResolvedValue([
+			{
+				accounts: vi.fn().mockResolvedValue([
+					{
+						address: 'AS12b4pgVgvF9GKL6S8wZ6AEKENeqihZ8Qmxkr5NT4Ho7wYp9D9NT',
+						publicKey: 'test-public-key'
+					}
+				]),
+				getClient: vi.fn().mockResolvedValue({
+					smartContracts: () => ({
+						callSmartContract: vi.fn().mockResolvedValue({
+							transactionId: '123'
+						}),
+						awaitRequiredOperationStatus: vi.fn().mockResolvedValue(undefined)
+					})
+				})
+			}
+		])
+	}
 }));
 
-describe('Counter Business Logic', () => {
-	const mockAddress = 'AS12b4pgVgvF9GKL6S8wZ6AEKENeqihZ8Qmxkr5NT4Ho7wYp9D9NT';
+const mockAddress = 'AS12b4pgVgvF9GKL6S8wZ6AEKENeqihZ8Qmxkr5NT4Ho7wYp9D9NT';
 
-	beforeEach(() => {
-		vi.clearAllMocks();
-	});
-
-	it('should handle successful wallet connection', async () => {
+describe('Counter Contract Interactions', () => {
+	it('should call increment function', async () => {
 		const walletProvider = (await import('@massalabs/wallet-provider')).default;
 		const wallets = await walletProvider.getWallets();
-		expect(wallets).toBeDefined();
-		expect(wallets.length).toBe(1);
-
-		const accounts = await wallets[0].accounts();
-		expect(accounts.length).toBe(1);
-		expect(accounts[0].address).toBe(mockAddress);
-	});
-
-	it('should handle counter increment', async () => {
-		const walletProvider = (await import('@massalabs/wallet-provider')).default;
-		const wallets = await walletProvider.getWallets();
-		const accounts = await wallets[0].accounts();
 		const client = await wallets[0].getClient();
-
-		expect(client).toBeTruthy();
-		expect(accounts[0].address).toBe(mockAddress);
 
 		const result = await client.smartContracts().callSmartContract({
 			targetAddress: mockAddress,

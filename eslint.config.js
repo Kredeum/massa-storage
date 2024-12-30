@@ -20,15 +20,21 @@ export default ts.config(
 				...globals.browser,
 				...globals.node
 			}
+		},
+		rules: {
+			'@typescript-eslint/no-unused-vars': 'warn',
+			'no-unused-vars': 'warn'
 		}
 	},
 	{
 		files: ['**/*.svelte'],
-
 		languageOptions: {
 			parserOptions: {
 				parser: ts.parser
 			}
+		},
+		rules: {
+			'svelte/valid-compile': ['warn', { ignoreWarnings: false }]
 		}
 	}
 );

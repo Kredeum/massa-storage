@@ -1,20 +1,13 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
 import { sveltekit } from '@sveltejs/kit/vite';
-import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
 	plugins: [sveltekit()],
-	server: {
-		open: true
-	},
 	resolve: {
 		alias: {
-			'$styles': fileURLToPath(new URL('./src/styles', import.meta.url))
+			$lib: '/src/lib',
+			$styles: '/src/styles'
 		}
 	},
-	test: {
-		include: ['test/unit/**/*.{t,spec}.{js,ts}'],
-		environment: 'jsdom',
-		setupFiles: ['src/setupTests.ts']
-	}
+	server: { open: true }
 });

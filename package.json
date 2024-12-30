@@ -1,17 +1,17 @@
 {
 	"name": "@kredeum/massa-storage",
 	"version": "0.0.2",
-  "description": "Massa off-chain Storage on IPFS",
-  "keywords": [
-    "massa",
-    "ipfs",
-    "storage",
-    "offchain",
-    "kredeum"
-  ],
-  "homepage": "https://github.com/kredeum/massa-storage",
-  "license": "MIT",
-  "author": "kredeum <contact@kredeum.com> (http://labs.kredeum.com/)",
+	"description": "Massa off-chain Storage on IPFS",
+	"keywords": [
+		"massa",
+		"ipfs",
+		"storage",
+		"offchain",
+		"kredeum"
+	],
+	"homepage": "https://github.com/kredeum/massa-storage",
+	"license": "MIT",
+	"author": "kredeum <contact@kredeum.com> (http://labs.kredeum.com/)",
 	"type": "module",
 	"scripts": {
 		"all": "pnpm run setup && pnpm run format && pnpm run check && pnpm run build && pnpm run test && pnpm run dev",

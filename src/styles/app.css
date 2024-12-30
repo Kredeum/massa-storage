@@ -2,12 +2,84 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-:root {
-	--toastContainerTop: auto;
-	--toastContainerRight: auto;
-	--toastContainerBottom: 2rem;
-	--toastContainerLeft: calc(50% - 8rem);
-	--toastWidth: 16rem;
-	--toastMinHeight: 2.5rem;
-	--toastPadding: 0.75rem 1rem;
+/* Common styles for the application */
+
+/* Typography */
+body {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+		'Open Sans', 'Helvetica Neue', sans-serif;
+	color: #333;
+	line-height: 1.6;
+}
+
+/* Links */
+a {
+	color: #333;
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+a:hover {
+	color: #666;
+}
+
+/* Layout */
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 1rem;
+}
+
+/* Header styles */
+.header {
+	padding: 1.5rem;
+	background: #f8f9fa;
+	border-bottom: 1px solid #e9ecef;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.header-nav {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.header-nav a {
+	font-weight: 600;
+	font-size: 1.1rem;
+	padding: 0.5rem 1rem;
+	border-radius: 4px;
+	transition: all 0.2s ease;
+}
+
+.header-nav a:hover {
+	background-color: #e9ecef;
+	color: #1a1a1a;
+}
+
+/* Footer */
+.footer {
+	width: 100%;
+	height: 100px;
+	border-top: 1px solid #eaeaea;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 3em;
+}
+
+.footer img {
+	width: 5em;
+	height: 5em;
+}
+
+.footer span {
+	font-size: 0.8em;
+}
+
+/* Common utility classes */
+.flex-center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
