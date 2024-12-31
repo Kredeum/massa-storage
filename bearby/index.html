@@ -23,16 +23,16 @@
 		<h2>bearby.contract</h2>
 		<button onclick="tryReadContract()">try read contract</button>
 		<button onclick="tryReadContractWithUnsafeParams()">
-      try read contract with unsafe params
+			try read contract with unsafe params
 		</button>
 		<button onclick="readBalance()">readBalance</button>
 		<button onclick="transfer()">transfer</button>
 		<button onclick="getDatastoreEntries()">Get datastore entry</button>
-    <button onclick="testunsafe()">test unsafe</button>
+		<button onclick="testunsafe()">test unsafe</button>
 		<button onclick="deploy()">deploy</button>
-    <br />
-    <h2>bearby.massa</h2>
-    <button onclick="getNodesStatus()">getNodesStatus</button>
+		<br />
+		<h2>bearby.massa</h2>
+		<button onclick="getNodesStatus()">getNodesStatus</button>
 
 		<script>
 			// Buildnet contract
@@ -159,7 +159,6 @@
 
 				console.log(hash);
 			}
-
 
 			async function deploy() {
 				const hash = await bearby.contract.deploy({

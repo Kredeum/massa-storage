@@ -11,27 +11,17 @@
 
 	const initProvider = async () => {
 		try {
-			let wallets;
-
 			if (!('bearby' in globalThis.window)) return;
 
-			wallets = await window.massa.wallet.account;
-
-			const wallet = wallets[0];
-
-			if (!wallet) {
-				toast.push('No wallet found');
+			const bearby = window.bearby;
+			if (!bearby?.wallet?.account) {
+				toast.push('Bearby wallet not found');
 				return;
 			}
 
-			const accounts = await wallet.accounts();
-			if (accounts.length === 0) {
-				toast.push('No accounts found');
-				return;
-			}
-
-			account = accounts[0];
-			// client = await wallet.getClient();
+			account = {
+				address: bearby.wallet.account.address
+			};
 			connected = true;
 		} catch (error) {
 			toast.push('Error connecting to wallet');
@@ -49,9 +39,9 @@
 	</div>
 {:else}
 	<button
-		onclick={initProvider}
-		class="rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+		on:click={initProvider}
+		class="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
 	>
-		Connect Wallet
+		Connect
 	</button>
 {/if}

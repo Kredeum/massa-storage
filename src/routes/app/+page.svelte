@@ -3,7 +3,6 @@
 	import Counter from '$lib/components/Counter.svelte';
 </script>
 
-
-<div class="flex flex-col h-64 justify-center items-center">
+<div class="flex h-64 flex-col items-center justify-center">
 	<Counter />
 </div>
