@@ -32,7 +32,6 @@
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.4",
-		"@hicaru/bearby.js": "^0.5.9",
 		"@playwright/test": "^1.49.1",
 		"@sveltejs/adapter-static": "^3.0.8",
 		"@sveltejs/kit": "^2.15.1",
@@ -54,6 +53,7 @@
 		"vitest": "^2.1.8"
 	},
 	"dependencies": {
+		"@hicaru/bearby.js": "^0.5.9",
 		"@massalabs/massa-web3": "^5.0.0",
 		"@massalabs/wallet-provider": "^3.0.0",
 		"@zerodevx/svelte-toast": "^0.9.6"

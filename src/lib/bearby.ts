@@ -1,130 +1,130 @@
 // Handles smart contract operations on the Massa blockchain
 type BearbyContract = {
-	getFilteredSCOutputEvent: (_filter: EventFilter) => Promise<FilterResponse>;
-	readSmartContract: (_params: ContractReadParams) => Promise<FilterResponse>;
-	call: (_params: ContractCallParams) => Promise<string>;
-	deploy: (_params: ContractCallParams) => Promise<string>;
-	getDatastoreEntries: (_params: { address: string; key: string }) => Promise<FilterResponse>;
-	types: ContractTypes;
+  getFilteredSCOutputEvent: (_filter: EventFilter) => Promise<FilterResponse>;
+  readSmartContract: (_params: ContractReadParams) => Promise<FilterResponse>;
+  call: (_params: ContractCallParams) => Promise<string>;
+  deploy: (_params: ContractCallParams) => Promise<string>;
+  getDatastoreEntries: (_params: { address: string; key: string }) => Promise<FilterResponse>;
+  types: ContractTypes;
 };
 
 // Core Massa blockchain interaction methods
 type BearbyMassa = {
-	getNodesStatus: () => Promise<NodeStatusResponse>;
-	getAddresses: (_publicKey: string) => Promise<AddressResponse>;
+  getNodesStatus: () => Promise<NodeStatusResponse>;
+  getAddresses: (_publicKey: string) => Promise<AddressResponse>;
 };
 
 // Low-level provider for direct wallet interactions
 type BearbyProvider = {
-	requestPubKey: () => Promise<string>;
-	signMessage: (_message: string) => Promise<string>;
+  requestPubKey: () => Promise<string>;
+  signMessage: (_message: string) => Promise<string>;
 };
 
 // Represents a Massa blockchain account
 type BearbyAccount = {
-	publicKey: string;
-	address: string;
-	base58: string;
+  publicKey: string;
+  address: string;
+  base58: string;
 };
 
 // Main wallet functionality for user interactions
 type BearbyWallet = {
-	installed: boolean;
-	connect: () => Promise<boolean>;
-	disconnect: () => Promise<boolean>;
-	network: string;
-	getPublicKey: () => Promise<string>;
-	signMessage: (_message: string) => Promise<string>;
-	provider: BearbyProvider;
-	account: BearbyAccount;
-	requestPubKey: () => Promise<string>;
+  installed: boolean;
+  connect: () => Promise<boolean>;
+  disconnect: () => Promise<boolean>;
+  network: string;
+  getPublicKey: () => Promise<string>;
+  signMessage: (_message: string) => Promise<string>;
+  provider: BearbyProvider;
+  account: BearbyAccount;
+  requestPubKey: () => Promise<string>;
 };
 
 // Main Bearby wallet integration point combining all functionality
 type Bearby = {
-	wallet: BearbyWallet;
-	contract: BearbyContract;
-	massa: BearbyMassa;
+  wallet: BearbyWallet;
+  contract: BearbyContract;
+  massa: BearbyMassa;
 };
 
 // Contract parameter types
 type ContractParameter = {
-	type: string;
-	value: string | number | boolean;
+  type: string;
+  value: string | number | boolean;
 };
 
 type ContractCallParams = {
-	maxGas: number | bigint;
-	maxCoins?: number;
-	coins?: number | bigint;
-	fee?: number;
-	targetAddress: string;
-	functionName: string;
-	parameter?: ContractParameter[];
-	unsafeParameters?: number[];
-	deployerBase64?: string;
+  maxGas: number | bigint;
+  maxCoins?: number;
+  coins?: number | bigint;
+  fee?: number;
+  targetAddress: string;
+  functionName: string;
+  parameter?: ContractParameter[];
+  unsafeParameters?: number[];
+  deployerBase64?: string;
 };
 
 type ContractReadParams = {
-	fee?: number;
-	maxGas: number;
-	simulatedGasPrice?: number;
-	targetAddress: string;
-	targetFunction: string;
-	parameter?: unknown[];
-	callerAddress?: string;
+  fee?: number;
+  maxGas: number;
+  simulatedGasPrice?: number;
+  targetAddress: string;
+  targetFunction: string;
+  parameter?: unknown[];
+  callerAddress?: string;
 };
 
 type EventFilter = {
-	start: string | null;
-	end: string | null;
-	original_caller_address: string | null;
-	original_operation_id: string | null;
-	emitter_address: string | null;
+  start: string | null;
+  end: string | null;
+  original_caller_address: string | null;
+  original_operation_id: string | null;
+  emitter_address: string | null;
 };
 
 type FilterResponse = {
-	result: Array<{
-		data: unknown;
-		result: Array<unknown>;
-	}>;
+  result: Array<{
+    data: unknown;
+    result: Array<unknown>;
+  }>;
 };
 
 type NodeStatusResponse = {
-	result: Array<{
-		[key: string]: unknown;
-	}>;
+  result: Array<{
+    [key: string]: unknown;
+  }>;
 };
 
 type AddressResponse = {
-	result: Array<{
-		final_balance: string;
-		candidate_balance: string;
-	}>;
+  result: Array<{
+    final_balance: string;
+    candidate_balance: string;
+  }>;
 };
 
 type ContractTypes = {
-	STRING: string;
-	BOOL: string;
-	F64: string;
-	U256: string;
+  STRING: string;
+  BOOL: string;
+  F64: string;
+  U256: string;
 };
 
 // Args type from Massa
-interface Args {
-	addString: (value: string) => Args;
-	serialize: () => Uint8Array;
+type Args = {
+  addString: (value: string) => Args;
+  serialize: () => Uint8Array;
 }
 
 // Declare bearby as a global variable
-declare const bearby: Bearby;
+declare let bearby: Bearby;
 
 declare global {
-	interface Window {
-		bearby: Bearby;
-		contract?: string;
-		Args?: new () => Args;
-	}
+  interface Window {
+    bearby?: Bearby;
+    contract?: string;
+    Args?: new () => Args;
+  }
 }
 
 // Buildnet contract
@@ -132,217 +132,220 @@ const USDC = 'AS12k8viVmqPtRuXzCm6rKXjLgpQWqbuMjc37YHhB452KSUUb9FgL';
 
 // Initialize Bearby instance
 const init = async (): Promise<void> => {
-	if (!('bearby' in globalThis.window)) return;
-	bearby = (await globalThis.window.bearby) as Bearby;
-	console.log(bearby);
+  if (!('bearby' in globalThis.window)) return;
+  bearby = (await globalThis.window.bearby) as Bearby;
+  console.log(bearby);
 };
 
 const connect = async () => {
-	console.log(bearby.wallet.installed);
-	const status = await bearby.wallet.connect();
-	console.log(bearby.wallet.installed);
-	console.log(status);
+  console.log(bearby.wallet.installed);
+  const status = await bearby.wallet.connect();
+  console.log(bearby.wallet.installed);
+  console.log(status);
 };
 const disconnect = async () => {
-	const status = await bearby.wallet.disconnect();
-	console.log(status);
+  const status = await bearby.wallet.disconnect();
+  console.log(status);
 };
 const accountBalance = async () => {
-	const account = bearby.wallet.account.base58;
-	const res = await bearby.massa.getAddresses(account);
-	const { final_balance, candidate_balance } = res.result[0];
-	console.log(final_balance, candidate_balance);
+  const account = bearby.wallet.account.base58;
+  const res = await bearby.massa.getAddresses(account);
+  const { final_balance, candidate_balance } = res.result[0];
+  console.log(final_balance, candidate_balance);
 };
 const test_req_pub_key = async () => {
-	const pubkey = await bearby.wallet.requestPubKey();
-	console.log(pubkey);
+  const pubkey = await bearby.wallet.requestPubKey();
+  console.log(pubkey);
 };
 const test_sign = async () => {
-	const res = await bearby.wallet.signMessage('test');
+  const res = await bearby.wallet.signMessage('test');
 
-	console.log(res);
+  console.log(res);
 };
 
 const tryReadContract = async () => {
-	const account = bearby.wallet.account.base58;
-	const result = await bearby.contract.readSmartContract({
-		fee: 0,
-		maxGas: 4294167295,
-		simulatedGasPrice: 0,
-		targetAddress: 'AS1CNmKBzXY3jwkqempmrv95wZUMqBHRBAQK3G4vicb3WpxZAy3e',
-		targetFunction: 'getMessage',
-		parameter: [],
-		callerAddress: account
-	});
-	console.log(result);
+  const account = bearby.wallet.account.base58;
+  const result = await bearby.contract.readSmartContract({
+    fee: 0,
+    maxGas: 4294167295,
+    simulatedGasPrice: 0,
+    targetAddress: 'AS1CNmKBzXY3jwkqempmrv95wZUMqBHRBAQK3G4vicb3WpxZAy3e',
+    targetFunction: 'getMessage',
+    parameter: [],
+    callerAddress: account
+  });
+  console.log(result);
 };
 const tryReadContractWithUnsafeParams = async () => {
-	const account = bearby.wallet.account.base58;
-	const Args = window['Args'];
-	if (!Args) {
-		console.error('Massa-web3 is not loaded. please wait a second');
-		return;
-	}
-	const unsafeParameters = new Args().addString(account).serialize();
-	const result = await bearby.contract.readSmartContract({
-		maxGas: 4294167295,
-		targetAddress: USDC,
-		targetFunction: 'balanceOf',
-		parameter: Array.from(unsafeParameters)
-	});
-	console.log(result);
+  const account = bearby.wallet.account.base58;
+  const Args = window['Args'];
+  if (!Args) {
+    console.error('Massa-web3 is not loaded. please wait a second');
+    return;
+  }
+  const unsafeParameters = new Args().addString(account).serialize();
+  const result = await bearby.contract.readSmartContract({
+    maxGas: 4294167295,
+    targetAddress: USDC,
+    targetFunction: 'balanceOf',
+    parameter: Array.from(unsafeParameters)
+  });
+  console.log(result);
 };
 const readBalance = async () => {
-	const data = await bearby.contract.readSmartContract({
-		fee: 0,
-		maxGas: 2100000,
-		simulatedGasPrice: 0,
-		targetAddress: 'AS12Emra1SrLsFgYdFRQXBjsksWummAs8zG14iFytS73bZBjbVY5v',
-		targetFunction: 'balanceOf',
-		parameter: [
-			{
-				type: bearby.contract.types.STRING,
-				value: 'AU1aFiPAan1ucLZjS6iREznGYHHpTseRFAXEYvYsbCocU9RL64GW'
-			}
-		]
-	});
-	console.log('readSmartContract', data.result[0]);
+  const data = await bearby.contract.readSmartContract({
+    fee: 0,
+    maxGas: 2100000,
+    simulatedGasPrice: 0,
+    targetAddress: 'AS12Emra1SrLsFgYdFRQXBjsksWummAs8zG14iFytS73bZBjbVY5v',
+    targetFunction: 'balanceOf',
+    parameter: [
+      {
+        type: bearby.contract.types.STRING,
+        value: 'AU1aFiPAan1ucLZjS6iREznGYHHpTseRFAXEYvYsbCocU9RL64GW'
+      }
+    ]
+  });
+  console.log('readSmartContract', data.result[0]);
 };
 
 const transfer = async () => {
-	const hash = await bearby.contract.call({
-		maxGas: 2000000,
-		maxCoins: 100000000,
-		coins: 0,
-		targetAddress: 'AS1brg4nueUAT41sm8eRZrmYndUgkAhs2hwEkJD4N8UejtK2Qa9C',
-		functionName: 'transfer',
-		parameter: [
-			{
-				type: bearby.contract.types.STRING,
-				value: 'Hello, World!'
-			},
-			{
-				type: bearby.contract.types.BOOL,
-				value: true
-			},
-			{
-				type: bearby.contract.types.F64,
-				value: 32
-			},
-			{
-				type: bearby.contract.types.U256,
-				value: '435435345234324324324323243242398854684'
-			}
-		]
-	});
+  const hash = await bearby.contract.call({
+    maxGas: 2000000,
+    maxCoins: 100000000,
+    coins: 0,
+    targetAddress: 'AS1brg4nueUAT41sm8eRZrmYndUgkAhs2hwEkJD4N8UejtK2Qa9C',
+    functionName: 'transfer',
+    parameter: [
+      {
+        type: bearby.contract.types.STRING,
+        value: 'Hello, World!'
+      },
+      {
+        type: bearby.contract.types.BOOL,
+        value: true
+      },
+      {
+        type: bearby.contract.types.F64,
+        value: 32
+      },
+      {
+        type: bearby.contract.types.U256,
+        value: '435435345234324324324323243242398854684'
+      }
+    ]
+  });
 
-	console.log(hash);
+  console.log(hash);
 };
 
 const getDatastoreEntries = async () => {
-	const data = await bearby.contract.getDatastoreEntries({ address: USDC, key: 'SYMBOL' });
-	console.log('Datastore data:', data.result[0]);
+  const data = await bearby.contract.getDatastoreEntries({ address: USDC, key: 'SYMBOL' });
+  console.log('Datastore data:', data.result[0]);
 };
 
 const testunsafe = async () => {
-	const hash = await bearby.contract.call({
-		maxGas: 1000000,
-		coins: 0,
-		fee: 1000,
-		targetAddress: 'AS1X4atEfMdoV4Rj9agjgpowsFgdZULpCig6SXhyX22kgnHMqK4y',
-		functionName: 'logEventArgAll',
-		unsafeParameters: [
-			2, 0, 0, 0, 1, 2, 3, 0, 0, 0, 49, 49, 49, 9, 0, 0, 0, 114, 101, 99, 101, 105, 118, 101, 114,
-			49, 3, 0, 0, 0, 77, 65, 83, 0, 0, 0, 0
-		]
-	});
+  const hash = await bearby.contract.call({
+    maxGas: 1000000,
+    coins: 0,
+    fee: 1000,
+    targetAddress: 'AS1X4atEfMdoV4Rj9agjgpowsFgdZULpCig6SXhyX22kgnHMqK4y',
+    functionName: 'logEventArgAll',
+    unsafeParameters: [
+      2, 0, 0, 0, 1, 2, 3, 0, 0, 0, 49, 49, 49, 9, 0, 0, 0, 114, 101, 99, 101, 105, 118, 101, 114,
+      49, 3, 0, 0, 0, 77, 65, 83, 0, 0, 0, 0
+    ]
+  });
 
-	console.log(hash);
+  console.log(hash);
 };
 
 const deploy = async () => {
-	const hash = await bearby.contract.deploy({
-		fee: 0,
-		maxGas: 3980167295n,
-		maxCoins: 0.1 * 10 ** 9,
-		coins: 100000000n,
-		parameter: [
-			{
-				type: bearby.contract.types.STRING,
-				value: 'Hello, World!'
-			}
-		],
-		targetAddress: '',
-		functionName: 'deploy',
-		deployerBase64: ''
-	});
+  const hash = await bearby.contract.deploy({
+    fee: 0,
+    maxGas: 3980167295n,
+    maxCoins: 0.1 * 10 ** 9,
+    coins: 100000000n,
+    parameter: [
+      {
+        type: bearby.contract.types.STRING,
+        value: 'Hello, World!'
+      }
+    ],
+    targetAddress: '',
+    functionName: 'deploy',
+    deployerBase64:
+      'AGFzbQEAAAABWA9gAX8Bf2AAAGACf38AYAJ/fwF/YAN/f38Bf2ADf39/AGABfwBgAX8BfmABfgF/YAR/f39+AX9gBH9/f38AYAJ/fgBgA39+fwF/YAR/f39/AX9gAn9+AX8C4gEHA2VudgVhYm9ydAAKBW1hc3NhGmFzc2VtYmx5X3NjcmlwdF9oYXNfb3Bfa2V5AAAFbWFzc2EbYXNzZW1ibHlfc2NyaXB0X2dldF9vcF9kYXRhAAAFbWFzc2EZYXNzZW1ibHlfc2NyaXB0X2NyZWF0ZV9zYwAABW1hc3NhH2Fzc2VtYmx5X3NjcmlwdF9mdW5jdGlvbl9leGlzdHMAAwVtYXNzYRRhc3NlbWJseV9zY3JpcHRfY2FsbAAJBW1hc3NhHmFzc2VtYmx5X3NjcmlwdF9nZW5lcmF0ZV9ldmVudAAGA1VUBQICBgIAAgICAgMDBAQEAQEBAQEBAQEBAQEBAAAFBQMAAAAACwIMDQAEAwcHAAAAAAcICAMOAAICBAAAAAMCAgIEAwAABQAAAAMAAwkDBgAABgEBBAUBcAEBAQUDAQABBkEMfwFBAAt/AUEAC38AQQALfwBBAQt/AEECC38AQQALfwFBAAt/AUEAC38AQbACC38AQdACC38AQYAJC38AQbwJCwdFBwRtYWluAFYFX19uZXcAEQVfX3BpbgBXB19fdW5waW4AWAlfX2NvbGxlY3QAWQtfX3J0dGlfYmFzZQMKBm1lbW9yeQIACAFaCQYBAEEBCwAMARMK7xNUAwABCxEAIAAgATYCBCAAIAFBABAHCwkAIAAgATYCAAtgAQZ/PwAhASABQRB0QQ9qQQ9Bf3NxIQIgACACSwRAIAAgAmtB//8DakH//wNBf3NxQRB2IQMgASIEIAMiBSAEIAVKGyEGIAZAAEEASARAIANAAEEASARAAAsLCyAAJAELCQAgACABNgIAC1MBBH8gAEH8////A0sEQEEgQeAAQSFBHRAAAAsjASEBIwFBBGohAgJ/IAAhAyADQQRqQQ9qQQ9Bf3NxQQRrDAALIQQgAiAEahAKIAEgBBALIAIPCwkAIAAgATYCBAsJACAAIAE2AggLCQAgACABNgIMCwkAIAAgATYCEAtLAQJ/IABB7P///wNLBEBBIEHgAEHWAEEeEAAAC0EQIABqEAwhAiACQQRrIQMgA0EAEA0gA0EAEA4gAyABEA8gAyAAEBAgAkEQag8LQQECfyABQfz///8DQQB2SwRAQaABQdABQTNBPBAAAAsgAUEAdCECIAJBBRARIQNBACMERxogA0EAIAL8CwAgAw8LLgAgAEUEQEEIQQQQESEACyAAQQAQCSAAQQBBABASEAggACABEAggACACEAkgAAseAQF/IAAgARARIQMgAgRAIAMgAiAA/AoAAAsgAw8LMAEBfwJAAkACQAJAIwYOAwECAwALAAtBAEEFQZACEBQhAQtBACECCyAAIAEgAhATCycAIwtBBGpBD2pBD0F/c3FBBGskACMAJAFBAEEAQQAkBkEAEBUkBwsEABAWCwQAEBcLBAAQGAsEABAZCwQAEBoLBAAQGwsEABAcCwQAEB0LBAAQHgsEABAfCwQAECALBwAgACgCEAsNACAAQRRrECJBAHYPCxIAIAAgAUEAdGogAjoAAEEAGgsiACABIAAQI08EQEGAA0HQAUHdAEEpEAAACyAAIAEgAhAkCy8BAX8gASAAECNPBEBBgANB0AFBzgBBKRAAAAsgACABQQB0ai0AACECQQAaIAIPCxEBAX8gABABIQEgAUEAECYPCwcAIAAQAg8LBwAgACgCAAsHACAAKAIECwkAIAAgATcDAAsRACAAIAE2AgggACABQQAQBwseACAARQRAQQxBBxARIQALIAAgARArIAAgAhAsIAALRAEDfyAAIAF0IQQgBEEBIAMQFCEFQRAgAhARIQYgBiAFNgIAIAYgBUEAEAcgBiAFNgIEIAYgBDYCCCAGIAA2AgwgBg8LBwAgACgCBAurAQEPfyAAECMhAyABQQBIBH8gASADaiIEQQAiBSAEIAVKGwUgASIGIAMiByAGIAdIGwshASACQQBIBH8gAiADaiIIQQAiCSAIIAlKGwUgAiIKIAMiCyAKIAtIGwshAiACIAFrIgxBACINIAwgDUobIQMgACABQQB0aiEOIANBAHQhDyAAIRBBARogA0EAQQhBABAuIRAgEBAvIRFBABogESAOIA/8CgAAIBAPCxYAIAAQKiAAECkgABApIAFqEDAQLw8LDABBAUUaIAApAwAPCwcAIAAQMg8LPQEBfiAAEClBCGogABAqECNKBEBBAEIAQeADEC0PCyAAQQgQMRAzIQEgACAAEClBCGoQCUEAIAFBABAtDwsHACAAKAIICw0A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',
+    contractDataBase64:
+      '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'
+  });
 
-	let k = 0;
-	const intr = setInterval(async () => {
-		const eventsFilter: EventFilter = {
-			start: null,
-			end: null,
-			original_caller_address: null,
-			original_operation_id: hash,
-			emitter_address: null
-		};
-		const response = await bearby.contract.getFilteredSCOutputEvent(eventsFilter);
-		if (response && response.result && response.result[0] && response.result[0].data) {
-			clearInterval(intr);
-			window.contract = String(response.result[0].data).replace('Address:', '');
-			console.log(window.contract);
-			alert(window.contract);
-		}
+  let k = 0;
+  const intr = setInterval(async () => {
+    const eventsFilter: EventFilter = {
+      start: null,
+      end: null,
+      original_caller_address: null,
+      original_operation_id: hash,
+      emitter_address: null
+    };
+    const response = await bearby.contract.getFilteredSCOutputEvent(eventsFilter);
+    if (response && response.result && response.result[0] && response.result[0].data) {
+      clearInterval(intr);
+      window.contract = String(response.result[0].data).replace('Address:', '');
+      console.log(window.contract);
+      alert(window.contract);
+    }
 
-		console.log(response);
+    console.log(response);
 
-		if (k > 10) {
-			clearInterval(intr);
-		}
-		k += 1;
-	}, 4000);
+    if (k > 10) {
+      clearInterval(intr);
+    }
+    k += 1;
+  }, 4000);
 };
 
 const getNodesStatus = async () => {
-	const network = await bearby.wallet.network;
-	console.log('network', network);
-	const data = await bearby.massa.getNodesStatus();
-	console.log('getNodesStatus', data);
+  const network = await bearby.wallet.network;
+  console.log('network', network);
+  const data = await bearby.massa.getNodesStatus();
+  console.log('getNodesStatus', data);
 };
 
 export {
-	bearby,
-	USDC,
-	init,
-	connect,
-	disconnect,
-	accountBalance,
-	test_req_pub_key,
-	test_sign,
-	tryReadContract,
-	tryReadContractWithUnsafeParams,
-	readBalance,
-	transfer,
-	getDatastoreEntries,
-	testunsafe,
-	deploy,
-	getNodesStatus
+  bearby,
+  USDC,
+  init,
+  connect,
+  disconnect,
+  accountBalance,
+  test_req_pub_key,
+  test_sign,
+  tryReadContract,
+  tryReadContractWithUnsafeParams,
+  readBalance,
+  transfer,
+  getDatastoreEntries,
+  testunsafe,
+  deploy,
+  getNodesStatus
 };
 
 export type {
-	BearbyContract,
-	BearbyMassa,
-	BearbyProvider,
-	BearbyAccount,
-	BearbyWallet,
-	ContractParameter,
-	ContractCallParams,
-	ContractReadParams,
-	EventFilter,
-	FilterResponse,
-	NodeStatusResponse,
-	AddressResponse,
-	Bearby,
-	Args,
-	Bearby as default
+  BearbyContract,
+  BearbyMassa,
+  BearbyProvider,
+  BearbyAccount,
+  BearbyWallet,
+  ContractParameter,
+  ContractCallParams,
+  ContractReadParams,
+  EventFilter,
+  FilterResponse,
+  NodeStatusResponse,
+  AddressResponse,
+  Bearby,
+  Args,
+  Bearby as default
 };
