@@ -1,6 +1,7 @@
 const wallet = $state<{
   address?: string,
-  connected?: boolean
+  connected?: boolean,
+  balance?: number
 }>({});
 
 

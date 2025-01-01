@@ -15,6 +15,28 @@
     console.log("bearbyWallet change", bearbyWallet, $state.snapshot(wallet));
   };
 
+  const readBalance = async () => {
+    if (!wallet.address) return;
+
+    const data = await web3.contract.readSmartContract({
+      fee: 0,
+      maxGas: 2100000,
+      targetAddress: "AS12Emra1SrLsFgYdFRQXBjsksWummAs8zG14iFytS73bZBjbVY5v",
+      targetFunction: "balanceOf",
+      parameter: [
+        {
+          type: web3.contract.types.STRING,
+          // value: "AU1aFiPAan1ucLZjS6iREznGYHHpTseRFAXEYvYsbCocU9RL64GW"
+          value: wallet.address
+        }
+      ]
+    });
+    const bal = data[0]?.result?.[0];
+    console.log("readBalance", data[0]?.result?.[0]);
+
+    return bal;
+  };
+
   const connectBearby = async () => {
     if (!bearbyWallet.installed) return toast.error("Wallet not installed");
     if (!bearbyWallet.enabled) return toast.error("Wallet not enabled");
@@ -56,13 +78,8 @@
   <div class="flex items-center gap-2">
     <span class="text-sm font-medium text-gray-700">{shortAddress}</span>
     <button onclick={disconnectBearby} class="button-standard"> Disconnect </button>
+    <button onclick={readBalance} class="button-standard"> Read Balance </button>
   </div>
 {:else}
   <button onclick={connectBearby} class="button-standard"> Connect </button>
 {/if}
-
-<style lang="postcss">
-  .button-standard {
-    @apply rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600;
-  }
-</style>
