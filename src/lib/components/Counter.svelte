@@ -1,13 +1,14 @@
 <!-- Counter.svelte -->
 <script lang="ts">
-  import { toast } from "@zerodevx/svelte-toast";
+  import { toast } from "svelte-hot-french-toast";
   import { web3 } from "@hicaru/bearby.js";
+  import { wallet } from "$lib/runes/state.svelte";
 
   let connected: boolean = $state(web3.wallet.connected);
   const CONTRACT_ADDRESS = "AS12b4pgVgvF9GKL6S8wZ6AEKENeqihZ8Qmxkr5NT4Ho7wYp9D9NT";
 
   const increment = async () => {
-    if (!web3.wallet.connected) return toast.push("Wallet not connected");
+    if (!web3.wallet.connected) return toast.error("Wallet not connected");
 
     try {
       const result = await web3.contract.call({
@@ -19,22 +20,17 @@
         parameters: []
       });
 
-      toast.push("Transaction sent: " + result);
+      toast.success("Transaction sent: " + result);
     } catch (error) {
-      toast.push("Error incrementing counter");
+      toast.success("Error incrementing counter");
       console.error("Error:", error);
     }
   };
 </script>
 
 <div class="flex flex-col items-center justify-center gap-4">
-  {#if connected}
-    <button
-      onclick={increment}
-      class="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-    >
-      Increment Counter
-    </button>
+  {#if wallet.connected}
+    <button onclick={increment} class="button-standard"> Increment Counter </button>
   {:else}
     Connect to use Counter
   {/if}

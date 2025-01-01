@@ -59,6 +59,6 @@
     "@hicaru/bearby.js": "^0.5.9",
     "@massalabs/massa-web3": "^5.0.0",
     "@massalabs/wallet-provider": "^3.0.0",
-    "@zerodevx/svelte-toast": "^0.9.6"
+    "svelte-hot-french-toast": "^1.0.0"
   }
 }

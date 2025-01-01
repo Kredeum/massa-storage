@@ -17,9 +17,9 @@ importers:
       '@massalabs/wallet-provider':
         specifier: ^3.0.0
         version: 3.0.0
-      '@zerodevx/svelte-toast':
-        specifier: ^0.9.6
-        version: 0.9.6(svelte@5.16.0)
+      svelte-hot-french-toast:
+        specifier: ^1.0.0
+        version: 1.0.0(svelte@5.16.0)
     devDependencies:
       '@eslint/compat':
         specifier: ^1.2.4
@@ -563,11 +563,6 @@ packages:
 
   '@vitest/utils@2.1.8':
     resolution: {integrity: sha512-dwSoui6djdwbfFmIgbIjX2ZhIoG7Ex/+xpxyiEgIGzjliY8xGkcpITKTlp6B4MgtGkF2ilvm97cPM96XZaAgcA==}
-
-  '@zerodevx/svelte-toast@0.9.6':
-    resolution: {integrity: sha512-nHlTrCjverlPK9yukK6fqbG3e/R+f10ldrc4nJHOe2qNDScuPTuYVSFEk2dDDtzWAwTN5pmdEXgA3M2RbT8jiw==}
-    peerDependencies:
-      svelte: ^3.57.0 || ^4.0.0 || ^5.0.0
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -1536,6 +1531,11 @@ packages:
       svelte:
         optional: true
 
+  svelte-hot-french-toast@1.0.0:
+    resolution: {integrity: sha512-SmJUwq7iHu9m0a794UBhCnp5YBQw0NV54j5z2oG+S/dtMMxbwC1s7bOGPpsPJrtZY7EED6jGV7BuulyorAaXWA==}
+    peerDependencies:
+      svelte: '>= 5'
+
   svelte@5.16.0:
     resolution: {integrity: sha512-Ygqsiac6UogVED2ruKclU+pOeMThxWtp9LG+li7BXeDKC2paVIsRTMkNmcON4Zejerd1s5sZHWx6ZtU85xklVg==}
     engines: {node: '>=18'}
@@ -2174,10 +2174,6 @@ snapshots:
       '@vitest/pretty-format': 2.1.8
       loupe: 3.1.2
       tinyrainbow: 1.2.0
-
-  '@zerodevx/svelte-toast@0.9.6(svelte@5.16.0)':
-    dependencies:
-      svelte: 5.16.0
 
   acorn-jsx@5.3.2(acorn@8.14.0):
     dependencies:
@@ -3035,6 +3031,10 @@ snapshots:
       postcss: 8.4.49
       postcss-scss: 4.0.9(postcss@8.4.49)
     optionalDependencies:
+      svelte: 5.16.0
+
+  svelte-hot-french-toast@1.0.0(svelte@5.16.0):
+    dependencies:
       svelte: 5.16.0
 
   svelte@5.16.0:
