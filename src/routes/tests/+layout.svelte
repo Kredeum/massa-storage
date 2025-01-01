@@ -1,18 +1,16 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
-
-	let { children }: { children: Snippet } = $props();
+  let { children } = $props();
 </script>
 
 <div class="flex min-h-screen flex-col">
-	<div class="p-8">
-		<h1 class="mb-6 text-2xl font-bold">
-			<a href="/app">App</a>
-		</h1>
-		<h1 class="mb-6 text-2xl font-bold">
-			<a href="/tests">Tests</a>
-		</h1>
+  <div class="p-8">
+    <h1 class="mb-6 text-2xl font-bold">
+      <a href="/app">App</a>
+    </h1>
+    <h1 class="mb-6 text-2xl font-bold">
+      <a href="/tests">Tests</a>
+    </h1>
 
-		<main class="relative flex flex-1 flex-col">{@render children()}</main>
-	</div>
+    <main class="relative flex flex-1 flex-col">{@render children()}</main>
+  </div>
 </div>

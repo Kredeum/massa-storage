@@ -1,25 +1,18 @@
 <!-- Header.svelte -->
 <script lang="ts">
-	import { base } from '$app/paths';
-	import Connect from './Connect.svelte';
+  import { base } from "$app/paths";
+  import Connect from "./Connect.svelte";
 </script>
 
 <header class="flex h-16 w-full items-center border-b border-gray-200 bg-white px-4 shadow-sm">
-	<nav class="container mx-auto flex items-center justify-between">
-		<div class="flex items-center gap-8">
-			<a href="{base}/" class="text-lg font-semibold text-gray-900">Massa Storage</a>
-			<a
-				href="https://github.com/kredeum/massa-storage"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="text-sm text-gray-600 hover:text-gray-900"
-			>
-				GitHub
-			</a>
-			<a href="{base}/tests" class="text-sm text-gray-600 hover:text-gray-900">Tests</a>
-		</div>
-		<div class="flex items-center">
-			<Connect />
-		</div>
-	</nav>
+  <nav class="container mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-8">
+      <a href="{base}/" class="text-lg font-semibold text-gray-900">Massa Storage</a>
+      <a href="https://github.com/kredeum/massa-storage" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-600 hover:text-gray-900"> GitHub </a>
+      <a href="{base}/tests" class="text-sm text-gray-600 hover:text-gray-900">Tests</a>
+    </div>
+    <div class="flex items-center">
+      <Connect />
+    </div>
+  </nav>
 </header>

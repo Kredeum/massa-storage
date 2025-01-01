@@ -1,8 +1,11 @@
 <script lang="ts">
-	import '$styles/app.css';
-	let { children } = $props();
+  import "$styles/app.css";
+  import "tailwindcss/tailwind.css";
+  let { children } = $props();
 </script>
 
+<title>Bearby Connect test</title>
+
 <div class="container">
-	{@render children()}
+  {@render children()}
 </div>

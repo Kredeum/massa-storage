@@ -1,10 +1,10 @@
 /* Toast styles */
 :root {
-	--toastContainerTop: auto;
-	--toastContainerRight: auto;
-	--toastContainerBottom: 2rem;
-	--toastContainerLeft: calc(50% - 8rem);
-	--toastWidth: 16rem;
-	--toastMinHeight: 2.5rem;
-	--toastPadding: 0.75rem 1rem;
+  --toastContainerTop: auto;
+  --toastContainerRight: auto;
+  --toastContainerBottom: 2rem;
+  --toastContainerLeft: calc(50% - 8rem);
+  --toastWidth: 16rem;
+  --toastMinHeight: 2.5rem;
+  --toastPadding: 0.75rem 1rem;
 }

@@ -1,57 +1,68 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { toast } from '@zerodevx/svelte-toast';
+  import { toast } from "@zerodevx/svelte-toast";
+  import { Wallet, web3 } from "@hicaru/bearby.js";
+  import { onMount, tick } from "svelte";
 
-	let account: { address: string } | undefined = $state();
-	let connected: boolean = $state(false);
+  let refresh = $state(0);
+  const connected = $derived<boolean>(refresh > 0 && web3.wallet.connected);
 
-	const shortenedAccount = $derived(
-		account?.address ? `${account.address.slice(0, 6)}...${account.address.slice(-6)}` : ''
-	);
+  let address = $state<string>();
+  const shortAddress = $derived(address ? `${address.slice(0, 6)}...${address.slice(-6)}` : "");
 
-	const initProvider = async () => {
-		try {
-			let wallets;
+  const disconnectBearby = async () => {
+    if (!web3.wallet.installed) return toast.push("Wallet not installed");
+    if (!web3.wallet.enabled) return toast.push("Wallet not enabled");
+    if (!web3.wallet.connected) return toast.push("Wallet not connected");
 
-			if (!('bearby' in globalThis.window)) return;
+    try {
+      await web3.wallet.disconnect();
+      toast.push(`Wallet disconnected`);
+    } catch (error) {
+      toast.push("Error disconnecting to Wallet");
+      console.error("Wallet Error:", error);
+    }
+    refresh++;
+  };
 
-			wallets = await window.massa.wallet.account;
+  const connectBearby = async () => {
+    console.log("connectBearby ~ web3.wallet:", web3.wallet);
+    console.log("connectBearby ~ connected:", web3.wallet.connected);
 
-			const wallet = wallets[0];
+    if (!web3.wallet.installed) return toast.push("Wallet not installed");
+    if (!web3.wallet.enabled) return toast.push("Wallet not enabled");
+    if (web3.wallet.connected) return toast.push(`Wallet already connected<br/>${shortAddress}`);
 
-			if (!wallet) {
-				toast.push('No wallet found');
-				return;
-			}
+    try {
+      await web3.wallet.connect();
+      address = web3.wallet.account.base58;
+      toast.push(`Wallet ${shortAddress} connected`);
+    } catch (error) {
+      toast.push("Error connecting to Wallet");
+      console.error("Wallet Error:", error);
+    }
+    refresh++;
+  };
 
-			const accounts = await wallet.accounts();
-			if (accounts.length === 0) {
-				toast.push('No accounts found');
-				return;
-			}
+  const init = async (): Promise<void> => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    console.log("onMount ~ web3.wallet:", web3.wallet, "web3.wallet.connected:", web3.wallet.connected);
+    refresh++;
+  };
 
-			account = accounts[0];
-			// client = await wallet.getClient();
-			connected = true;
-		} catch (error) {
-			toast.push('Error connecting to wallet');
-			console.error('Error:', error);
-		}
-	};
-
-	onMount(initProvider);
+  onMount(init);
 </script>
 
 {#if connected}
-	<div class="flex items-center gap-2">
-		<span class="text-sm font-medium text-gray-700">{shortenedAccount}</span>
-		<div class="h-2 w-2 rounded-full bg-green-500"></div>
-	</div>
+  <div class="flex items-center gap-2">
+    <span class="text-sm font-medium text-gray-700">{shortAddress}</span>
+    <button onclick={disconnectBearby} class="connect-button"> Disconnect </button>
+  </div>
 {:else}
-	<button
-		onclick={initProvider}
-		class="rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-	>
-		Connect Wallet
-	</button>
+  <button onclick={connectBearby} class="connect-button"> Connect </button>
 {/if}
+
+<style lang="postcss">
+  .connect-button {
+    @apply rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600;
+  }
+</style>

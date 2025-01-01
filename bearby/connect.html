@@ -1,0 +1,11 @@
+<html>
+  <head>
+    <title>Bearby Connect test</title>
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+    <script type="module" src="../node_modules/@hicaru/bearby.js/dist/index.js"></script>
+  </head>
+  <body>
+    <button onclick="bearby.wallet.connect().then(console.info)">connect</button>
+    <button onclick="bearby.wallet.disconnect().then(console.info)">disconnect</button>
+  </body>
+</html>
