@@ -1,33 +1,39 @@
 <script lang="ts">
-  import { ICONS } from '$lib/constants';
-  export let searchTerm: string;
-  export let onSearch: (value: string) => void;
+  let { searchTerm, onsearch } = $props<{
+    searchTerm: string;
+    onsearch: (value: string) => void;
+  }>();
 
   function clearSearch() {
     searchTerm = "";
-    onSearch("");
+    onsearch("");
+  }
+
+  function handleInput(e: Event) {
+    const value = (e.target as HTMLInputElement).value;
+    onsearch(value);
   }
 </script>
 
 <div class="relative">
-  <input
-    type="text"
-    placeholder="Search files..."
-    class="w-full px-4 py-2 border rounded-lg pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
-    bind:value={searchTerm}
-    oninput={(e: Event) => searchTerm = (e.target as HTMLInputElement).value}
-    aria-label="Search files"
-  />
   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
     🔍
   </span>
-  {#if searchTerm?.length > 0}
-    <button 
+  <input
+    type="text"
+    placeholder="Search files..."
+    class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    bind:value={searchTerm}
+    oninput={handleInput}
+    aria-label="Search files"
+  />
+  {#if searchTerm}
+    <button
+      class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
       onclick={clearSearch}
-      class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer font-bold text-xl"
       aria-label="Clear search"
     >
-      ×
+      ✕
     </button>
   {/if}
 </div>

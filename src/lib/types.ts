@@ -3,11 +3,12 @@ export interface File {
   name: string;
   size: number;
   type: string;
+  status?: 'pending' | 'approved' | 'rejected' | 'pinned';
 }
 
 export interface Filters {
   type: string[];
-  size: string[];
+  size: (string | [number, number])[];
 }
 
 export interface SortConfig {
