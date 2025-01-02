@@ -1,30 +1,23 @@
 <!-- Counter.svelte -->
 <script lang="ts">
   import { toast } from "svelte-hot-french-toast";
-  import { web3 } from "@hicaru/bearby.js";
-  import { wallet } from "$lib/runes/state.svelte";
   import { type JsonRPCResponseExecuteReadOnly } from "@hicaru/bearby.js";
-
-  const CONTRACT_ADDRESS = "AS12b4pgVgvF9GKL6S8wZ6AEKENeqihZ8Qmxkr5NT4Ho7wYp9D9NT";
+  import { web3 } from "@hicaru/bearby.js";
+  import { readU64 } from "$lib/ts/readResult";
+  import { wallet } from "$lib/runes/state.svelte";
+  import { COUNTER_ADDRESS } from "$lib/ts/constants";
 
   const readCounter = async () => {
-    const result: JsonRPCResponseExecuteReadOnly[] = await web3.contract.readSmartContract({
-      // fee: 0,
-      // maxGas: 4294167295,
-      // targetAddress: CONTRACT_ADDRESS,
-      // targetFunction: "getCounter",
-      // parameter: [],
-      // callerAddress: wallet.address
+    const data: JsonRPCResponseExecuteReadOnly[] = await web3.contract.readSmartContract({
       fee: 0,
       maxGas: 4294167295,
-      // simulatedGasPrice: 0,
       targetAddress: "AS1CNmKBzXY3jwkqempmrv95wZUMqBHRBAQK3G4vicb3WpxZAy3e",
       targetFunction: "getMessage",
       parameter: [],
       callerAddress: wallet.address
     });
-    console.log(result[0]?.result?.[0]);
-    console.log(result[0]?.result?.[0]?.result);
+    const count = readU64(data);
+    console.log("readCounter count", count);
   };
 
   const increment = async () => {
@@ -35,7 +28,7 @@
         maxGas: 200000,
         coins: 0,
         fee: 10000000,
-        targetAddress: CONTRACT_ADDRESS,
+        targetAddress: COUNTER_ADDRESS,
         functionName: "increment",
         parameters: []
       });

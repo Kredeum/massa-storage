@@ -13,6 +13,11 @@
   "license": "MIT",
   "author": "kredeum <contact@kredeum.com> (http://labs.kredeum.com/)",
   "type": "module",
+  "packageManager": "pnpm@9.12.3",
+  "engines": {
+    "node": "^22",
+    "pnpm": "^9"
+  },
   "scripts": {
     "all": "pnpm run setup && pnpm run format && pnpm run check && pnpm run build && pnpm run test && pnpm run dev",
     "clean": "rm -rf node_modules .pnpm-lock.yaml .svelte-kit",
@@ -50,6 +55,7 @@
     "svelte": "^5.16.0",
     "svelte-check": "^4.1.1",
     "tailwindcss": "^3.4.17",
+    "turbo": "^2.3.3",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.19.0",
     "vite": "^5.4.11",

@@ -9,32 +9,32 @@
 
   const shortAddress = $derived(wallet.address ? `${wallet.address.slice(0, 6)}...${wallet.address.slice(-6)}` : "");
 
+  const getBalance = async () => {
+    if (!wallet.connected) return;
+    if (!wallet.address) return;
+
+    try {
+      const data = await web3.massa.getAddresses(wallet.address);
+      return data.result?.[0]?.final_balance;
+    } catch (error) {
+      console.error("Error getting native balance:", error);
+      toast.error("Error getting native balance");
+    }
+  };
+
+  const refreshBalance = async () => {
+    const bal = await getBalance();
+    if (bal !== undefined) {
+      wallet.balance = bal;
+      toast.success("Balance refreshed");
+    }
+  };
+
   const updateAccount = async () => {
     wallet.address = bearbyWallet.account.base58;
     wallet.connected = bearbyWallet.connected;
+    wallet.balance = await getBalance();
     console.log("bearbyWallet change", bearbyWallet, $state.snapshot(wallet));
-  };
-
-  const readBalance = async () => {
-    if (!wallet.address) return;
-
-    const data = await web3.contract.readSmartContract({
-      fee: 0,
-      maxGas: 2100000,
-      targetAddress: "AS12Emra1SrLsFgYdFRQXBjsksWummAs8zG14iFytS73bZBjbVY5v",
-      targetFunction: "balanceOf",
-      parameter: [
-        {
-          type: web3.contract.types.STRING,
-          // value: "AU1aFiPAan1ucLZjS6iREznGYHHpTseRFAXEYvYsbCocU9RL64GW"
-          value: wallet.address
-        }
-      ]
-    });
-    const bal = data[0]?.result?.[0];
-    console.log("readBalance", data[0]?.result?.[0]);
-
-    return bal;
   };
 
   const connectBearby = async () => {
@@ -75,10 +75,13 @@
 
 {#if wallet.connected}
   <div class="flex items-center gap-2">
-    <span class="text-sm font-medium text-gray-700">{shortAddress}</span>
-    <button onclick={disconnectBearby} class="button-standard"> Disconnect </button>
-    <button onclick={readBalance} class="button-standard"> Read Balance </button>
+    <div class="flex flex-col text-sm">
+      <span class="font-medium text-gray-700">{shortAddress}</span>
+      <span class="font-medium text-gray-700">{wallet.balance} nMAS</span>
+    </div>
+    <button onclick={refreshBalance} class="button-standard" title="Refresh Balance">↻</button>
+    <button onclick={disconnectBearby} class="button-standard">Disconnect</button>
   </div>
 {:else}
-  <button onclick={connectBearby} class="button-standard"> Connect </button>
+  <button onclick={connectBearby} class="button-standard">Connect</button>
 {/if}
