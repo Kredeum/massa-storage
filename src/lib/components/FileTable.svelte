@@ -15,16 +15,16 @@
   <table class="w-full">
     <thead>
       <tr class="bg-gray-50">
-        <th class="px-4 py-2">
-          <label class="cursor-pointer">
+        <th class="w-[52px] px-4 py-2">
+          <div class="flex items-center">
             <input
               type="checkbox"
               checked={selectedFiles.length === files.length}
               onchange={() => onSelectAll(files)}
-              class="rounded text-blue-500 focus:ring-blue-500"
+              class="rounded text-blue-500 focus:ring-blue-500 cursor-pointer"
               aria-label="Select all files"
             />
-          </label>
+          </div>
         </th>
         <th
           class="px-4 py-2 cursor-pointer"
@@ -67,15 +67,15 @@
           class="border-b hover:bg-gray-50 transition-colors cursor-pointer" 
           onclick={() => onCheckbox(file.id)}
         >
-          <td class="px-4 py-2">
-            <label class="cursor-pointer">
+          <td class="w-[52px] px-4 py-2">
+            <div class="flex items-center">
               <input
                 type="checkbox"
                 checked={selectedFiles.includes(file.id)}
                 onchange={() => onCheckbox(file.id)}
-                class="rounded text-blue-500 focus:ring-blue-500"
+                class="rounded text-blue-500 focus:ring-blue-500 cursor-pointer"
               />
-            </label>
+            </div>
           </td>
           <td class="px-4 py-2">
             <div class="flex items-center space-x-2">
