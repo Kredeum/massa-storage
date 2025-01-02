@@ -39,7 +39,6 @@
 
   const connectBearby = async () => {
     if (!bearbyWallet.installed) return toast.error("Wallet not installed");
-    if (!bearbyWallet.enabled) return toast.error("Wallet not enabled");
     if (bearbyWallet.connected) return toast.error(`Wallet already connected<br/>${shortAddress}`);
 
     try {
