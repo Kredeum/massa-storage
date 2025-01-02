@@ -15,7 +15,7 @@
     placeholder="Search files..."
     class="w-full px-4 py-2 border rounded-lg pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
     bind:value={searchTerm}
-    onchange={(e) => onSearch(e.target.value)}
+    oninput={(e: Event) => searchTerm = (e.target as HTMLInputElement).value}
     aria-label="Search files"
   />
   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
