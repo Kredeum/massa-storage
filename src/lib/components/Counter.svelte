@@ -1,50 +1,75 @@
 <!-- Counter.svelte -->
 <script lang="ts">
+  import { onMount } from "svelte";
   import { toast } from "svelte-hot-french-toast";
-  import { type JsonRPCResponseExecuteReadOnly } from "@hicaru/bearby.js";
-  import { web3 } from "@hicaru/bearby.js";
-  import { readU64 } from "$lib/ts/readResult";
-  import { wallet } from "$lib/runes/state.svelte";
-  import { COUNTER_ADDRESS } from "$lib/ts/constants";
+  import { Args, Account, OperationStatus, Web3Provider, type ReadSCData } from "@massalabs/massa-web3";
+  import { getWallets, type Wallet } from "@massalabs/wallet-provider";
+
+  import { BURNER_WALLET_KEY, COUNTER_ADDRESS } from "$lib/ts/config";
+  import { account } from "$lib/runes/account.svelte";
+
+  let count = $state<bigint | undefined>();
+  let txHash = $state<string>();
 
   const readCounter = async () => {
-    const data: JsonRPCResponseExecuteReadOnly[] = await web3.contract.readSmartContract({
-      fee: 0,
-      maxGas: 4294167295,
-      targetAddress: "AS1CNmKBzXY3jwkqempmrv95wZUMqBHRBAQK3G4vicb3WpxZAy3e",
-      targetFunction: "getMessage",
-      parameter: [],
-      callerAddress: wallet.address
+    const account = await Account.fromPrivateKey(BURNER_WALLET_KEY);
+    const provider = Web3Provider.buildnet(account);
+
+    const result: ReadSCData = await provider.readSC({
+      func: "getCount",
+      target: COUNTER_ADDRESS
     });
-    const count = readU64(data);
-    console.log("readCounter count", count);
+
+    if (result.info.error) return toast.error("readCounter ERROR " + result.info.error);
+
+    count = new Args(result.value).nextU64();
   };
 
-  const increment = async () => {
-    if (!wallet.connected) return toast.error("Wallet not connected");
+  const refreshCounter = async () => {
+    await readCounter();
+    toast.success("Counter refreshed");
+  };
+
+  const incrementCounter = async () => {
+    const wallets: Wallet[] = await getWallets();
+    if (wallets.length === 0) return toast.error("No Wallet found");
+    const wallet: Wallet = wallets[0];
+
+    const accounts = await wallet.accounts();
+    if (accounts.length === 0) return toast.error("No Account found in Wallet");
+    const provider = accounts[0];
 
     try {
-      const result = await web3.contract.call({
-        maxGas: 200000,
-        coins: 0,
-        fee: 10000000,
-        targetAddress: COUNTER_ADDRESS,
-        functionName: "increment",
-        parameters: []
+      const op = await provider.callSC({
+        parameter: new Args().addU64(1n).serialize(),
+        func: "increment",
+        target: COUNTER_ADDRESS
       });
+      // console.info("incrementCounter ~ op:", op);
 
-      toast.success("Transaction sent: " + result);
+      txHash = op.id;
+      toast.success("Transaction sent: " + txHash);
+      console.log(`https://massexplo.io/tx/${txHash}`);
+      // console.log(`https://explorer.massa.net/mainnet/operation/${txHash}`);
+
+      const status = await op.waitSpeculativeExecution();
+      if (status !== OperationStatus.SpeculativeSuccess) return toast.error("Failed to increment count");
+
+      readCounter();
     } catch (error) {
-      toast.success("Error incrementing counter");
+      toast.error("Error incrementing counter");
       console.error("Error:", error);
     }
   };
+
+  onMount(readCounter);
 </script>
 
-<div class="flex flex-col items-center justify-center gap-4">
-  {#if wallet.connected}
-    <button onclick={readCounter} class="button-standard"> Read Counter </button>
-    <button onclick={increment} class="button-standard"> Increment Counter </button>
+<div class="mt-12 flex items-center space-x-3">
+  {#if account.connected}
+    <button onclick={incrementCounter} class="button-standard">Increment Counter</button>
+    <span class="text-lg font-semibold">{count ?? "???"}</span>
+    <button onclick={refreshCounter} class="button-standard" title="Refresh Counter">↻</button>
   {:else}
     Connect to Increment Counter
   {/if}

@@ -1,21 +1,32 @@
 <script lang="ts">
-  import { onDestroy, onMount, setContext } from "svelte";
   import { toast } from "svelte-hot-french-toast";
-  import { web3 } from "@hicaru/bearby.js";
 
-  import { wallet } from "$lib/runes/state.svelte";
+  import type { Provider } from "@massalabs/massa-web3";
+  import { getWallets, type Wallet } from "@massalabs/wallet-provider";
 
-  const bearbyWallet = web3.wallet;
+  import { account } from "$lib/runes/account.svelte";
+  import { onMount } from "svelte";
 
-  const shortAddress = $derived(wallet.address ? `${wallet.address.slice(0, 6)}...${wallet.address.slice(-6)}` : "");
+  let wallet = $state<Wallet>();
+  let provider = $state<Provider>();
 
-  const getBalance = async () => {
-    if (!wallet.connected) return;
-    if (!wallet.address) return;
+  const shortAddress = $derived(account.address ? `${account.address.slice(0, 6)}...${account.address.slice(-6)}` : "");
+
+  const init = async () => {
+    const wallets: Wallet[] = await getWallets();
+    if (wallets.length === 0) return toast.error("No Wallet found");
+    wallet = wallets[0];
+
+    const accounts: Provider[] = await wallet.accounts();
+    if (accounts.length === 0) return toast.error("No Account found in Wallet");
+    provider = accounts[0];
+  };
+
+  const getBalance = async (): Promise<bigint | undefined> => {
+    if (!provider) return;
 
     try {
-      const data = await web3.massa.getAddresses(wallet.address);
-      return data.result?.[0]?.final_balance;
+      return await provider.balance(true);
     } catch (error) {
       console.error("Error getting native balance:", error);
       toast.error("Error getting native balance");
@@ -25,25 +36,28 @@
   const refreshBalance = async () => {
     const bal = await getBalance();
     if (bal !== undefined) {
-      wallet.balance = bal;
+      account.balance = bal;
       toast.success("Balance refreshed");
     }
   };
 
-  const updateAccount = async () => {
-    wallet.address = bearbyWallet.account.base58;
-    wallet.connected = bearbyWallet.connected;
-    wallet.balance = await getBalance();
-    console.log("bearbyWallet change", bearbyWallet, $state.snapshot(wallet));
+  const updateWallet = async () => {
+    if (!wallet) return toast.error("Wallet not installed");
+    if (!provider) return toast.error("Provider not found");
+
+    account.address = provider.address;
+    account.connected = wallet.connected();
+    account.balance = await getBalance();
+    console.log("account change", wallet, $state.snapshot(account));
   };
 
-  const connectBearby = async () => {
-    if (!bearbyWallet.installed) return toast.error("Wallet not installed");
-    if (bearbyWallet.connected) return toast.error(`Wallet already connected<br/>${shortAddress}`);
+  const connect = async () => {
+    if (!wallet) return toast.error("Wallet not installed");
+    if (account.connected) return toast.error(`Wallet already connected`);
 
     try {
-      await bearbyWallet.connect();
-      updateAccount();
+      await wallet.connect();
+      updateWallet();
       toast.success(`Wallet ${shortAddress} connected`);
     } catch (error) {
       toast.error("Error connecting to Wallet");
@@ -51,12 +65,13 @@
     }
   };
 
-  const disconnectBearby = async () => {
-    if (!wallet.connected) return toast.error("Wallet not connected");
+  const disconnect = async () => {
+    if (!wallet) return toast.error("Wallet not installed");
+    if (!account.connected) return toast.error("Wallet not connected");
 
     try {
-      await bearbyWallet.disconnect();
-      updateAccount();
+      await wallet.disconnect();
+      updateWallet();
       toast.success(`Wallet disconnected`);
     } catch (error) {
       toast.error("Error disconnecting to Wallet");
@@ -64,24 +79,18 @@
     }
   };
 
-  let accountSubscription: { unsubscribe: () => void };
-  onMount(() => {
-    accountSubscription = bearbyWallet.account.subscribe(updateAccount);
-  });
-  onDestroy(() => {
-    accountSubscription?.unsubscribe();
-  });
+  onMount(init);
 </script>
 
-{#if wallet.connected}
+{#if account.connected}
   <div class="flex items-center gap-2">
     <div class="flex flex-col text-sm">
       <span class="font-medium text-gray-700">{shortAddress}</span>
-      <span class="font-medium text-gray-700">{wallet.balance} nMAS</span>
+      <span class="font-medium text-gray-700">{account.balance} nMAS</span>
     </div>
     <button onclick={refreshBalance} class="button-standard" title="Refresh Balance">↻</button>
-    <button onclick={disconnectBearby} class="button-standard">Disconnect</button>
+    <button onclick={disconnect} class="button-standard">Disconnect</button>
   </div>
 {:else}
-  <button onclick={connectBearby} class="button-standard">Connect</button>
+  <button onclick={connect} class="button-standard">Connect</button>
 {/if}
