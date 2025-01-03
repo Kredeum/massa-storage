@@ -2,30 +2,6 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Counter functionality", () => {
   test("should increment counter by 1", async ({ page }) => {
-    // Mock the wallet provider before navigating
-    await page.addInitScript(() => {
-      (window as Window).massa = {
-        wallet: {
-          getWallets: async () => [
-            {
-              accounts: async () => [
-                {
-                  address: "AS12b4pgVgvF9GKL6S8wZ6AEKENeqihZ8Qmxkr5NT4Ho7wYp9D9NT",
-                  publicKey: "test-public-key"
-                }
-              ],
-              getClient: async () => ({
-                smartContracts: () => ({
-                  callSmartContract: async () => ({ transactionId: "123" }),
-                  awaitRequiredOperationStatus: async () => {}
-                })
-              })
-            }
-          ]
-        }
-      };
-    });
-
     // Navigate to the page and wait for network to be idle
     await page.goto("http://localhost:5173", { waitUntil: "networkidle" });
 
