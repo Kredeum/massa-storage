@@ -9,5 +9,15 @@ export default defineConfig({
       $styles: "/src/styles"
     }
   },
-  server: { open: true }
+  server: { open: true },
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: "globalThis"
+      }
+    }
+  },
+  define: {
+    global: {}
+  }
 });

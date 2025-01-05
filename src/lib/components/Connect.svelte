@@ -4,22 +4,32 @@
   import type { Provider } from "@massalabs/massa-web3";
   import { getWallets, type Wallet } from "@massalabs/wallet-provider";
 
-  import { account } from "$lib/runes/account.svelte";
+  import { account, resetAccount } from "$lib/runes/account.svelte";
   import { onMount } from "svelte";
 
   let wallet = $state<Wallet>();
   let provider = $state<Provider>();
 
-  const shortAddress = $derived(account.address ? `${account.address.slice(0, 6)}...${account.address.slice(-6)}` : "");
+  const shortAddress = $derived(provider?.address ? `'${provider.address.slice(0, 4)}...${provider.address.slice(-4)}'` : "");
 
-  const init = async () => {
+  const isMassaWallet = () => account.walletName === "MASSASTATION";
+
+  const initProvider = async () => {
     const wallets: Wallet[] = await getWallets();
     if (wallets.length === 0) return toast.error("No Wallet found");
+
     wallet = wallets[0];
+    console.log("init ~ wallet:", wallet);
+    toast.success(`Wallet ${wallet.name()} ${wallets.length > 1 ? `(multiple found)` : ""}`);
 
     const accounts: Provider[] = await wallet.accounts();
     if (accounts.length === 0) return toast.error("No Account found in Wallet");
+
     provider = accounts[0];
+    console.log("init ~ provider:", provider);
+    toast.success(`Account ${shortAddress} ${accounts.length > 1 ? `(multiple found)` : ""}`);
+
+    await updateWallet();
   };
 
   const getBalance = async (): Promise<bigint | undefined> => {
@@ -46,22 +56,27 @@
     if (!provider) return toast.error("Provider not found");
 
     account.address = provider.address;
-    account.connected = wallet.connected();
     account.balance = await getBalance();
+    account.walletName = wallet.name();
+    account.connected = isMassaWallet() || wallet.connected();
+
     console.log("account change", wallet, $state.snapshot(account));
   };
 
   const connect = async () => {
-    if (!wallet) return toast.error("Wallet not installed");
-    if (account.connected) return toast.error(`Wallet already connected`);
+    await initProvider();
 
+    if (!wallet) return toast.error("Wallet not installed");
+
+    console.log("connect ~ account:", account);
+    console.log("connect ~ account.walletName:", account.walletName);
     try {
-      await wallet.connect();
+      if (!isMassaWallet()) await wallet.connect();
       updateWallet();
-      toast.success(`Wallet ${shortAddress} connected`);
+      toast.success(`${shortAddress} connected`);
     } catch (error) {
-      toast.error("Error connecting to Wallet");
-      console.error("Wallet Error:", error);
+      toast.error("Error connecting...");
+      console.error("Connect Error:", error);
     }
   };
 
@@ -70,16 +85,16 @@
     if (!account.connected) return toast.error("Wallet not connected");
 
     try {
-      await wallet.disconnect();
-      updateWallet();
-      toast.success(`Wallet disconnected`);
+      if (!isMassaWallet()) await wallet.disconnect();
+      resetAccount();
+      toast.success(`${shortAddress} disconnected`);
     } catch (error) {
       toast.error("Error disconnecting to Wallet");
       console.error("Wallet Error:", error);
     }
   };
 
-  onMount(init);
+  onMount(initProvider);
 </script>
 
 {#if account.connected}

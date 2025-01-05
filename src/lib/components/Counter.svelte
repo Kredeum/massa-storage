@@ -1,5 +1,6 @@
 <!-- Counter.svelte -->
 <script lang="ts">
+  import { Buffer } from "buffer";
   import { onMount } from "svelte";
   import { toast } from "svelte-hot-french-toast";
   import { Args, Account, OperationStatus, Web3Provider, type ReadSCData } from "@massalabs/massa-web3";
