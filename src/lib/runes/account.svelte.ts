@@ -1,3 +1,4 @@
+import type { NetworkName } from "@massalabs/massa-web3";
 import type { WalletName } from "@massalabs/wallet-provider";
 
 const account = $state<{
@@ -5,6 +6,7 @@ const account = $state<{
   connected?: boolean;
   balance?: bigint;
   walletName?: WalletName;
+  networkName?: NetworkName;
 }>({});
 
 const resetAccount = () => {
@@ -12,6 +14,7 @@ const resetAccount = () => {
   account.balance = undefined;
   account.connected = undefined;
   account.walletName = undefined;
+  account.networkName = undefined;
 };
 
 export { account, resetAccount };

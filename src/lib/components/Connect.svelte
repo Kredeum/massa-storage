@@ -1,7 +1,7 @@
 <script lang="ts">
   import { toast } from "svelte-hot-french-toast";
 
-  import type { Provider } from "@massalabs/massa-web3";
+  import type { NetworkName, Provider } from "@massalabs/massa-web3";
   import { getWallets, type Wallet } from "@massalabs/wallet-provider";
 
   import { account, resetAccount } from "$lib/runes/account.svelte";
@@ -10,7 +10,9 @@
   let wallet = $state<Wallet>();
   let provider = $state<Provider>();
 
-  const shortAddress = $derived(provider?.address ? `'${provider.address.slice(0, 4)}...${provider.address.slice(-4)}'` : "");
+  const displayAddress = $derived(provider?.address ? `'${provider.address.slice(0, 4)}...${provider.address.slice(-4)}'` : "");
+
+  const displayBalance = $derived(account?.balance ? `${(Number(account.balance) / 1e9).toFixed(2)} MAS` : "0.00 MAS");
 
   const isMassaWallet = () => account.walletName === "MASSASTATION";
 
@@ -27,7 +29,7 @@
 
     provider = accounts[0];
     console.log("init ~ provider:", provider);
-    toast.success(`Account ${shortAddress} ${accounts.length > 1 ? `(multiple found)` : ""}`);
+    toast.success(`Account ${displayAddress} ${accounts.length > 1 ? `(multiple found)` : ""}`);
 
     await updateWallet();
   };
@@ -57,6 +59,7 @@
 
     account.address = provider.address;
     account.balance = await getBalance();
+    account.networkName = (await wallet.networkInfos()).name as NetworkName;
     account.walletName = wallet.name();
     account.connected = isMassaWallet() || wallet.connected();
 
@@ -73,7 +76,7 @@
     try {
       if (!isMassaWallet()) await wallet.connect();
       updateWallet();
-      toast.success(`${shortAddress} connected`);
+      toast.success(`${displayAddress} connected`);
     } catch (error) {
       toast.error("Error connecting...");
       console.error("Connect Error:", error);
@@ -87,7 +90,7 @@
     try {
       if (!isMassaWallet()) await wallet.disconnect();
       resetAccount();
-      toast.success(`${shortAddress} disconnected`);
+      toast.success(`${displayAddress} disconnected`);
     } catch (error) {
       toast.error("Error disconnecting to Wallet");
       console.error("Wallet Error:", error);
@@ -99,9 +102,9 @@
 
 {#if account.connected}
   <div class="flex items-center gap-2">
-    <div class="flex flex-col text-sm">
-      <span class="font-medium text-gray-700">{shortAddress}</span>
-      <span class="font-medium text-gray-700">{account.balance} nMAS</span>
+    <div class="flex flex-col items-center justify-center text-sm">
+      <span class="font-medium text-gray-700">{displayAddress}</span>
+      <span class="font-medium text-gray-700">{displayBalance}</span>
     </div>
     <button onclick={refreshBalance} class="button-standard" title="Refresh Balance">↻</button>
     <button onclick={disconnect} class="button-standard">Disconnect</button>
@@ -109,3 +112,6 @@
 {:else}
   <button onclick={connect} class="button-standard">Connect</button>
 {/if}
+<div class="ml-4 w-16 text-sm">
+  <span class="font-medium text-gray-700">{account.networkName}</span>
+</div>
