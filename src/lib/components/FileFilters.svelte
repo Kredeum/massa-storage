@@ -1,11 +1,13 @@
 <script lang="ts">
   import type { FilterState, SortConfig, FileItem } from '$lib/types/file';
 
-  export let filters: FilterState;
-  export let sortConfig: SortConfig;
-  export let onTypeFilter: (value: FilterState['type']) => void;
-  export let onSizeFilter: (value: string) => void;
-  export let onSort: (key: keyof FileItem) => void;
+  let { filters, sortConfig, onTypeFilter, onSizeFilter, onSort }: {
+    filters: FilterState;
+    sortConfig: SortConfig;
+    onTypeFilter: (value: FilterState['type']) => void;
+    onSizeFilter: (value: string) => void;
+    onSort: (key: keyof FileItem) => void;
+  } = $props();
 
   function handleTypeFilterChange(e: Event) {
     const value = (e.target as HTMLSelectElement).value as FilterState['type'];
@@ -29,7 +31,7 @@
     <select
       class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
       value={filters.type}
-      on:change={handleTypeFilterChange}
+      onchange={handleTypeFilterChange}
     >
       <option value="all">All Types</option>
       <option value="document">Document</option>
@@ -43,7 +45,7 @@
     <select
       class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
       value={sortConfig.key}
-      on:change={handleSortChange}
+      onchange={handleSortChange}
     >
       <option value="name">Name</option>
       <option value="size">Size</option>

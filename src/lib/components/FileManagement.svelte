@@ -94,17 +94,15 @@
             : [...selectedFiles, fileId];
     }
 
-    function handlePin(e: CustomEvent<number>) {
-        const fileId = e.detail;
+    function handlePin(id: number) {
         files = files.map(file =>
-            file.id === fileId ? { ...file, isPinned: !file.isPinned } : file
+            file.id === id ? { ...file, isPinned: !file.isPinned } : file
         );
     }
 
-    function handleModeration(e: CustomEvent<{ id: number; status: FileItem['status'] }>) {
-        const { id: fileId, status: newStatus } = e.detail;
+    function handleModeration(data: { id: number; status: FileItem['status'] }) {
         files = files.map(file =>
-            file.id === fileId ? { ...file, status: newStatus } : file
+            file.id === data.id ? { ...file, status: data.status } : file
         );
     }
 
@@ -156,9 +154,9 @@
     >
         <svelte:fragment slot="actions" let:file>
             <FileActions 
-                {file} 
-                on:moderate={handleModeration} 
-                on:pin={handlePin} 
+                {file}
+                onModerate={handleModeration}
+                onPin={handlePin}
             />
         </svelte:fragment>
     </FileTable>
