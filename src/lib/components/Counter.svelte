@@ -18,7 +18,7 @@
 
     const result: ReadSCData = await provider.readSC({
       func: "getCount",
-      target: COUNTER_ADDRESS
+      target: COUNTER_ADDRESS()
     });
 
     if (result.info.error) return toast.error("readCounter ERROR " + result.info.error);
@@ -44,7 +44,7 @@
       const op = await provider.callSC({
         parameter: new Args().addU64(1n).serialize(),
         func: "increment",
-        target: COUNTER_ADDRESS
+        target: COUNTER_ADDRESS()
       });
       // console.info("incrementCounter ~ op:", op);
 
