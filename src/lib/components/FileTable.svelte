@@ -1,16 +1,15 @@
 <script lang="ts">
-  import type { File, SortConfig } from '$lib/types';
-  import { getFileIcon, formatFileSize } from '$lib/utils';
+  import type { FileItem, SortConfig } from '$lib/types/file';
 
-  export let files: File[];
+  export let files: FileItem[];
   export let selectedFiles: number[];
   export let sortConfig: SortConfig;
   export let onSort: (key: 'name' | 'size' | 'type') => void;
   export let onCheckbox: (id: number) => void;
-  export let onSelectAll: (files: File[]) => void;
-  export let onModerate: (id: number, action: 'approved' | 'rejected') => void;
+  export let onSelectAll: (files: FileItem[]) => void;
+  export let onModerate: (id: number, action: 'Approved' | 'Rejected') => void;
 
-  let isModerator = true; // You might want to get this from your auth system
+  let isModerator = true;
 </script>
 
 <div class="overflow-x-auto">
@@ -83,30 +82,25 @@
               />
             </div>
           </td>
-          <td class="px-4 py-2">
-            <div class="flex items-center space-x-2">
-              <span>{getFileIcon(file.type)}</span>
-              <span>{file.name}</span>
-            </div>
-          </td>
-          <td class="px-4 py-2">{formatFileSize(file.size)}</td>
-          <td class="px-4 py-2 capitalize">{file.type}</td>
+          <td class="px-4 py-2">{file.name}</td>
+          <td class="px-4 py-2">{file.size}</td>
+          <td class="px-4 py-2">{file.type}</td>
           {#if isModerator}
             <td class="px-4 py-2">
               <div class="flex items-center justify-center space-x-4">
                 <button
-                  onclick={() => onModerate(file.id, 'approved')}
+                  onclick={() => onModerate(file.id, 'Approved')}
                   class="text-green-600 hover:text-green-900 disabled:opacity-50"
-                  disabled={file.status === 'approved'}
+                  disabled={file.status === 'Approved'}
                 >
-                  ✓
+                  Approve
                 </button>
                 <button
-                  onclick={() => onModerate(file.id, 'rejected')}
+                  onclick={() => onModerate(file.id, 'Rejected')}
                   class="text-red-600 hover:text-red-900 disabled:opacity-50"
-                  disabled={file.status === 'rejected'}
+                  disabled={file.status === 'Rejected'}
                 >
-                  ✕
+                  Reject
                 </button>
               </div>
             </td>
