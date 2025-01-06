@@ -1,110 +1,111 @@
 <script lang="ts">
-  import type { FileItem, SortConfig } from '$lib/types/file';
+  import type { FileItem } from '$lib/types/file';
 
-  export let files: FileItem[];
-  export let selectedFiles: number[];
-  export let sortConfig: SortConfig;
-  export let onSort: (key: 'name' | 'size' | 'type') => void;
-  export let onCheckbox: (id: number) => void;
-  export let onSelectAll: (files: FileItem[]) => void;
-  export let onModerate: (id: number, action: 'Approved' | 'Rejected') => void;
+  export let files: FileItem[] = [];
+  export let selectedFiles: number[] = [];
 
-  let isModerator = true;
+  function handleSort(column: 'name' | 'size' | 'type') {
+    const event = new CustomEvent('sort', { detail: column });
+    dispatchEvent(event);
+  }
+
+  function handleSelect(id: number) {
+    if (selectedFiles.includes(id)) {
+      selectedFiles = selectedFiles.filter((fileId: number) => fileId !== id);
+    } else {
+      selectedFiles = [...selectedFiles, id];
+    }
+    const event = new CustomEvent('select', { detail: id });
+    dispatchEvent(event);
+  }
+
+  function handleSelectAll() {
+    const event = new CustomEvent('selectAll', { detail: files });
+    dispatchEvent(event);
+  }
+
+  function getFileIcon(type: string): string {
+    switch (type) {
+      case 'document':
+        return '📄';
+      case 'image':
+        return '🖼️';
+      case 'video':
+        return '🎥';
+      case 'sound':
+        return '🎵';
+      default:
+        return '📁';
+    }
+  }
 </script>
 
 <div class="overflow-x-auto">
-  <table class="w-full">
+  <table class="min-w-full divide-y divide-gray-200">
     <thead class="bg-gray-50">
       <tr>
-        <th class="w-[52px] px-4 py-2">
-          <div class="flex items-center">
-            <input
-              type="checkbox"
-              checked={selectedFiles.length === files.length}
-              onchange={() => onSelectAll(files)}
-              class="rounded text-blue-500 focus:ring-blue-500 cursor-pointer"
-              aria-label="Select all files"
-            />
-          </div>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <input
+            type="checkbox"
+            class="rounded text-blue-600"
+            checked={selectedFiles.length === files.length}
+            onclick={() => handleSelectAll()}
+          />
         </th>
-        <th
-          class="px-4 py-2 cursor-pointer"
-          onclick={() => onSort("name")}
-        >
-          <div class="flex items-center space-x-1">
-            <span>File Name</span>
-            {#if sortConfig.key === "name"}
-              <span>{sortConfig.direction === "asc" ? "↑" : "↓"}</span>
-            {/if}
-          </div>
+        {#each ['name', 'size', 'type'] as column}
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+            onclick={() => handleSort(column as 'name' | 'size' | 'type')}
+          >
+            <div class="flex items-center gap-2">
+              {column}
+              <span class="text-gray-400">↓</span>
+            </div>
+          </th>
+        {/each}
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Status
         </th>
-        <th
-          class="px-4 py-2 cursor-pointer"
-          onclick={() => onSort("size")}
-        >
-          <div class="flex items-center space-x-1">
-            <span>Size</span>
-            {#if sortConfig.key === "size"}
-              <span>{sortConfig.direction === "asc" ? "↑" : "↓"}</span>
-            {/if}
-          </div>
+        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-center w-32">
+          Actions
         </th>
-        <th
-          class="px-4 py-2 cursor-pointer"
-          onclick={() => onSort("type")}
-        >
-          <div class="flex items-center space-x-1">
-            <span>Type</span>
-            {#if sortConfig.key === "type"}
-              <span>{sortConfig.direction === "asc" ? "↑" : "↓"}</span>
-            {/if}
-          </div>
-        </th>
-        {#if isModerator}
-          <th class="px-4 py-2">Actions</th>
-        {/if}
       </tr>
     </thead>
-    <tbody>
-      {#each files as file (file.id)}
-        <tr
-          class="border-b hover:bg-gray-50 transition-colors cursor-pointer"
-          onclick={() => onCheckbox(file.id)}
+    <tbody class="bg-white divide-y divide-gray-200">
+      {#each files as file}
+        <tr 
+          class="hover:bg-gray-50 cursor-pointer"
+          onclick={() => handleSelect(file.id)}
         >
-          <td class="w-[52px] px-4 py-2">
-            <div class="flex items-center">
-              <input
-                type="checkbox"
-                checked={selectedFiles.includes(file.id)}
-                onchange={() => onCheckbox(file.id)}
-                class="rounded text-blue-500 focus:ring-blue-500"
-                onclick={(e) => e.stopPropagation()}
-              />
+          <td class="px-6 py-4 whitespace-nowrap">
+            <input
+              type="checkbox"
+              class="rounded text-blue-600"
+              checked={selectedFiles.includes(file.id)}
+              onclick={(e) => { e.stopPropagation(); handleSelect(file.id); }}
+              onchange={() => handleSelect(file.id)}
+            />
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center gap-2">
+              <span>{getFileIcon(file.type)}</span>
+              <span>{file.name}</span>
             </div>
           </td>
-          <td class="px-4 py-2">{file.name}</td>
-          <td class="px-4 py-2">{file.size}</td>
-          <td class="px-4 py-2">{file.type}</td>
-          {#if isModerator}
-            <td class="px-4 py-2">
-              <div class="flex items-center justify-center space-x-4">
-                <button
-                  onclick={() => onModerate(file.id, 'Approved')}
-                  class="text-green-600 hover:text-green-900 disabled:opacity-50"
-                  disabled={file.status === 'Approved'}
-                >
-                  Approve
-                </button>
-                <button
-                  onclick={() => onModerate(file.id, 'Rejected')}
-                  class="text-red-600 hover:text-red-900 disabled:opacity-50"
-                  disabled={file.status === 'Rejected'}
-                >
-                  Reject
-                </button>
-              </div>
-            </td>
-          {/if}
+          <td class="px-6 py-4 whitespace-nowrap">{file.size}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{file.type}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+              ${file.status === 'Approved' ? 'bg-green-100 text-green-800' : ''}
+              ${file.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : ''}
+              ${file.status === 'Rejected' ? 'bg-red-100 text-red-800' : ''}`}
+            >
+              {file.status}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <slot name="actions" file={file} />
+          </td>
         </tr>
       {/each}
     </tbody>

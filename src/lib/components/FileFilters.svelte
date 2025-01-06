@@ -1,11 +1,26 @@
 <script lang="ts">
-  import type { Filters, SortConfig } from '$lib/types';
+  import type { FilterState, SortConfig, FileItem } from '$lib/types/file';
 
-  export let filters: Filters;
+  export let filters: FilterState;
   export let sortConfig: SortConfig;
-  export let ontypefilter: (types: string[]) => void;
-  export let onsizefilter: (size: string | [number, number]) => void;
-  export let onsort: (key: 'name' | 'size' | 'type') => void;
+  export let onTypeFilter: (value: FilterState['type']) => void;
+  export let onSizeFilter: (value: string) => void;
+  export let onSort: (key: keyof FileItem) => void;
+
+  function handleTypeFilterChange(e: Event) {
+    const value = (e.target as HTMLSelectElement).value as FilterState['type'];
+    onTypeFilter(value);
+  }
+
+  function handleSizeFilterChange(e: Event) {
+    const value = (e.target as HTMLSelectElement).value;
+    onSizeFilter(value);
+  }
+
+  function handleSortChange(e: Event) {
+    const value = (e.target as HTMLSelectElement).value as keyof FileItem;
+    onSort(value);
+  }
 </script>
 
 <div class="flex space-x-4">
@@ -13,37 +28,26 @@
     <span class="text-gray-500">📁</span>
     <select
       class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      value={filters.type.length > 0 ? filters.type[0] : ""}
-      onchange={e => ontypefilter((e.target as HTMLSelectElement).value ? [ (e.target as HTMLSelectElement).value ] : [])}
+      value={filters.type}
+      on:change={handleTypeFilterChange}
     >
-      <option value="">All Types</option>
+      <option value="all">All Types</option>
       <option value="document">Document</option>
       <option value="image">Image</option>
       <option value="video">Video</option>
+      <option value="sound">Sound</option>
     </select>
   </div>
   <div class="flex items-center space-x-2">
-    <span class="text-gray-500">↕️</span>
+    <span class="text-gray-500">🔄</span>
     <select
       class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      onchange={e => onsort((e.target as HTMLSelectElement).value as 'name' | 'size' | 'type')}
       value={sortConfig.key}
+      on:change={handleSortChange}
     >
       <option value="name">Name</option>
       <option value="size">Size</option>
       <option value="type">Type</option>
-    </select>
-  </div>
-  <div class="flex items-center space-x-2">
-    <select
-      class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      value={filters.size.length > 0 ? filters.size[0] : ""}
-      onchange={e => onsizefilter((e.target as HTMLSelectElement).value)}
-    >
-      <option value="">All Sizes</option>
-      <option value="small">Small (&lt;1MB)</option>
-      <option value="medium">Medium (1-10MB)</option>
-      <option value="large">Large (&gt;10MB)</option>
     </select>
   </div>
 </div>
