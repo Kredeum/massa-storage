@@ -27,7 +27,6 @@
 
 <div class="flex space-x-4">
   <div class="flex items-center space-x-2">
-    <span class="text-gray-500">📁</span>
     <select
       class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
       value={filters.type}
@@ -41,7 +40,6 @@
     </select>
   </div>
   <div class="flex items-center space-x-2">
-    <span class="text-gray-500">🔄</span>
     <select
       class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
       value={sortConfig.key}
@@ -50,6 +48,13 @@
       <option value="name">Name</option>
       <option value="size">Size</option>
       <option value="type">Type</option>
+      <option value="lastModified">Date</option>
     </select>
+    <button
+      class="p-2 rounded-lg hover:bg-gray-100"
+      onclick={() => onSort(sortConfig.key)}
+    >
+      {sortConfig.direction === 'asc' ? '↑' : '↓'}
+    </button>
   </div>
 </div>

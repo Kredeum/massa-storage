@@ -10,7 +10,7 @@
       <a href="{base}/" class="text-lg font-semibold text-gray-900">Massa Storage</a>
       <a href="https://github.com/kredeum/massa-storage" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-600 hover:text-gray-900"> GitHub </a>
       <a href="{base}/tests" class="text-sm text-gray-600 hover:text-gray-900">Tests</a>
-      <a href="{base}/app/list" class="text-sm text-gray-600 hover:text-gray-900">List</a>
+      <a href="{base}/app/files" class="text-sm text-gray-600 hover:text-gray-900">Files</a>
     </div>
     <div class="flex items-center">
       <Connect />
