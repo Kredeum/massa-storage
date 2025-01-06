@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalPassThroughEnv": [],
+  "globalPassThroughEnv": ["PUBLIC_BURNER_WALLET_KEY", "PUBLIC_COUNTER_ADDRESS"],
   "envMode": "strict",
   "ui": "stream",
   "tasks": {
