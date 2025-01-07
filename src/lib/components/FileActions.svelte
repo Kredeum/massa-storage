@@ -21,36 +21,36 @@
   }
 </script>
 
-<div class="flex items-center justify-end gap-3">
+<div class="flex items-center justify-end gap-3.5">
   <button
     onclick={(e) => {
       e.stopPropagation();
       handleModerate("Approved");
     }}
-    class="text-green-600 hover:text-green-900"
+    class="cursor-pointer text-green-600 hover:text-green-900"
     disabled={file.status === "Approved"}
   >
-    <Check size={18} />
+    <Check size={22} strokeWidth={3} />
   </button>
   <button
     onclick={(e) => {
       e.stopPropagation();
       handleModerate("Rejected");
     }}
-    class="text-red-600 hover:text-red-900"
+    class="cursor-pointer text-red-600 hover:text-red-900"
     disabled={file.status === "Rejected"}
   >
-    <X size={18} />
+    <X size={22} strokeWidth={3} />
   </button>
   <button
     onclick={(e) => {
       e.stopPropagation();
       handlePin();
     }}
-    class="transition-colors hover:text-blue-900"
+    class="cursor-pointer transition-colors hover:text-blue-900"
     class:text-blue-600={file.isPinned}
     class:text-gray-400={!file.isPinned}
   >
-    <Pin size={18} class={!file.isPinned ? "rotate-45" : ""} />
+    <Pin size={22} strokeWidth={3} class={!file.isPinned ? "rotate-45" : ""} />
   </button>
 </div>
