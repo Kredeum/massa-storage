@@ -75,7 +75,7 @@ class Client {
       return false;
     }
 
-    const connected = this.#isMassaWallet() ? true : (await this.#wallet?.connect());
+    const connected = this.#isMassaWallet() ? true : await this.#wallet?.connect();
     const info = `Connect ${this.#provider?.address} on ${(await this.#provider?.networkInfos())?.name}`;
     console.info(info, connected);
 
@@ -87,6 +87,8 @@ class Client {
 
     this.#walletConnected = true;
     await this.refresh();
+
+    return true;
   };
   // return disconnect status
   disconnect = async () => {
@@ -96,7 +98,7 @@ class Client {
     }
 
     const info = `Disconnect ${this.#provider?.address} on ${(await this.#provider?.networkInfos())?.name}`;
-    const connected = this.#isMassaWallet() ? false : (await this.#wallet?.disconnect());
+    const connected = this.#isMassaWallet() ? false : await this.#wallet?.disconnect();
     console.info(info, connected);
 
     if (connected) {
