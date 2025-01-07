@@ -1,8 +1,7 @@
-<!-- +page.svelte -->
 <script lang="ts">
-  import Counter from "$lib/components/Counter.svelte";
+  import FileManagement from "$lib/components/FileManagement.svelte";
 </script>
 
-<div class="flex h-64 flex-col items-center justify-center">
-  <Counter />
+<div class="container mx-auto py-6">
+  <FileManagement />
 </div>
