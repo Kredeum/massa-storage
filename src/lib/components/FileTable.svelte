@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { FileItem } from "$lib/types/file";
+  import { FileText, Image, Video, Music, File } from "lucide-svelte";
 
   export let files: FileItem[] = [];
   export let selectedFiles: number[] = [];
@@ -24,18 +25,18 @@
     dispatchEvent(event);
   }
 
-  function getFileIcon(type: string): string {
+  function getFileIcon(type: string) {
     switch (type) {
       case "document":
-        return "📄";
+        return FileText;
       case "image":
-        return "🖼️";
+        return Image;
       case "video":
-        return "🎥";
+        return Video;
       case "sound":
-        return "🎵";
+        return Music;
       default:
-        return "📁";
+        return File;
     }
   }
 </script>
@@ -75,13 +76,17 @@
             />
           </td>
           <td class="whitespace-nowrap px-6 py-4">
-            <div class="flex items-center gap-2">
-              <span>{getFileIcon(file.type)}</span>
+            <div class="flex items-center">
               <span>{file.name}</span>
             </div>
           </td>
           <td class="whitespace-nowrap px-6 py-4">{file.size}</td>
-          <td class="whitespace-nowrap px-6 py-4">{file.type}</td>
+          <td class="whitespace-nowrap px-6 py-4">
+            <div class="flex items-center gap-2">
+              <svelte:component this={getFileIcon(file.type)} size={18} class="text-gray-500" />
+              <span>{file.type}</span>
+            </div>
+          </td>
           <td class="whitespace-nowrap px-6 py-4">
             <span
               class="inline-flex rounded-full px-2 text-xs font-semibold leading-5

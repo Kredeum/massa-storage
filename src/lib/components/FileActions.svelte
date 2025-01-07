@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { FileItem } from "$lib/types/file";
+  import { Check, X, Pin } from "lucide-svelte";
 
   let {
     file,
@@ -13,12 +14,10 @@
 
   function handleModerate(status: FileItem["status"]) {
     onModerate({ id: file.id, status });
-    console.log("🚀 ~ handleModerate ~ id: file.id, status:", file.id, status);
   }
 
   function handlePin() {
     onPin(file.id);
-    console.log("🚀 ~ handlePin ~ onPin(file.id):", file.id);
   }
 </script>
 
@@ -31,7 +30,7 @@
     class="text-green-600 hover:text-green-900"
     disabled={file.status === "Approved"}
   >
-    ✓
+    <Check size={18} />
   </button>
   <button
     onclick={(e) => {
@@ -41,7 +40,7 @@
     class="text-red-600 hover:text-red-900"
     disabled={file.status === "Rejected"}
   >
-    ✗
+    <X size={18} />
   </button>
   <button
     onclick={(e) => {
@@ -52,6 +51,6 @@
     class:text-blue-600={file.isPinned}
     class:text-gray-400={!file.isPinned}
   >
-    📌
+    <Pin size={18} class={!file.isPinned ? "rotate-45" : ""} />
   </button>
 </div>
