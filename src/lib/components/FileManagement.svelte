@@ -38,7 +38,7 @@
   const itemsPerPage = 20;
   const totalItems = 100;
 
-  let files = generateMockData(totalItems);
+  let files = $state(generateMockData(totalItems));
   let selectedFiles: number[] = $state([]);
   let searchQuery = $state("");
   let filters: FilterState = $state({
