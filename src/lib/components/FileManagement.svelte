@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { writable } from 'svelte/store';
     import type { FileItem, FilterState, SortConfig } from '$lib/types/file';
     import SearchBar from './SearchBar.svelte';
     import FileFilters from './FileFilters.svelte';
@@ -7,7 +6,7 @@
     import FileActions from './FileActions.svelte';
     import FilePagination from './FilePagination.svelte';
 
-    // Fonction pour générer des données aléatoires
+    // Function to generate random mock data
     function generateMockData(count: number): FileItem[] {
         const types = ['document', 'image', 'video', 'sound'] as const;
         const statuses = ['Pending', 'Approved', 'Rejected'] as const;
@@ -36,9 +35,9 @@
         });
     }
 
-    // État global
+    // Global state
     let currentPage = 0;
-    const itemsPerPage = 10;
+    const itemsPerPage = 20;
     const totalItems = 100;
 
     let files = generateMockData(totalItems);
@@ -53,7 +52,7 @@
         direction: 'asc'
     };
 
-    // Filtrage et tri réactifs
+    // Reactive filtering and sorting
     $: filteredFiles = files.filter(file => {
         const matchesSearch = file.name.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesType = filters.type === 'all' || file.type === filters.type;
