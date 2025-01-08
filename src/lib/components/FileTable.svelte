@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { FileItem } from "$lib/types/file";
-  import { FileText, Image, Video, Music, File } from "lucide-svelte";
+  import { FileText, Image, Video, Music, File, ChevronDown } from "lucide-svelte";
 
   export let files: FileItem[] = [];
   export let selectedFiles: number[] = [];
 
-  function handleSort(column: "name" | "size" | "type") {
+  function handleSort(column: "name" | "size" | "type" | "status") {
     const event = new CustomEvent("sort", { detail: column });
     dispatchEvent(event);
   }
@@ -31,39 +31,48 @@
     <thead class="bg-gray-50">
       <tr>
         <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-          <input 
-            type="checkbox" 
-            class="rounded text-blue-600 cursor-pointer" 
+          <input
+            type="checkbox"
+            class="cursor-pointer rounded text-blue-600"
             checked={selectedFiles.length === files.length && files.length > 0}
             onclick={(e) => {
               e.stopPropagation();
               if (selectedFiles.length === files.length) {
                 selectedFiles = [];
               } else {
-                selectedFiles = files.map(file => file.id);
+                selectedFiles = files.map((file) => file.id);
               }
             }}
           />
         </th>
         {#each ["name", "size", "type"] as column}
-          <th class="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500" onclick={() => handleSort(column as "name" | "size" | "type")}>
-            <div class="flex items-center gap-2">
+          <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+            <button
+              type="button"
+              class="flex w-fit items-center gap-2 text-xs font-medium uppercase tracking-wider text-gray-500 hover:text-gray-700"
+              onclick={() => handleSort(column as "name" | "size" | "type")}
+            >
               {column}
-              <span class="text-gray-400">↓</span>
-            </div>
+              <ChevronDown size={14} class="text-gray-400" />
+            </button>
           </th>
         {/each}
-        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"> Status </th>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+          <button type="button" class="flex w-fit items-center gap-2 text-xs font-medium uppercase tracking-wider text-gray-500 hover:text-gray-700" onclick={() => handleSort("status")}>
+            Status
+            <ChevronDown size={14} class="text-gray-400" />
+          </button>
+        </th>
         <th class="w-32 px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500"> Actions </th>
       </tr>
     </thead>
     <tbody class="divide-y divide-gray-200 bg-white">
       {#each files as file}
-        <tr 
-          class="hover:bg-gray-50 cursor-pointer" 
+        <tr
+          class="cursor-pointer hover:bg-gray-50"
           onclick={() => {
             if (selectedFiles.includes(file.id)) {
-              selectedFiles = selectedFiles.filter(id => id !== file.id);
+              selectedFiles = selectedFiles.filter((id) => id !== file.id);
             } else {
               selectedFiles = [...selectedFiles, file.id];
             }
@@ -72,12 +81,12 @@
           <td class="whitespace-nowrap px-6 py-4">
             <input
               type="checkbox"
-              class="rounded text-blue-600 cursor-pointer"
+              class="cursor-pointer rounded text-blue-600"
               checked={selectedFiles.includes(file.id)}
               onclick={(e) => {
                 e.stopPropagation();
                 if (selectedFiles.includes(file.id)) {
-                  selectedFiles = selectedFiles.filter(id => id !== file.id);
+                  selectedFiles = selectedFiles.filter((id) => id !== file.id);
                 } else {
                   selectedFiles = [...selectedFiles, file.id];
                 }

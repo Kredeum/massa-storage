@@ -48,8 +48,5 @@
       <option value="type">Type</option>
       <option value="lastModified">Date</option>
     </select>
-    <button class="rounded-lg p-2 hover:bg-gray-100" onclick={() => onSort(sortConfig.key)}>
-      {sortConfig.direction === "asc" ? "↑" : "↓"}
-    </button>
   </div>
 </div>
