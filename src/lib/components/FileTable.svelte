@@ -9,7 +9,7 @@
   function getMockCid(fileId: number): string {
     // Generate shorter deterministic CIDv1 mock for each file with ellipsis
     const fullCid = `bafybeih${fileId.toString().padStart(4, "0")}v5jfkqogqfx4xmxjhvgkwrgvk${fileId.toString().padStart(4, "0")}`;
-    return `${fullCid.slice(0, 8)}...${fullCid.slice(-4)}`;
+    return `${fullCid.slice(0, 4)}...${fullCid.slice(-4)}`;
   }
 
   function getFullCid(fileId: number): string {
