@@ -46,7 +46,7 @@
       <option value="name">Name</option>
       <option value="size">Size</option>
       <option value="type">Type</option>
-      <option value="lastModified">Date</option>
+      <option value="status">Status</option>
     </select>
   </div>
 </div>
