@@ -27,5 +27,5 @@ export default defineConfig({
       external: ["lodash"]
     }
   },
-  assetsInclude: ['**/*.svg']
+  assetsInclude: ["**/*.svg"]
 });
