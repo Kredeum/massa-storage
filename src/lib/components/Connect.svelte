@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Client } from "$lib/runes/client.svelte";
 
-  let client = new Client();
+  const { client }: { client: Client } = $props();
 </script>
 
 <div class="flex items-center gap-2 text-sm font-medium text-gray-700">

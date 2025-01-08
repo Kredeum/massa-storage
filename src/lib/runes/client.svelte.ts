@@ -1,13 +1,16 @@
-import { shortenString } from "$lib/ts/utils";
-import type { Network, Provider, NetworkName, Account } from "@massalabs/massa-web3";
-import { getWallets, type Wallet, type WalletName } from "@massalabs/wallet-provider";
 import { toast } from "svelte-hot-french-toast";
+
+import { type Network, type Provider, type NetworkName } from "@massalabs/massa-web3";
+import { getWallets, type Wallet } from "@massalabs/wallet-provider";
+
+import type { EmptyObject } from "$lib/ts/types";
+import { shortenString } from "$lib/ts/utils";
 
 class Client {
   #isMassaWallet = () => this.walletName === "MASSASTATION";
 
   // PROVIDER
-  #provider = $state<Provider | undefined>();
+  provider = $state<Provider | EmptyObject>({});
 
   // WALLET
   #wallet = $state<Wallet | undefined>();
@@ -28,10 +31,10 @@ class Client {
   // ADDRESS
   #balance = $state<bigint | undefined>();
   get address() {
-    return this.#provider?.address;
+    return this.provider.address || "???";
   }
   get addressToDisplay() {
-    return shortenString(this.#provider?.address || "");
+    return shortenString(this.provider.address || "???");
   }
   get balance() {
     return this.#balance;
@@ -51,12 +54,11 @@ class Client {
 
   // ASYNC REFRESH
   refresh = async () => {
-    if (!this.#provider) return;
-    console.log("refresh= ~ this.#provider:", this.#provider);
+    console.log("refresh= ~ this.provider:", this.provider);
 
     try {
-      this.#balance = await this.#provider.balance(true);
-      this.#network = await this.#provider.networkInfos();
+      this.#balance = await this.provider.balance(true);
+      this.#network = await this.provider.networkInfos();
     } catch (error) {
       console.error("Error while updating Wallet:", error);
     }
@@ -68,6 +70,7 @@ class Client {
     this.#balance = undefined;
     this.#network = undefined;
   };
+
   // return connect status
   connect = async (): Promise<boolean> => {
     if (!this.#wallet) {
@@ -76,7 +79,7 @@ class Client {
     }
 
     const connected = this.#isMassaWallet() ? true : await this.#wallet?.connect();
-    const info = `Connect ${this.#provider?.address} on ${(await this.#provider?.networkInfos())?.name}`;
+    const info = `Connect ${this.provider.address} on ${(await this.provider.networkInfos())?.name}`;
     console.info(info, connected);
 
     if (!connected) {
@@ -86,6 +89,7 @@ class Client {
     toast.success(`${this.addressToDisplay} connected`);
 
     this.#walletConnected = true;
+
     await this.refresh();
 
     return true;
@@ -97,7 +101,7 @@ class Client {
       return false;
     }
 
-    const info = `Disconnect ${this.#provider?.address} on ${(await this.#provider?.networkInfos())?.name}`;
+    const info = `Disconnect ${this.provider.address} on ${(await this.provider.networkInfos())?.name}`;
     const connected = this.#isMassaWallet() ? false : await this.#wallet?.disconnect();
     console.info(info, connected);
 
@@ -151,7 +155,7 @@ class Client {
     else info += `no Account`;
     console.info(info);
 
-    this.#provider = provider;
+    this.provider = provider;
     this.#wallet = wallet;
   };
 
