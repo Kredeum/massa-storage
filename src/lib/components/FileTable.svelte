@@ -4,12 +4,28 @@
 
   export let files: FileItem[] = [];
   export let selectedFiles: number[] = [];
+  let copiedCid: number | null = null;
 
   function getMockCid(fileId: number): string {
     // Generate shorter deterministic CIDv1 mock for each file with ellipsis
-    const prefix = "bafy";
-    const suffix = fileId.toString().padStart(4, "0");
-    return `${prefix}...${suffix}`;
+    const fullCid = `bafybeih${fileId.toString().padStart(4, "0")}v5jfkqogqfx4xmxjhvgkwrgvk${fileId.toString().padStart(4, "0")}`;
+    return `${fullCid.slice(0, 8)}...${fullCid.slice(-4)}`;
+  }
+
+  function getFullCid(fileId: number): string {
+    return `bafybeih${fileId.toString().padStart(4, "0")}v5jfkqogqfx4xmxjhvgkwrgvk${fileId.toString().padStart(4, "0")}`;
+  }
+
+  async function copyToClipboard(fileId: number) {
+    try {
+      await navigator.clipboard.writeText(getFullCid(fileId));
+      copiedCid = fileId;
+      setTimeout(() => {
+        copiedCid = null;
+      }, 1000);
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
   }
 
   function handleSort(column: "name" | "hash" | "size" | "type" | "status") {
@@ -118,7 +134,23 @@
             </div>
           </td>
           <td class="w-1/5 whitespace-nowrap px-4 py-4 text-center font-mono text-sm text-gray-500">
-            <span>{getMockCid(file.id)}</span>
+            <div class="relative inline-block">
+              <button
+                class="hover:text-gray-900"
+                onclick={(e) => {
+                  e.stopPropagation();
+                  copyToClipboard(file.id);
+                }}
+                title="Click to copy full CID"
+              >
+                <span>{getMockCid(file.id)}</span>
+              </button>
+              {#if copiedCid === file.id}
+                <span class="absolute left-full ml-2 text-green-600 text-xs whitespace-nowrap">
+                  Copied!
+                </span>
+              {/if}
+            </div>
           </td>
           <td class="w-1/6 whitespace-nowrap px-4 py-4 text-center">
             {file.size}
