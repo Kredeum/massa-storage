@@ -44,11 +44,13 @@
     "@sveltejs/adapter-static": "^3.0.8",
     "@sveltejs/kit": "^2.15.1",
     "@sveltejs/vite-plugin-svelte": "^4.0.4",
+    "@tsconfig/svelte": "^5.0.4",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-svelte": "^2.46.1",
     "globals": "^15.14.0",
+    "lucide-svelte": "^0.469.0",
     "prettier": "^3.4.2",
     "prettier-plugin-svelte": "^3.3.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
@@ -66,7 +68,6 @@
     "@massalabs/massa-web3": "^5.1.0",
     "@massalabs/wallet-provider": "^3.0.0",
     "buffer": "^6.0.3",
-    "lucide-svelte": "^0.469.0",
     "svelte-hot-french-toast": "^1.0.0"
   }
 }
