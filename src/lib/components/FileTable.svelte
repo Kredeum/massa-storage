@@ -94,16 +94,14 @@
             />
           </td>
           <td class="whitespace-nowrap px-6 py-4">
-            <div class="flex items-center">
+            <div class="flex items-center gap-2">
+              <svelte:component this={getFileIcon(file.type)} size={18} class="text-gray-500" />
               <span>{file.name}</span>
             </div>
           </td>
           <td class="whitespace-nowrap px-6 py-4">{file.size}</td>
           <td class="whitespace-nowrap px-6 py-4">
-            <div class="flex items-center gap-2">
-              <svelte:component this={getFileIcon(file.type)} size={18} class="text-gray-500" />
-              <span>{file.type}</span>
-            </div>
+            <span>{file.type}</span>
           </td>
           <td class="whitespace-nowrap px-6 py-4">
             <span
