@@ -22,6 +22,7 @@
   export let handleSort: (key: keyof FileItem) => void;
   export let onSelectionChange: (selected: number[]) => void;
   let copiedCid: number | null = null;
+  let hoveredCid: number | null = null;
 
   function getMockCid(fileId: number): string {
     // Generate a deterministic mock CID for display
@@ -175,9 +176,16 @@
                   e.stopPropagation();
                   copyToClipboard(file.id);
                 }}
+                onmouseenter={() => (hoveredCid = file.id)}
+                onmouseleave={() => (hoveredCid = null)}
               >
                 <span class="text-sm">{getMockCid(file.id)}</span>
               </button>
+              {#if hoveredCid === file.id}
+                <span class="absolute -top-0.5 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white">
+                  {getFullCid(file.id)}
+                </span>
+              {/if}
               {#if copiedCid === file.id}
                 <span class="absolute left-1/2 -translate-x-1/2 rounded bg-gray-800 px-2 py-1 text-xs text-white"> Copied! </span>
               {/if}
