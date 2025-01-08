@@ -20,6 +20,7 @@
   export let selectedFiles: number[] = [];
   export let sortConfig: SortConfig;
   export let handleSort: (key: keyof FileItem) => void;
+  export let onSelectionChange: (selected: number[]) => void;
   let copiedCid: number | null = null;
 
   function getMockCid(fileId: number): string {
@@ -73,11 +74,9 @@
             class="cursor-pointer rounded text-blue-600"
             onclick={(e) => {
               const target = e.target as HTMLInputElement;
-              if (target.checked) {
-                selectedFiles = files.map((file) => file.id);
-              } else {
-                selectedFiles = [];
-              }
+              const newSelected = target.checked ? files.map((file) => file.id) : [];
+              selectedFiles = newSelected;
+              onSelectionChange(newSelected);
             }}
           />
         </th>
@@ -123,11 +122,9 @@
         <tr
           class="cursor-pointer hover:bg-gray-50"
           onclick={() => {
-            if (selectedFiles.includes(file.id)) {
-              selectedFiles = selectedFiles.filter((id) => id !== file.id);
-            } else {
-              selectedFiles = [...selectedFiles, file.id];
-            }
+            const newSelected = selectedFiles.includes(file.id) ? selectedFiles.filter((id) => id !== file.id) : [...selectedFiles, file.id];
+            selectedFiles = newSelected;
+            onSelectionChange(newSelected);
           }}
         >
           <td class="w-12 whitespace-nowrap px-4 py-4">
@@ -138,9 +135,13 @@
               onclick={(e) => {
                 e.stopPropagation();
                 if (selectedFiles.includes(file.id)) {
-                  selectedFiles = selectedFiles.filter((id) => id !== file.id);
+                  const newSelected = selectedFiles.filter((id) => id !== file.id);
+                  selectedFiles = newSelected;
+                  onSelectionChange(newSelected);
                 } else {
-                  selectedFiles = [...selectedFiles, file.id];
+                  const newSelected = [...selectedFiles, file.id];
+                  selectedFiles = newSelected;
+                  onSelectionChange(newSelected);
                 }
               }}
             />

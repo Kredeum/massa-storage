@@ -6,6 +6,7 @@
   import FileActions from "./FileActions.svelte";
   import FilePagination from "./FilePagination.svelte";
   import FileUpload from "./FileUpload.svelte";
+  import FileSelectionBar from "./FileSelectionBar.svelte";
 
   // Function to generate random mock data
   function generateMockData(count: number): FileItem[] {
@@ -145,6 +146,26 @@
   function handleFilesSelected(newFiles: FileItem[]) {
     files = [...files, ...newFiles];
   }
+
+  function handleSelectionChange(selected: number[]) {
+    selectedFiles = selected;
+  }
+
+  // Bulk actions
+  function handleBulkApprove() {
+    files = files.map((file) => (selectedFiles.includes(file.id) ? { ...file, status: "Approved" } : file));
+    selectedFiles = [];
+  }
+
+  function handleBulkReject() {
+    files = files.map((file) => (selectedFiles.includes(file.id) ? { ...file, status: "Rejected" } : file));
+    selectedFiles = [];
+  }
+
+  function handleBulkPin() {
+    files = files.map((file) => (selectedFiles.includes(file.id) ? { ...file, isPinned: true } : file));
+    selectedFiles = [];
+  }
 </script>
 
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
@@ -158,7 +179,7 @@
     </div>
   </div>
 
-  <FileTable files={paginatedFiles} {selectedFiles} {sortConfig} {handleSort}>
+  <FileTable files={paginatedFiles} {selectedFiles} {sortConfig} {handleSort} onSelectionChange={handleSelectionChange}>
     <svelte:fragment slot="actions" let:file>
       <FileActions {file} onModerate={handleModeration} onPin={handlePin} />
     </svelte:fragment>
@@ -166,3 +187,5 @@
 
   <FilePagination {currentPage} {totalPages} {itemsPerPage} totalItems={filteredFiles.length} setPage={(page) => setPage(page)} />
 </div>
+
+<FileSelectionBar selectedCount={selectedFiles.length} onApprove={handleBulkApprove} onReject={handleBulkReject} onPin={handleBulkPin} />
