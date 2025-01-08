@@ -26,5 +26,6 @@ export default defineConfig({
     rollupOptions: {
       external: ["lodash"]
     }
-  }
+  },
+  assetsInclude: ['**/*.svg']
 });
