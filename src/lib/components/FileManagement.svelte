@@ -5,6 +5,7 @@
   import FileTable from "./FileTable.svelte";
   import FileActions from "./FileActions.svelte";
   import FilePagination from "./FilePagination.svelte";
+  import FileUpload from "./FileUpload.svelte";
 
   // Function to generate random mock data
   function generateMockData(count: number): FileItem[] {
@@ -30,7 +31,7 @@
         isPinned: Math.random() > 0.8,
         lastModified: new Date(2024, 0, Math.floor(Math.random() * 31) + 1).toISOString().split("T")[0]
       };
-    });
+    }).reverse();
   }
 
   // Global state
@@ -46,8 +47,8 @@
     status: "all"
   });
   let sortConfig: SortConfig = $state({
-    key: "name",
-    direction: "asc"
+    key: "id",
+    direction: "desc"
   });
 
   // Reactive filtering and sorting
@@ -124,6 +125,10 @@
   function setPage(page: number) {
     currentPage = page;
   }
+
+  function handleFilesSelected(newFiles: FileItem[]) {
+    files = [...files, ...newFiles];
+  }
 </script>
 
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
@@ -131,6 +136,9 @@
     <div class="flex items-center justify-between">
       <SearchBar searchTerm={searchQuery} onSearch={handleSearchChange} />
       <FileFilters {filters} {sortConfig} onTypeFilter={handleTypeFilter} onSizeFilter={handleSizeFilter} onSort={handleSort} />
+    </div>
+    <div class="mb-8">
+      <FileUpload onFilesSelected={handleFilesSelected} />
     </div>
   </div>
 
