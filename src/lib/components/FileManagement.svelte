@@ -46,8 +46,9 @@
     type: "all",
     status: "all"
   });
+
   let sortConfig: SortConfig = $state({
-    key: "id",
+    key: "name",
     direction: "desc"
   });
 
@@ -63,14 +64,30 @@
 
   const sortedFiles = $derived(
     [...filteredFiles].sort((a, b) => {
-      const aValue = a[sortConfig.key];
-      const bValue = b[sortConfig.key];
       const direction = sortConfig.direction === "asc" ? 1 : -1;
 
-      if (typeof aValue === "string" && typeof bValue === "string") {
-        return direction * aValue.localeCompare(bValue);
+      // Pour "name", on garde le tri par ID inversé
+      if (sortConfig.key === "name") {
+        return direction * (Number(a.id) - Number(b.id));
       }
-      return direction * (Number(aValue) - Number(bValue));
+
+      // Pour "size", on convertit en nombres
+      if (sortConfig.key === "size") {
+        const aSize = parseFloat(a.size);
+        const bSize = parseFloat(b.size);
+        return direction * (bSize - aSize) || direction * (Number(a.id) - Number(b.id));
+      }
+
+      // Pour "type" et "status", tri alphabétique
+      if (sortConfig.key === "type" || sortConfig.key === "status") {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+        const comparison = aValue.localeCompare(bValue);
+        return comparison !== 0 ? direction * comparison : direction * (Number(a.id) - Number(b.id));
+      }
+
+      // Par défaut (id), tri chronologique inversé
+      return direction * (Number(a.id) - Number(b.id));
     })
   );
 
@@ -80,10 +97,19 @@
 
   // Actions
   function handleSort(key: keyof FileItem) {
-    sortConfig = {
-      key,
-      direction: sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc"
-    };
+    if (key === sortConfig.key) {
+      // Si même colonne, on inverse juste la direction
+      sortConfig = {
+        key,
+        direction: sortConfig.direction === "desc" ? "asc" : "desc"
+      };
+    } else {
+      // Nouvelle colonne, on met la direction par défaut
+      sortConfig = {
+        key,
+        direction: "desc"
+      };
+    }
   }
 
   function handleCheckbox(e: CustomEvent<number>) {
@@ -118,10 +144,6 @@
     };
   }
 
-  function handleSizeFilter(value: string) {
-    // Not implemented
-  }
-
   function setPage(page: number) {
     currentPage = page;
   }
@@ -133,12 +155,12 @@
 
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 space-y-4">
-    <div class="flex items-center justify-between">
-      <SearchBar searchTerm={searchQuery} onSearch={handleSearchChange} />
-      <FileFilters {filters} {sortConfig} onTypeFilter={handleTypeFilter} onSizeFilter={handleSizeFilter} onSort={handleSort} />
-    </div>
     <div class="mb-8">
       <FileUpload onFilesSelected={handleFilesSelected} />
+    </div>
+    <div class="flex items-center justify-between">
+      <SearchBar searchTerm={searchQuery} onSearch={handleSearchChange} />
+      <FileFilters {filters} {sortConfig} onTypeFilter={handleTypeFilter} onSort={handleSort} />
     </div>
   </div>
 

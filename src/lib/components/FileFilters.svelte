@@ -5,24 +5,17 @@
     filters,
     sortConfig,
     onTypeFilter,
-    onSizeFilter,
     onSort
   }: {
     filters: FilterState;
     sortConfig: SortConfig;
     onTypeFilter: (value: FilterState["type"]) => void;
-    onSizeFilter: (value: string) => void;
     onSort: (key: keyof FileItem) => void;
   } = $props();
 
   function handleTypeFilterChange(e: Event) {
     const value = (e.target as HTMLSelectElement).value as FilterState["type"];
     onTypeFilter(value);
-  }
-
-  function handleSizeFilterChange(e: Event) {
-    const value = (e.target as HTMLSelectElement).value;
-    onSizeFilter(value);
   }
 
   function handleSortChange(e: Event) {
