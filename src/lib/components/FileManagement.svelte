@@ -66,19 +66,19 @@
     [...filteredFiles].sort((a, b) => {
       const direction = sortConfig.direction === "asc" ? 1 : -1;
 
-      // Pour "name", on garde le tri par ID inversé
+      // For "name", keep reverse ID sorting
       if (sortConfig.key === "name") {
         return direction * (Number(a.id) - Number(b.id));
       }
 
-      // Pour "size", on convertit en nombres
+      // For "size", convert to numbers
       if (sortConfig.key === "size") {
         const aSize = parseFloat(a.size);
         const bSize = parseFloat(b.size);
         return direction * (bSize - aSize) || direction * (Number(a.id) - Number(b.id));
       }
 
-      // Pour "type" et "status", tri alphabétique
+      // For "type" and "status", alphabetical sorting
       if (sortConfig.key === "type" || sortConfig.key === "status") {
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
@@ -86,7 +86,7 @@
         return comparison !== 0 ? direction * comparison : direction * (Number(a.id) - Number(b.id));
       }
 
-      // Par défaut (id), tri chronologique inversé
+      // Default (id), reverse chronological sorting
       return direction * (Number(a.id) - Number(b.id));
     })
   );
@@ -97,19 +97,11 @@
 
   // Actions
   function handleSort(key: keyof FileItem) {
-    if (key === sortConfig.key) {
-      // Si même colonne, on inverse juste la direction
-      sortConfig = {
-        key,
-        direction: sortConfig.direction === "desc" ? "asc" : "desc"
-      };
-    } else {
-      // Nouvelle colonne, on met la direction par défaut
-      sortConfig = {
-        key,
-        direction: "desc"
-      };
-    }
+    // Update sort config when column is clicked
+    sortConfig = {
+      key,
+      direction: sortConfig.key === key && sortConfig.direction === "desc" ? "asc" : "desc"
+    };
   }
 
   function handleCheckbox(e: CustomEvent<number>) {
@@ -118,10 +110,12 @@
   }
 
   function handlePin(id: number) {
+    // Toggle pin status
     files = files.map((file) => (file.id === id ? { ...file, isPinned: !file.isPinned } : file));
   }
 
   function handleModeration(data: { id: number; status: FileItem["status"] }) {
+    // Update file status based on moderation action
     files = files.map((file) => (file.id === data.id ? { ...file, status: data.status } : file));
   }
 
@@ -164,7 +158,7 @@
     </div>
   </div>
 
-  <FileTable files={paginatedFiles} {selectedFiles}>
+  <FileTable files={paginatedFiles} {selectedFiles} {sortConfig} {handleSort}>
     <svelte:fragment slot="actions" let:file>
       <FileActions {file} onModerate={handleModeration} onPin={handlePin} />
     </svelte:fragment>
