@@ -10,21 +10,6 @@
     dispatchEvent(event);
   }
 
-  function handleSelect(id: number) {
-    if (selectedFiles.includes(id)) {
-      selectedFiles = selectedFiles.filter((fileId: number) => fileId !== id);
-    } else {
-      selectedFiles = [...selectedFiles, id];
-    }
-    const event = new CustomEvent("select", { detail: id });
-    dispatchEvent(event);
-  }
-
-  function handleSelectAll() {
-    const event = new CustomEvent("selectAll", { detail: files });
-    dispatchEvent(event);
-  }
-
   function getFileIcon(type: string) {
     switch (type) {
       case "document":
@@ -46,7 +31,19 @@
     <thead class="bg-gray-50">
       <tr>
         <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-          <input type="checkbox" class="rounded text-blue-600" checked={selectedFiles.length === files.length} onclick={() => handleSelectAll()} />
+          <input 
+            type="checkbox" 
+            class="rounded text-blue-600 cursor-pointer" 
+            checked={selectedFiles.length === files.length && files.length > 0}
+            onclick={(e) => {
+              e.stopPropagation();
+              if (selectedFiles.length === files.length) {
+                selectedFiles = [];
+              } else {
+                selectedFiles = files.map(file => file.id);
+              }
+            }}
+          />
         </th>
         {#each ["name", "size", "type"] as column}
           <th class="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500" onclick={() => handleSort(column as "name" | "size" | "type")}>
@@ -62,17 +59,29 @@
     </thead>
     <tbody class="divide-y divide-gray-200 bg-white">
       {#each files as file}
-        <tr class="cursor-pointer hover:bg-gray-50" onclick={() => handleSelect(file.id)}>
+        <tr 
+          class="hover:bg-gray-50 cursor-pointer" 
+          onclick={() => {
+            if (selectedFiles.includes(file.id)) {
+              selectedFiles = selectedFiles.filter(id => id !== file.id);
+            } else {
+              selectedFiles = [...selectedFiles, file.id];
+            }
+          }}
+        >
           <td class="whitespace-nowrap px-6 py-4">
             <input
               type="checkbox"
-              class="rounded text-blue-600"
+              class="rounded text-blue-600 cursor-pointer"
               checked={selectedFiles.includes(file.id)}
               onclick={(e) => {
                 e.stopPropagation();
-                handleSelect(file.id);
+                if (selectedFiles.includes(file.id)) {
+                  selectedFiles = selectedFiles.filter(id => id !== file.id);
+                } else {
+                  selectedFiles = [...selectedFiles, file.id];
+                }
               }}
-              onchange={() => handleSelect(file.id)}
             />
           </td>
           <td class="whitespace-nowrap px-6 py-4">
