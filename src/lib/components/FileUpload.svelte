@@ -60,14 +60,17 @@
     if (mimeType.startsWith("image/")) return "image";
     if (mimeType.startsWith("video/")) return "video";
     if (mimeType.startsWith("audio/")) return "sound";
-    if (mimeType === "application/pdf" || 
-        mimeType === "application/msword" || 
-        mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-        mimeType === "application/vnd.ms-excel" ||
-        mimeType === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-        mimeType === "application/vnd.ms-powerpoint" ||
-        mimeType === "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
-        mimeType.startsWith("text/")) return "document";
+    if (
+      mimeType === "application/pdf" ||
+      mimeType === "application/msword" ||
+      mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+      mimeType === "application/vnd.ms-excel" ||
+      mimeType === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+      mimeType === "application/vnd.ms-powerpoint" ||
+      mimeType === "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+      mimeType.startsWith("text/")
+    )
+      return "document";
     return "document";
   }
 </script>

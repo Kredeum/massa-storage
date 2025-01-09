@@ -8,8 +8,8 @@ export interface FileItem {
   status: "Pending" | "Approved" | "Rejected";
   isPinned: boolean;
   lastModified: string;
-  blob?: Blob;  // Optional blob for image preview
-  mimeType?: string;  // Store original MIME type for proper handling
+  blob?: Blob; // Optional blob for image preview
+  mimeType?: string; // Store original MIME type for proper handling
 }
 
 export interface FilterState {
