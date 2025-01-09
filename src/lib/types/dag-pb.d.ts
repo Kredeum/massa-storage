@@ -1,4 +1,4 @@
-declare module '@ipld/dag-pb' {
+declare module "@ipld/dag-pb" {
   export interface PBNode {
     Data?: Uint8Array;
     Links: PBLink[];
@@ -12,7 +12,7 @@ declare module '@ipld/dag-pb' {
 
   export function encode(node: PBNode): Uint8Array;
   export function decode(data: Uint8Array): PBNode;
-  
+
   export const code: number;
   export const name: string;
 }

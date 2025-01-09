@@ -30,8 +30,8 @@
   let previewUrls: { [key: number]: string } = {};
 
   function getDisplayCid(file: FileItem): string {
-    const cid = file.cid;
-    return `${cid.slice(0, 4)}...${cid.slice(-4)}`;
+    if (!file.cid) return "N/A";
+    return `${file.cid.slice(0, 4)}...${file.cid.slice(-4)}`;
   }
 
   function getPreviewUrl(file: FileItem): string {
@@ -45,7 +45,7 @@
   async function copyToClipboard(fileId: number) {
     try {
       const file = files.find((f) => f.id === fileId);
-      if (!file) return;
+      if (!file?.cid) return;
 
       await navigator.clipboard.writeText(file.cid);
       copiedCid = fileId;
@@ -213,41 +213,45 @@
           <td class="w-1/6 px-4 py-3 text-center text-sm text-gray-500">{file.type}</td>
           <td class="w-1/6 px-4 py-3 text-center">
             <span
-              class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
+              class="inline-flex min-w-[80px] justify-center rounded-full px-2 text-xs font-semibold leading-5"
               class:bg-yellow-100={file.status === "Pending"}
               class:text-yellow-800={file.status === "Pending"}
               class:bg-green-100={file.status === "Approved"}
               class:text-green-800={file.status === "Approved"}
-              class:bg-red-100={file.status === "Rejected"}
-              class:text-red-800={file.status === "Rejected"}
+              class:bg-red-100={file.status === "Rejected" || file.status === "Error"}
+              class:text-red-800={file.status === "Rejected" || file.status === "Error"}
             >
               {file.status}
             </span>
           </td>
           <td class="w-1/5 whitespace-nowrap px-4 py-4 text-center font-mono text-sm text-gray-500">
             <div class="relative inline-block">
-              <button
-                class="relative cursor-pointer"
-                onclick={(e) => {
-                  e.stopPropagation();
-                  copyToClipboard(file.id);
-                }}
-                onmouseenter={() => {
-                  hoveredCid = file.id;
-                }}
-                onmouseleave={() => {
-                  hoveredCid = null;
-                }}
-              >
-                <span class="text-sm">{getDisplayCid(file)}</span>
-              </button>
-              {#if hoveredCid === file.id}
-                <span class="absolute -top-1.5 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-md bg-gray-600 px-2 py-1 text-xs text-white">
-                  {file.cid}
-                </span>
-              {/if}
-              {#if copiedCid === file.id}
-                <span class="absolute left-1/2 -translate-x-1/2 rounded-md bg-gray-600 px-2 py-1 text-xs text-white"> Copied! </span>
+              {#if file.cid}
+                <button
+                  class="relative cursor-pointer"
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    copyToClipboard(file.id);
+                  }}
+                  onmouseenter={() => {
+                    hoveredCid = file.id;
+                  }}
+                  onmouseleave={() => {
+                    hoveredCid = null;
+                  }}
+                >
+                  <span class="text-sm">{getDisplayCid(file)}</span>
+                </button>
+                {#if hoveredCid === file.id}
+                  <span class="absolute -top-1.5 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-md bg-gray-600 px-2 py-1 text-xs text-white">
+                    {file.cid}
+                  </span>
+                {/if}
+                {#if copiedCid === file.id}
+                  <span class="absolute left-1/2 -translate-x-1/2 rounded-md bg-gray-600 px-2 py-1 text-xs text-white"> Copied! </span>
+                {/if}
+              {:else}
+                <span class="text-gray-400">N/A</span>
               {/if}
             </div>
           </td>
