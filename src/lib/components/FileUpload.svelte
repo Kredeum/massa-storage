@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Upload } from "lucide-svelte";
   import type { FileItem } from "$lib/types";
+  import { calculateCID } from "$lib/utils/cid";
 
   export let onFilesSelected: (files: FileItem[]) => void;
   let dragOver = false;
@@ -30,21 +31,25 @@
     }
   }
 
-  function handleFiles(files: FileList) {
-    const fileItems: FileItem[] = Array.from(files).map((file, index) => {
+  async function handleFiles(files: FileList) {
+    const filePromises = Array.from(files).map(async (file, index) => {
       const type = getFileType(file.type);
+      const cid = await calculateCID(file);
       return {
         id: Date.now() + index,
         name: file.name,
         size: formatFileSize(file.size),
         type,
-        status: "Pending",
+        status: "Pending" as const,
         isPinned: false,
         lastModified: new Date(file.lastModified).toISOString(),
         mimeType: file.type,
+        cid,
         ...(["image", "video", "document"].includes(type) ? { blob: file } : {})
-      };
+      } satisfies FileItem;
     });
+
+    const fileItems = await Promise.all(filePromises);
     onFilesSelected(fileItems);
   }
 

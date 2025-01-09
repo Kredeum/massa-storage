@@ -29,15 +29,9 @@
   let mouseY = 0;
   let previewUrls: { [key: number]: string } = {};
 
-  function getMockCid(fileId: number): string {
-    // Generate a deterministic mock CID for display
-    const fullCid = `bafybeih${fileId.toString().padStart(4, "0")}v5jfkqogqfx4xmxjhvgkwrgvk${fileId.toString().padStart(4, "0")}`;
-    return `${fullCid.slice(0, 4)}...${fullCid.slice(-4)}`;
-  }
-
-  function getFullCid(fileId: number): string {
-    // Generate full CID for copying
-    return `bafybeih${fileId.toString().padStart(4, "0")}v5jfkqogqfx4xmxjhvgkwrgvk${fileId.toString().padStart(4, "0")}`;
+  function getDisplayCid(file: FileItem): string {
+    const cid = file.cid;
+    return `${cid.slice(0, 4)}...${cid.slice(-4)}`;
   }
 
   function getPreviewUrl(file: FileItem): string {
@@ -50,30 +44,16 @@
 
   async function copyToClipboard(fileId: number) {
     try {
-      // Copy full CID to clipboard
-      await navigator.clipboard.writeText(getFullCid(fileId));
+      const file = files.find((f) => f.id === fileId);
+      if (!file) return;
+
+      await navigator.clipboard.writeText(file.cid);
       copiedCid = fileId;
       setTimeout(() => {
         copiedCid = null;
       }, 1000);
     } catch (err) {
-      console.error("Failed to copy text: ", err);
-    }
-  }
-
-  function getFileIcon(type: string) {
-    // Return appropriate icon based on file type
-    switch (type) {
-      case "document":
-        return FileText;
-      case "image":
-        return Image;
-      case "video":
-        return Video;
-      case "sound":
-        return Music;
-      default:
-        return File;
+      console.error("Failed to copy to clipboard:", err);
     }
   }
 
@@ -259,11 +239,11 @@
                   hoveredCid = null;
                 }}
               >
-                <span class="text-sm">{getMockCid(file.id)}</span>
+                <span class="text-sm">{getDisplayCid(file)}</span>
               </button>
               {#if hoveredCid === file.id}
                 <span class="absolute -top-1.5 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-md bg-gray-600 px-2 py-1 text-xs text-white">
-                  {getFullCid(file.id)}
+                  {file.cid}
                 </span>
               {/if}
               {#if copiedCid === file.id}

@@ -10,6 +10,7 @@ export interface FileItem {
   lastModified: string;
   blob?: Blob; // Optional blob for image preview
   mimeType?: string; // Store original MIME type for proper handling
+  cid: string; // IPFS Content Identifier
 }
 
 export interface FilterState {
