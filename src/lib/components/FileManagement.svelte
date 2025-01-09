@@ -8,39 +8,11 @@
   import FileUpload from "./FileUpload.svelte";
   import FileSelectionBar from "./FileSelectionBar.svelte";
 
-  // Function to generate random mock data
-  function generateMockData(count: number): FileItem[] {
-    const types = ["document", "image", "video", "sound"] as const;
-    const statuses = ["Pending", "Approved", "Rejected"] as const;
-    const extensions = {
-      document: ".pdf",
-      image: [".jpg", ".png", ".gif"],
-      video: [".mp4", ".mov", ".avi"],
-      sound: [".mp3", ".wav", ".ogg"]
-    };
-
-    return Array.from({ length: count }, (_, i) => {
-      const type = types[Math.floor(Math.random() * types.length)];
-      const ext = Array.isArray(extensions[type]) ? extensions[type][Math.floor(Math.random() * extensions[type].length)] : extensions[type];
-
-      return {
-        id: i + 1,
-        name: `File ${i + 1}${ext}`,
-        size: `${Math.floor(Math.random() * 100)}.${Math.floor(Math.random() * 9)}MB`,
-        type,
-        status: statuses[Math.floor(Math.random() * statuses.length)],
-        isPinned: Math.random() > 0.8,
-        lastModified: new Date(2024, 0, Math.floor(Math.random() * 31) + 1).toISOString().split("T")[0]
-      };
-    }).reverse();
-  }
-
   // Global state
   let currentPage = $state(0);
   const itemsPerPage = 20;
-  const totalItems = 100;
 
-  let files = $state(generateMockData(totalItems));
+  let files = $state<FileItem[]>([]);
   let selectedFiles: number[] = $state([]);
   let searchQuery = $state("");
   let filters: FilterState = $state({
@@ -105,11 +77,6 @@
     };
   }
 
-  function handleCheckbox(e: CustomEvent<number>) {
-    const fileId = e.detail;
-    selectedFiles = selectedFiles.includes(fileId) ? selectedFiles.filter((id) => id !== fileId) : [...selectedFiles, fileId];
-  }
-
   function handlePin(id: number) {
     // Toggle pin status
     files = files.map((file) => (file.id === id ? { ...file, isPinned: !file.isPinned } : file));
@@ -122,14 +89,6 @@
 
   function handleSearchChange(query: string) {
     searchQuery = query;
-  }
-
-  function handleFilterChange(e: CustomEvent<{ type: string; value: string }>) {
-    const { type, value } = e.detail;
-    filters = {
-      ...filters,
-      [type]: value
-    };
   }
 
   function handleTypeFilter(value: FilterState["type"]) {
