@@ -173,8 +173,13 @@
     <div class="mb-8">
       <FileUpload onFilesSelected={handleFilesSelected} />
     </div>
-    <div class="flex items-center justify-between">
-      <SearchBar searchTerm={searchQuery} onSearch={handleSearchChange} />
+    <div class="flex items-center justify-between gap-4">
+      <div class="flex flex-1 items-center gap-4">
+        <SearchBar searchTerm={searchQuery} onSearch={handleSearchChange} />
+        {#if selectedFiles.length > 0}
+          <FileSelectionBar selectedCount={selectedFiles.length} onApprove={handleBulkApprove} onReject={handleBulkReject} onPin={handleBulkPin} />
+        {/if}
+      </div>
       <FileFilters {filters} {sortConfig} onTypeFilter={handleTypeFilter} onSort={handleSort} />
     </div>
   </div>
@@ -187,5 +192,3 @@
 
   <FilePagination {currentPage} {totalPages} {itemsPerPage} totalItems={filteredFiles.length} setPage={(page) => setPage(page)} />
 </div>
-
-<FileSelectionBar selectedCount={selectedFiles.length} onApprove={handleBulkApprove} onReject={handleBulkReject} onPin={handleBulkPin} />

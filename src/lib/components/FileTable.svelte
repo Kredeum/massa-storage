@@ -13,7 +13,7 @@
     { key: "size", label: "size", sortable: true },
     { key: "type", label: "type", sortable: true },
     { key: "status", label: "status", sortable: true },
-    { key: null, label: "hash", sortable: false }
+    { key: null, label: "cid", sortable: false }
   ];
 
   export let files: FileItem[] = [];
@@ -85,7 +85,7 @@
           <th
             class="{column.label === 'name'
               ? 'w-1/6 text-left'
-              : column.label === 'hash'
+              : column.label === 'cid'
                 ? 'w-1/5 text-center'
                 : column.label === 'size'
                   ? 'w-1/6 text-center'
@@ -93,7 +93,7 @@
           >
             <button
               type="button"
-              class="flex w-full items-center gap-1 text-xs font-medium uppercase tracking-wider text-gray-500 {column.label === 'hash'
+              class="flex w-full items-center gap-1 text-xs font-medium uppercase tracking-wider text-gray-500 {column.label === 'cid'
                 ? 'cursor-default justify-center'
                 : column.sortable
                   ? 'cursor-pointer justify-center hover:text-gray-700'
