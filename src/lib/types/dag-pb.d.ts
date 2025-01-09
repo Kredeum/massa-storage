@@ -5,7 +5,7 @@ declare module "@ipld/dag-pb" {
   }
 
   export interface PBLink {
-    Hash?: Uint8Array;
+    Hash: CID | Uint8Array;  // Allow both CID and Uint8Array
     Name?: string;
     Tsize?: number;
   }

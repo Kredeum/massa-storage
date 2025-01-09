@@ -50,14 +50,15 @@
     border-radius: 0.5rem;
     color: white;
     min-width: 180px;
-    max-width: 320px;
+    max-width: 400px;
     animation: slideIn 0.2s ease-out;
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
     border: none;
     text-align: left;
     cursor: pointer;
     width: 100%;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
+    line-height: 1.4;
     transition: all 0.2s ease;
   }
 
@@ -66,18 +67,21 @@
   }
 
   .error {
-    background-color: rgba(239, 68, 68, 0.9);
+    background-color: rgba(254, 226, 226, 0.95);
     border-left: 4px solid rgb(220, 38, 38);
+    color: rgb(153, 27, 27);
   }
 
   .success {
-    background-color: rgba(34, 197, 94, 0.9);
+    background-color: rgba(209, 250, 229, 0.95);
     border-left: 4px solid rgb(22, 163, 74);
+    color: rgb(6, 95, 70);
   }
 
   .info {
-    background-color: rgba(59, 130, 246, 0.9);
+    background-color: rgba(219, 234, 254, 0.95);
     border-left: 4px solid rgb(37, 99, 235);
+    color: rgb(30, 64, 175);
   }
 
   @keyframes slideIn {

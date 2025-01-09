@@ -2,14 +2,12 @@ import { CID } from "multiformats/cid";
 import * as dagPB from "@ipld/dag-pb";
 import * as raw from "multiformats/codecs/raw";
 import { sha256 } from "multiformats/hashes/sha2";
+import { base16 } from "multiformats/bases/base16";
 import { base32 } from "multiformats/bases/base32";
 import { base58btc } from "multiformats/bases/base58";
 import { UnixFS } from "ipfs-unixfs";
 import type { Version } from "multiformats/interface";
-import { base16 } from "multiformats/bases/base16";
 
-// Default block size for chunking (256KB)
-const BLOCK_SIZE = 256 * 1024;
 // Maximum file size (100MB)
 const MAX_FILE_SIZE = 100 * 1024 * 1024;
 // Maximum chunk size for memory efficiency (1MB)
@@ -78,23 +76,6 @@ async function* readFileChunks(file: File, chunkSize: number): AsyncGenerator<Ui
 }
 
 /**
- * Normalize data based on MIME type
- */
-function normalizeData(data: Uint8Array, mimeType: string): ArrayBuffer {
-  try {
-    if (mimeType.startsWith("text/")) {
-      const text = new TextDecoder().decode(data);
-      const normalized = text.replace(/\r\n/g, "\n");
-      const encodedBuffer = new TextEncoder().encode(normalized).buffer;
-      return ensureArrayBuffer(encodedBuffer);
-    }
-    return ensureArrayBuffer(data.buffer);
-  } catch (error) {
-    throw new CIDError("Failed to normalize data", error);
-  }
-}
-
-/**
  * Create a UnixFS node with the given data
  */
 async function createFileNode(data: Uint8Array): Promise<Uint8Array> {
@@ -156,8 +137,12 @@ async function calculateChunkedCID(file: File, version: Version, format: CIDForm
     const chunks: Uint8Array[] = [];
     const blockCIDs: CID[] = [];
 
+    console.log("Starting chunked CID calculation...");
+    console.log(`File size: ${file.size} bytes`);
+
     // Process file in chunks
     for await (const chunk of readFileChunks(file, MAX_CHUNK_SIZE)) {
+      console.log(`Processing chunk of size: ${chunk.length} bytes`);
       chunks.push(chunk);
 
       // Create a DAG-PB node for each chunk
@@ -165,21 +150,32 @@ async function calculateChunkedCID(file: File, version: Version, format: CIDForm
         type: "file",
         data: chunk
       });
+      console.log("UnixFS node created for chunk.");
 
       const chunkNode: dagPB.PBNode = {
         Data: chunkFs.marshal(),
         Links: []
       };
+      console.log("DAG-PB node created for chunk.");
 
       // Encode the chunk node
       const chunkDagData = dagPB.encode(chunkNode);
+      console.log("Chunk DAG-PB data encoded.");
+
       const chunkHash = await sha256.digest(chunkDagData);
+      console.log(`Chunk hash calculated: ${chunkHash.digest}`);
+
       const chunkCID = CID.create(version, dagPB.code, chunkHash);
+      console.log(`Chunk CID created: ${chunkCID.toString()}`);
+
       blockCIDs.push(chunkCID);
     }
 
+    console.log(`Total chunks processed: ${blockCIDs.length}`);
+
     // If only one chunk, return its CID directly
     if (blockCIDs.length === 1) {
+      console.log("Single chunk detected. Returning its CID.");
       return blockCIDs[0];
     }
 
@@ -189,28 +185,37 @@ async function calculateChunkedCID(file: File, version: Version, format: CIDForm
       data: new Uint8Array(0),
       blockSizes: chunks.map((chunk) => BigInt(chunk.length))
     });
+    console.log("UnixFS root node created.");
 
-    // Create DAG-PB node
+    // Create DAG-PB node with proper CID links
     const links = blockCIDs.map((cid, index) => ({
       Name: "", // Empty name as per UnixFS spec
       Tsize: chunks[index].length,
-      Hash: cid.multihash.bytes
+      Hash: cid
     }));
+    console.log("Links for root node created.");
 
     const node: dagPB.PBNode = {
       Data: unixFs.marshal(),
       Links: links
     };
+    console.log("Root DAG-PB node created.");
 
     // Encode the node using DAG-PB codec
     const dagPBBytes = dagPB.encode(node);
+    console.log("Root DAG-PB data encoded.");
 
     // Calculate the root hash
     const rootHash = await sha256.digest(dagPBBytes);
+    console.log(`Root hash calculated: ${rootHash.digest}`);
 
     // Create the final CID
-    return CID.create(version, dagPB.code, rootHash);
+    const rootCID = CID.create(version, dagPB.code, rootHash);
+    console.log(`Final root CID created: ${rootCID.toString()}`);
+
+    return rootCID;
   } catch (error) {
+    console.error("Error occurred during chunked CID calculation:");
     if (error instanceof Error) {
       console.error("Error details:", error.message);
       if ("cause" in error) {
