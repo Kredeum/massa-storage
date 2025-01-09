@@ -1,11 +1,15 @@
+export type FileType = "image" | "video" | "sound" | "document";
+
 export interface FileItem {
   id: number;
   name: string;
   size: string;
-  type: "image" | "video" | "sound" | "document";
+  type: FileType;
   status: "Pending" | "Approved" | "Rejected";
   isPinned: boolean;
   lastModified: string;
+  blob?: Blob;  // Optional blob for image preview
+  mimeType?: string;  // Store original MIME type for proper handling
 }
 
 export interface FilterState {

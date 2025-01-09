@@ -31,15 +31,20 @@
   }
 
   function handleFiles(files: FileList) {
-    const fileItems: FileItem[] = Array.from(files).map((file, index) => ({
-      id: Date.now() + index,
-      name: file.name,
-      size: formatFileSize(file.size),
-      type: getFileType(file.type),
-      status: "Pending",
-      isPinned: false,
-      lastModified: new Date(file.lastModified).toISOString()
-    }));
+    const fileItems: FileItem[] = Array.from(files).map((file, index) => {
+      const type = getFileType(file.type);
+      return {
+        id: Date.now() + index,
+        name: file.name,
+        size: formatFileSize(file.size),
+        type,
+        status: "Pending",
+        isPinned: false,
+        lastModified: new Date(file.lastModified).toISOString(),
+        mimeType: file.type,
+        ...(["image", "video", "document"].includes(type) ? { blob: file } : {})
+      };
+    });
     onFilesSelected(fileItems);
   }
 
@@ -55,6 +60,14 @@
     if (mimeType.startsWith("image/")) return "image";
     if (mimeType.startsWith("video/")) return "video";
     if (mimeType.startsWith("audio/")) return "sound";
+    if (mimeType === "application/pdf" || 
+        mimeType === "application/msword" || 
+        mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+        mimeType === "application/vnd.ms-excel" ||
+        mimeType === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+        mimeType === "application/vnd.ms-powerpoint" ||
+        mimeType === "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+        mimeType.startsWith("text/")) return "document";
     return "document";
   }
 </script>
