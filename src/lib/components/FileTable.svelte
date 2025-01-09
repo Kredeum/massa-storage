@@ -182,12 +182,12 @@
                 <span class="text-sm">{getMockCid(file.id)}</span>
               </button>
               {#if hoveredCid === file.id}
-                <span class="absolute -top-0.5 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white">
+                <span class="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-md bg-gray-600 px-2 py-1 text-xs text-white">
                   {getFullCid(file.id)}
                 </span>
               {/if}
               {#if copiedCid === file.id}
-                <span class="absolute left-1/2 -translate-x-1/2 rounded bg-gray-800 px-2 py-1 text-xs text-white"> Copied! </span>
+                <span class="absolute left-1/2 -translate-x-1/2 rounded-md bg-gray-600 px-2 py-1 text-xs text-white"> Copied! </span>
               {/if}
             </div>
           </td>
