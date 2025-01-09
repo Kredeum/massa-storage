@@ -10,8 +10,8 @@ import type { Version } from "multiformats/interface";
 
 // Maximum file size (100MB)
 const MAX_FILE_SIZE = 100 * 1024 * 1024;
-// Maximum chunk size for memory efficiency (1MB)
-const MAX_CHUNK_SIZE = 1024 * 1024;
+// Maximum chunk size for memory efficiency (256KB)
+const MAX_CHUNK_SIZE = 256 * 1024;
 
 export type CIDVersion = 0 | 1;
 export type CIDFormat = "dag-pb" | "raw";
@@ -68,10 +68,11 @@ async function* readFileChunks(file: File, chunkSize: number): AsyncGenerator<Ui
   let offset = 0;
 
   while (offset < fileSize) {
-    const chunk = file.slice(offset, offset + chunkSize);
+    const end = Math.min(offset + chunkSize, fileSize);
+    const chunk = file.slice(offset, end);
     const buffer = await chunk.arrayBuffer();
     yield new Uint8Array(ensureArrayBuffer(buffer));
-    offset += chunkSize;
+    offset = end;
   }
 }
 
@@ -182,8 +183,7 @@ async function calculateChunkedCID(file: File, version: Version, format: CIDForm
     // Create root node with links to all blocks
     const unixFs = new UnixFS({
       type: "file",
-      data: new Uint8Array(0),
-      blockSizes: chunks.map((chunk) => BigInt(chunk.length))
+      data: new Uint8Array(0)
     });
     console.log("UnixFS root node created.");
 
