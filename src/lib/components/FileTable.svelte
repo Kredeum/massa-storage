@@ -201,9 +201,6 @@
                 <div class="font-medium text-gray-900">
                   {file.name}
                 </div>
-                <div class="text-gray-500">
-                  {file.lastModified}
-                </div>
               </div>
             </div>
             {#if hoveredPreview === file.id && file.blob}
