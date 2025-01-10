@@ -35,22 +35,22 @@
   }
 
   function getFileType(mimeType: string): FileType {
-    if (mimeType.startsWith('image/')) return 'image';
-    if (mimeType.startsWith('video/')) return 'video';
-    if (mimeType.startsWith('audio/')) return 'sound';
-    return 'document';
+    if (mimeType.startsWith("image/")) return "image";
+    if (mimeType.startsWith("video/")) return "video";
+    if (mimeType.startsWith("audio/")) return "sound";
+    return "document";
   }
 
   function formatFileSize(bytes: number): string {
-    const units = ['B', 'KB', 'MB', 'GB'];
+    const units = ["B", "KB", "MB", "GB"];
     let size = bytes;
     let unitIndex = 0;
-    
+
     while (size >= 1024 && unitIndex < units.length - 1) {
       size /= 1024;
       unitIndex++;
     }
-    
+
     return `${size.toFixed(1)} ${units[unitIndex]}`;
   }
 
@@ -94,7 +94,7 @@
 
     const results = await Promise.all(filePromises);
     const validFiles = results.filter((file): file is FileItem => file !== null);
-    
+
     if (validFiles.length > 0) {
       onFilesSelected(validFiles);
     }
