@@ -55,8 +55,9 @@
   }
 
   async function handleFiles(files: FileList) {
-    const filePromises = Array.from(files).map(async (file, index) => {
+    const filePromises = Array.from(files).map(async (file: File, index: number) => {
       try {
+        console.log("filePromises ~ file:", file);
         const type = getFileType(file.type);
 
         // Check file size
@@ -81,7 +82,7 @@
           isPinned: false,
           lastModified: new Date(file.lastModified).toISOString(),
           mimeType: file.type,
-          blob: ["image", "video"].includes(type) ? file : undefined
+          blob: file
         };
 
         return fileItem;

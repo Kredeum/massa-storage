@@ -3,13 +3,13 @@
   import type { FileItem } from "$lib/types";
 
   const handleFilesSelected = (files: FileItem[]) => {
-    files.forEach(async (file) => {
+    files.forEach(async (file: FileItem) => {
       if (!file) return;
       console.log("File name:", file.name);
       try {
         // First, add the file to IPFS
         const formData = new FormData();
-        formData.append("file", file.blob || file);
+        formData.append("file", file.blob as Blob);
 
         const addResponse = await fetch("http://127.0.0.1:5001/pins", {
           method: "POST",
