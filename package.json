@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.4",
+    "@helia/strings": "^4.0.1",
     "@playwright/test": "^1.49.1",
     "@sveltejs/adapter-static": "^3.0.8",
     "@sveltejs/kit": "^2.15.2",
@@ -50,6 +51,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-svelte": "^2.46.1",
     "globals": "^15.14.0",
+    "helia": "^5.1.1",
     "lucide-svelte": "^0.469.0",
     "prettier": "^3.4.2",
     "prettier-plugin-svelte": "^3.3.2",
