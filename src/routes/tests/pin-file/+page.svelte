@@ -4,7 +4,7 @@
 
   import { createHelia, type Helia } from "helia";
   import { unixfs, type UnixFS } from "@helia/unixfs";
-  import FileUpload5 from "$lib/components/FileUpload5.svelte";
+  import FileUpload5 from "$lib/components/FileUpload.svelte";
 
   let helia: Helia;
   let fs: UnixFS;
@@ -38,7 +38,6 @@
   $effect(() => {
     fileHandle(fileInput);
   });
-
 
   const fileRetrieve = async () => {
     if (!cidInput.trim()) return;

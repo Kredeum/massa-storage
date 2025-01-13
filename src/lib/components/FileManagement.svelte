@@ -1,28 +1,82 @@
 <script lang="ts">
-  import type { FileItem, FilterState, SortConfig } from "$lib/types/file";
+  import type { FileItem, FilterState, SortConfig, FileStatus, FileType } from "$lib/types/file";
   import SearchBar from "./SearchBar.svelte";
   import FileFilters from "./FileFilters.svelte";
   import FileTable from "./FileTable.svelte";
   import FileActions from "./FileActions.svelte";
-  import FilePagination from "./FilePagination.svelte";
   import FileUpload from "./FileUpload.svelte";
   import FileSelectionBar from "./FileSelectionBar.svelte";
+  import FilePagination from "./FilePagination.svelte";
+  import Toast from "./Toast.svelte";
+  import { toastStore } from "../stores/toast";
+
+  const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
   // Global state
   let currentPage = $state(0);
   const itemsPerPage = 20;
-
   let files = $state<FileItem[]>([]);
-  let selectedFiles: number[] = $state([]);
+  let selectedFiles = $state<number[]>([]);
   let searchQuery = $state("");
+  let uploadFiles = $state<FileList | undefined>();
   let filters: FilterState = $state({
     type: "all",
     status: "all"
   });
 
   let sortConfig: SortConfig = $state({
-    key: "name",
+    key: "lastModified",
     direction: "desc"
+  });
+
+  function getFileType(mimeType: string): FileType {
+    if (mimeType.startsWith("image/")) return "image";
+    if (mimeType.startsWith("video/")) return "video";
+    if (mimeType.startsWith("audio/")) return "sound";
+    return "document";
+  }
+
+  function formatSize(bytes: number): string {
+    const units = ["B", "KB", "MB", "GB"];
+    let size = bytes;
+    let unitIndex = 0;
+
+    while (size >= 1024 && unitIndex < units.length - 1) {
+      size /= 1024;
+      unitIndex++;
+    }
+
+    return `${size.toFixed(1)} ${units[unitIndex]}`;
+  }
+
+  $effect(() => {
+    if (uploadFiles) {
+      const newFiles: FileItem[] = Array.from(uploadFiles)
+        .filter((file) => {
+          if (file.size > MAX_FILE_SIZE) {
+            toastStore.add(`File ${file.name} exceeds maximum size of ${formatSize(MAX_FILE_SIZE)}`, "error");
+            return false;
+          }
+          return true;
+        })
+        .map((file) => ({
+          id: Date.now() + Math.random(),
+          name: file.name,
+          size: formatSize(file.size),
+          type: getFileType(file.type),
+          status: "Pending" as const,
+          isPinned: false,
+          lastModified: new Date(file.lastModified).toISOString(),
+          blob: file,
+          mimeType: file.type
+        }));
+
+      files = [...files, ...newFiles];
+      if (newFiles.length > 0) {
+        toastStore.add(`Successfully added ${newFiles.length} file${newFiles.length > 1 ? "s" : ""}`, "success");
+      }
+      uploadFiles = undefined; // Reset after processing
+    }
   });
 
   // Reactive filtering and sorting
@@ -39,28 +93,22 @@
     [...filteredFiles].sort((a, b) => {
       const direction = sortConfig.direction === "asc" ? 1 : -1;
 
-      // For "name", keep reverse ID sorting
       if (sortConfig.key === "name") {
-        return direction * (Number(a.id) - Number(b.id));
+        return direction * a.name.localeCompare(b.name);
       }
 
-      // For "size", convert to numbers
       if (sortConfig.key === "size") {
         const aSize = parseFloat(a.size);
         const bSize = parseFloat(b.size);
-        return direction * (bSize - aSize) || direction * (Number(a.id) - Number(b.id));
+        return direction * (bSize - aSize);
       }
 
-      // For "type" and "status", alphabetical sorting
       if (sortConfig.key === "type" || sortConfig.key === "status") {
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
-        const comparison = aValue.localeCompare(bValue);
-        return comparison !== 0 ? direction * comparison : direction * (Number(a.id) - Number(b.id));
+        return direction * a[sortConfig.key].localeCompare(b[sortConfig.key]);
       }
 
-      // Default (id), reverse chronological sorting
-      return direction * (Number(a.id) - Number(b.id));
+      // Default (lastModified)
+      return direction * (new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime());
     })
   );
 
@@ -70,11 +118,11 @@
 
   // Actions
   function handleSort(key: keyof FileItem) {
-    // Update sort config when column is clicked
-    sortConfig = {
-      key,
-      direction: sortConfig.key === key && sortConfig.direction === "desc" ? "asc" : "desc"
-    };
+    if (sortConfig.key === key) {
+      sortConfig.direction = sortConfig.direction === "asc" ? "desc" : "asc";
+    } else {
+      sortConfig = { key, direction: "desc" };
+    }
   }
 
   function handlePin(id: number) {
@@ -82,7 +130,7 @@
     files = files.map((file) => (file.id === id ? { ...file, isPinned: !file.isPinned } : file));
   }
 
-  function handleModeration(data: { id: number; status: FileItem["status"] }) {
+  function handleModeration(data: { id: number; status: FileStatus }) {
     // Update file status based on moderation action
     files = files.map((file) => (file.id === data.id ? { ...file, status: data.status } : file));
   }
@@ -100,10 +148,6 @@
 
   function setPage(page: number) {
     currentPage = page;
-  }
-
-  function handleFilesSelected(newFiles: FileItem[]) {
-    files = [...files, ...newFiles];
   }
 
   function handleSelectionChange(selected: number[]) {
@@ -127,10 +171,12 @@
   }
 </script>
 
+<Toast />
+
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 space-y-4">
     <div class="mb-8">
-      <FileUpload onFilesSelected={handleFilesSelected} />
+      <FileUpload bind:files={uploadFiles} />
     </div>
     <div class="flex items-center justify-between gap-4">
       <div class="flex flex-1 items-center gap-4">
