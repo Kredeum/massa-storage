@@ -32,7 +32,7 @@
   function getFileType(mimeType: string): FileType {
     if (mimeType.startsWith("image/")) return "image";
     if (mimeType.startsWith("video/")) return "video";
-    if (mimeType.startsWith("audio/")) return "sound";
+    if (mimeType.startsWith("audio/")) return "audio";
     return "document";
   }
 
@@ -47,6 +47,19 @@
     }
 
     return `${size.toFixed(1)} ${units[unitIndex]}`;
+  }
+
+  function sizeToBytes(sizeStr: string): number {
+    const units = {
+      B: 1,
+      KB: 1024,
+      MB: 1024 * 1024,
+      GB: 1024 * 1024 * 1024
+    };
+    const matches = sizeStr.match(/^([\d.]+)\s*([A-Z]+)$/);
+    if (!matches) return 0;
+    const [, size, unit] = matches;
+    return parseFloat(size) * (units[unit as keyof typeof units] || 1);
   }
 
   $effect(() => {
@@ -91,16 +104,16 @@
 
   const sortedFiles = $derived(
     [...filteredFiles].sort((a, b) => {
-      const direction = sortConfig.direction === "asc" ? 1 : -1;
+      const direction = sortConfig.direction === "desc" ? 1 : -1;
 
       if (sortConfig.key === "name") {
         return direction * a.name.localeCompare(b.name);
       }
 
       if (sortConfig.key === "size") {
-        const aSize = parseFloat(a.size);
-        const bSize = parseFloat(b.size);
-        return direction * (bSize - aSize);
+        const aBytes = sizeToBytes(a.size);
+        const bBytes = sizeToBytes(b.size);
+        return direction * (bBytes - aBytes);
       }
 
       if (sortConfig.key === "type" || sortConfig.key === "status") {
@@ -133,10 +146,6 @@
   function handleModeration(data: { id: number; status: FileStatus }) {
     // Update file status based on moderation action
     files = files.map((file) => (file.id === data.id ? { ...file, status: data.status } : file));
-  }
-
-  function handleSearchChange(query: string) {
-    searchQuery = query;
   }
 
   function handleTypeFilter(value: FilterState["type"]) {

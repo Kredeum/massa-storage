@@ -7,12 +7,7 @@
     onPin: () => void;
   }
 
-  let {
-    selectedCount,
-    onApprove,
-    onReject,
-    onPin
-  }: Props = $props();
+  let { selectedCount, onApprove, onReject, onPin }: Props = $props();
 </script>
 
 {#if selectedCount > 0}

@@ -7,13 +7,7 @@
     setPage: (page: number) => void;
   }
 
-  let {
-    currentPage,
-    totalPages,
-    itemsPerPage,
-    totalItems,
-    setPage
-  }: Props = $props();
+  let { currentPage, totalPages, itemsPerPage, totalItems, setPage }: Props = $props();
 
   function handlePrevious() {
     if (currentPage > 0) {

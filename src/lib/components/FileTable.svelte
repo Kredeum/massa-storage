@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { FileItem, SortConfig } from "$lib/types/file";
-  import { FileText, Image, Video, Music, File, ChevronDown, ChevronUp } from "lucide-svelte";
+  import { FileText, Image, Video, Music, ChevronDown, ChevronUp } from "lucide-svelte";
   import { onDestroy } from "svelte";
 
   type Column = {
@@ -23,17 +23,10 @@
     sortConfig: SortConfig;
     handleSort: (key: keyof FileItem) => void;
     onSelectionChange: (selected: number[]) => void;
-    actions?: import('svelte').Snippet<[any]>;
+    actions?: import("svelte").Snippet<[any]>;
   }
 
-  let {
-    files = [],
-    selectedFiles = $bindable([]),
-    sortConfig,
-    handleSort,
-    onSelectionChange,
-    actions
-  }: Props = $props();
+  let { files = [], selectedFiles = $bindable([]), sortConfig, handleSort, onSelectionChange, actions }: Props = $props();
   let copiedCid: number | null = $state(null);
   let hoveredCid: number | null = $state(null);
   let hoveredPreview: number | null = $state(null);
@@ -161,7 +154,7 @@
                   <Image class="h-5 w-5 text-blue-500" />
                 {:else if file.type === "video"}
                   <Video class="h-5 w-5 text-purple-500" />
-                {:else if file.type === "sound"}
+                {:else if file.type === "audio"}
                   <Music class="h-5 w-5 text-green-500" />
                 {:else}
                   <FileText class="h-5 w-5 text-gray-500" />
@@ -259,7 +252,7 @@
             </div>
           </td>
           <td class="w-32 px-4 py-3 text-center">
-            {@render actions?.({ file, })}
+            {@render actions?.({ file })}
           </td>
         </tr>
       {/each}

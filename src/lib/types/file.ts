@@ -1,4 +1,4 @@
-export type FileType = "image" | "video" | "sound" | "document";
+export type FileType = "image" | "video" | "audio" | "document";
 
 export type FileStatus = "Pending" | "Approved" | "Rejected" | "Error";
 
@@ -17,7 +17,7 @@ export interface FileItem {
 }
 
 export interface FilterState {
-  type: "all" | "image" | "video" | "sound" | "document";
+  type: "all" | "image" | "video" | "audio" | "document";
   status: "all" | FileStatus;
 }
 
