@@ -128,7 +128,6 @@
           class="cursor-pointer hover:bg-gray-50"
           onclick={() => {
             const newSelected = selectedFiles.includes(file.id) ? selectedFiles.filter((id) => id !== file.id) : [...selectedFiles, file.id];
-            selectedFiles = newSelected;
             onSelectionChange(newSelected);
           }}
         >
@@ -137,17 +136,9 @@
               type="checkbox"
               class="cursor-pointer rounded text-blue-600"
               checked={selectedFiles.includes(file.id)}
-              onclick={(e) => {
-                e.stopPropagation();
-                if (selectedFiles.includes(file.id)) {
-                  const newSelected = selectedFiles.filter((id) => id !== file.id);
-                  selectedFiles = newSelected;
-                  onSelectionChange(newSelected);
-                } else {
-                  const newSelected = [...selectedFiles, file.id];
-                  selectedFiles = newSelected;
-                  onSelectionChange(newSelected);
-                }
+              onchange={() => {
+                const newSelected = selectedFiles.includes(file.id) ? selectedFiles.filter((id) => id !== file.id) : [...selectedFiles, file.id];
+                onSelectionChange(newSelected);
               }}
             />
           </td>

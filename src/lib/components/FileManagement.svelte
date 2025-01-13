@@ -180,7 +180,7 @@
     </div>
     <div class="flex items-center justify-between gap-4">
       <div class="flex flex-1 items-center gap-4">
-        <SearchBar searchTerm={searchQuery} onSearch={handleSearchChange} />
+        <SearchBar bind:searchTerm={searchQuery} />
         {#if selectedFiles.length > 0}
           <FileSelectionBar selectedCount={selectedFiles.length} onApprove={handleBulkApprove} onReject={handleBulkReject} onPin={handleBulkPin} />
         {/if}
