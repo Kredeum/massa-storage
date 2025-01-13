@@ -1,7 +1,5 @@
 <script lang="ts">
   import { Upload } from "lucide-svelte";
-  import type { FileItem, FileType } from "$lib/types/file";
-  import { toastStore } from "$lib/stores/toast";
 
   let { files = $bindable() }: { files?: FileList } = $props();
 
