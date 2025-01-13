@@ -9,81 +9,87 @@
   let helia: Helia;
   let fs: UnixFS;
 
-  let cidInput = $state<string>("");
   let files = $state<FileList>();
-  let fileInput = $derived<File | undefined>(files?.[0]);
-  let fileRetreived = $state<string>("");
+  let file0 = $derived<File | undefined>(files?.[0]);
+  let cid = $state<string>("");
+  let file = $state<string>("");
 
   onMount(async () => {
     helia = await createHelia();
     fs = unixfs(helia);
   });
 
-  const fileHandle = async (fileData?: File) => {
-    if (!fileData) return "";
+  const fileHandle = async () => {
+    if (!file0) return "";
 
     try {
-      const arrayBuffer = await fileData.arrayBuffer();
+      const arrayBuffer = await file0.arrayBuffer();
       const content = new Uint8Array(arrayBuffer);
-      const cid = await fs.addFile({
-        path: fileData.name,
+      console.log("fileHandle ~ content:", content);
+      const _cid = await fs.addFile({
+        path: file0.name,
         content
       });
-
-      cidInput = cid.toString();
+      cid = _cid.toString();
     } catch (error) {
       console.error("Error uploading file:", error);
     }
   };
-  $effect(() => {
-    fileHandle(fileInput);
-  });
 
-
-  const fileRetrieve = async () => {
-    if (!cidInput.trim()) return;
+  const fileRetreive = async () => {
+    if (!cid) return "";
 
     try {
-      const parsedCid = CID.parse(cidInput);
-      const decoder = new TextDecoder();
-      let content = "";
+      const parsedCid = CID.parse(cid);
+      const chunks: Uint8Array[] = [];
 
       for await (const chunk of fs.cat(parsedCid)) {
-        content += decoder.decode(chunk, { stream: true });
+        console.log("fileRetreive ~ chunk");
+        chunks.push(chunk);
       }
 
-      fileRetreived = content;
+      const blob = new Blob(chunks);
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        file = reader.result as string;
+      };
+
+      reader.readAsDataURL(blob);
     } catch (error) {
       console.error("Error retrieving file:", error);
-      fileRetreived = "Error: Could not retrieve file";
     }
   };
+
+  const inputHandle = async () => {
+    await fileHandle();
+    await fileRetreive();
+  };
+  $effect(() => {
+    inputHandle();
+  });
 </script>
 
 <div class="flex flex-col items-center justify-center space-y-8 p-4">
-  <div class="w-full max-w-3xl space-y-4">
+  <div class="w-full max-w-xl space-y-4">
     <FileUpload5 bind:files />
 
-    <form onsubmit={fileRetrieve}>
-      <div class="flex gap-2">
-        <input type="text" bind:value={cidInput} placeholder="Enter CID" class="input" />
-        <button type="submit" class="button">Retrieve</button>
-      </div>
-    </form>
-    {#if fileRetreived}
+    <input type="text" bind:value={cid} placeholder="CID" class=" w-full flex-1 rounded border p-2" />
+    {#if file}
       <div class="mt-4 rounded bg-gray-100 p-6">
-        <p class="whitespace-pre-wrap text-lg">{fileRetreived}</p>
+        {#if file.startsWith("data:")}
+          <div class="space-y-4">
+            <img src={file} alt="Retreived content" class="h-auto max-w-full" />
+            <div class="flex justify-end">
+              <a href={file} download={file0?.name ?? "downloaded-file"} class="inline-flex items-center rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                Download {file0?.name ?? "File"}
+              </a>
+            </div>
+          </div>
+        {:else}
+          <p class="whitespace-pre-wrap text-lg">{file}</p>
+        {/if}
       </div>
     {/if}
   </div>
 </div>
-
-<style>
-  .input {
-    @apply min-w-[400px] flex-1 rounded border p-2;
-  }
-
-  .button {
-    @apply w-[140px] whitespace-nowrap rounded bg-blue-500 p-2 px-6 text-white hover:bg-blue-600;
-  }
-</style>
