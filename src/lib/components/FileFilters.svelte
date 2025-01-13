@@ -31,7 +31,7 @@
       <option value="document">Document</option>
       <option value="image">Image</option>
       <option value="video">Video</option>
-      <option value="sound">Sound</option>
+      <option value="audio">Audio</option>
     </select>
   </div>
   <div class="flex items-center space-x-2">

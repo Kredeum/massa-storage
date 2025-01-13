@@ -26,7 +26,7 @@
 
   let sortConfig: SortConfig = $state({
     key: "lastModified",
-    direction: "desc"
+    direction: "asc"
   });
 
   function getFileType(mimeType: string): FileType {
@@ -75,7 +75,7 @@
       if (newFiles.length > 0) {
         toastStore.add(`Successfully added ${newFiles.length} file${newFiles.length > 1 ? "s" : ""}`, "success");
       }
-      uploadFiles = undefined; // Reset after processing
+      uploadFiles = undefined;
     }
   });
 
@@ -191,10 +191,8 @@
 
   <FileTable files={paginatedFiles} {selectedFiles} {sortConfig} {handleSort} onSelectionChange={handleSelectionChange}>
     {#snippet actions({ file })}
-      
-        <FileActions {file} onModerate={handleModeration} onPin={handlePin} />
-      
-      {/snippet}
+      <FileActions {file} onModerate={handleModeration} onPin={handlePin} />
+    {/snippet}
   </FileTable>
 
   <FilePagination {currentPage} {totalPages} {itemsPerPage} totalItems={filteredFiles.length} setPage={(page) => setPage(page)} />
