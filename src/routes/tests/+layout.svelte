@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
-  console.log("page:", $state.snapshot(page));
+  // console.info("page:", $state.snapshot(page));
   let { children } = $props();
 </script>
 

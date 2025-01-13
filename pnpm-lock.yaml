@@ -57,6 +57,12 @@ importers:
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.49)
+      blockstore-idb:
+        specifier: ^2.0.1
+        version: 2.0.1
+      datastore-idb:
+        specifier: ^3.0.1
+        version: 3.0.1
       eslint:
         specifier: ^9.18.0
         version: 9.18.0(jiti@1.21.7)
@@ -72,6 +78,9 @@ importers:
       helia:
         specifier: ^5.1.1
         version: 5.1.1(bufferutil@4.0.9)(react-native@0.76.6(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(bufferutil@4.0.9)(react@18.3.1))
+      it-all:
+        specifier: ^3.0.6
+        version: 3.0.6
       lucide-svelte:
         specifier: ^0.469.0
         version: 0.469.0(svelte@5.17.3)
@@ -1877,6 +1886,9 @@ packages:
   blockstore-core@5.0.2:
     resolution: {integrity: sha512-y7/BHdYLO3YCpJMg6Ue7b4Oz4FT1HWSZoHHdlsaJTsvoE8XieXb6kUCB9UkkUBDw2x4neRDwlgYBpyK77+Ro2Q==}
 
+  blockstore-idb@2.0.1:
+    resolution: {integrity: sha512-dDoiEILLn0BaL5YMHTJW25XeEtSA8HV7yiUb/UMVFqdBHvvdSCuQnSbi0S5CMG/cc78ZkNaWG4Te4SfOL66UvQ==}
+
   bn.js@4.12.1:
     resolution: {integrity: sha512-k8TVBiPkPJT9uHLdOKfFpqcfprwBFOAAXXozRubr7R7PfIuKvQlzcI4M0pALeqXN09vdaMbUdUj+pass+uULAg==}
 
@@ -2150,6 +2162,9 @@ packages:
 
   datastore-core@10.0.2:
     resolution: {integrity: sha512-B3WXxI54VxJkpXxnYibiF17si3bLXE1XOjrJB7wM5co9fx2KOEkiePDGiCCEtnapFHTnmAnYCPdA7WZTIpdn/A==}
+
+  datastore-idb@3.0.1:
+    resolution: {integrity: sha512-JY+mqFXadONjFDdcJCokAg0Tn5zOxpl3Rk3QB/vWyRRu+lQW5vUmXf1BsNStqtJAB/p3FlwmlQZz900xy1AhgA==}
 
   debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
@@ -2741,6 +2756,9 @@ packages:
   human-signals@4.3.1:
     resolution: {integrity: sha512-nZXjEF2nbo7lIw3mgYjItAfgQXog3OjJogSbKa2CQIIvSGWcKgeJnQlNXip6NglNzYH45nSRiEVimMvYL8DDqQ==}
     engines: {node: '>=14.18.0'}
+
+  idb@8.0.1:
+    resolution: {integrity: sha512-EkBCzUZSdhJV8PxMSbeEV//xguVKZu9hZZulM+2gHXI0t2hGVU3eYE6/XnH77DS6FM2FY8wl17aDcu9vXpvLWQ==}
 
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
@@ -7361,6 +7379,14 @@ snapshots:
       it-pushable: 3.2.3
       multiformats: 13.3.1
 
+  blockstore-idb@2.0.1:
+    dependencies:
+      blockstore-core: 5.0.2
+      idb: 8.0.1
+      interface-blockstore: 5.3.1
+      interface-store: 6.0.2
+      multiformats: 13.3.1
+
   bn.js@4.12.1: {}
 
   bn.js@5.2.1: {}
@@ -7705,6 +7731,15 @@ snapshots:
       it-pushable: 3.2.3
       it-sort: 3.0.6
       it-take: 3.0.6
+
+  datastore-idb@3.0.1:
+    dependencies:
+      datastore-core: 10.0.2
+      idb: 8.0.1
+      interface-datastore: 8.3.1
+      interface-store: 6.0.2
+      it-filter: 3.1.1
+      it-sort: 3.0.6
 
   debug@2.6.9:
     dependencies:
@@ -8340,6 +8375,8 @@ snapshots:
   human-signals@2.1.0: {}
 
   human-signals@4.3.1: {}
+
+  idb@8.0.1: {}
 
   ieee754@1.2.1: {}
 

@@ -24,30 +24,22 @@
     await blockstore.open();
     helia = await createHelia({ blockstore });
     fs = unixfs(helia);
+
+    await pinsList();
   });
 
-  const fileHandle = async () => {
-    if (!file0) return "";
-
-    try {
-      const arrayBuffer = await file0.arrayBuffer();
-      const content = new Uint8Array(arrayBuffer);
-      console.log("fileHandle ~ content:", content);
-      const _cid = await fs.addFile({
-        path: file0.name,
-        content
-      });
-      cid = _cid.toString();
-    } catch (error) {
-      console.error("Error uploading file:", error);
-    }
+  const pinsList = async () => {
+    const pins = await all(helia.pins.ls());
+    console.info("Total pins found:", pins.length);
   };
 
-  const fileRetreive = async () => {
+  const fileRetreive = async (cid?: string) => {
     if (!cid) return "";
 
     try {
-      const chunks = await all(fs.cat(CID.parse(cid)));
+      const parsedCid = CID.parse(cid);
+      const chunks = await all(fs.cat(parsedCid));
+
       const blob = new Blob(chunks);
       const reader = new FileReader();
 
@@ -61,20 +53,13 @@
     }
   };
 
-  const inputHandle = async () => {
-    console.log("inputHandle ~ cid:", cid);
-    await fileHandle();
-    await fileRetreive();
-  };
   $effect(() => {
-    inputHandle();
+    fileRetreive(cid);
   });
 </script>
 
 <div class="flex flex-col items-center justify-center space-y-8 p-4">
   <div class="w-full max-w-xl space-y-4">
-    <FileUpload bind:files />
-
     <input type="text" bind:value={cid} placeholder="CID" class=" w-full flex-1 rounded border p-2" />
     {#if file}
       <div class="mt-4 rounded bg-gray-100 p-6">

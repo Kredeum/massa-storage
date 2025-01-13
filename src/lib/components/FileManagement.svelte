@@ -130,7 +130,7 @@
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 space-y-4">
     <div class="mb-8">
-      <FileUpload onFilesSelected={handleFilesSelected} />
+      <!-- <FileUpload onFilesSelected={handleFilesSelected} /> -->
     </div>
     <div class="flex items-center justify-between gap-4">
       <div class="flex flex-1 items-center gap-4">

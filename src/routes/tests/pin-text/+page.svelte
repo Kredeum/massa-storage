@@ -5,6 +5,13 @@
   import { createHelia, type Helia } from "helia";
   import { strings, type Strings } from "@helia/strings";
 
+  import { IDBBlockstore } from "blockstore-idb";
+
+  import all from "it-all";
+
+  // blocks storage inside browser with indexedDB
+  const blockstore = new IDBBlockstore("helia/blockstore");
+
   let helia: Helia;
   let s: Strings;
 
@@ -13,14 +20,21 @@
   let dataRetrieved = $state<string>("");
 
   onMount(async () => {
-    helia = await createHelia();
+    await blockstore.open();
+    helia = await createHelia({ blockstore });
     s = strings(helia);
   });
 
   const dataHandle = async (data?: string) => {
     if (!data?.trim()) return;
 
+    // add data
     const cid = await s.add(data);
+
+    // pin data
+    await helia.pins.add(cid);
+
+    // string cid
     cidInput = cid.toString();
   };
   $effect(() => {
