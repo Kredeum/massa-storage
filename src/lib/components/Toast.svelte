@@ -2,7 +2,7 @@
 <script lang="ts">
   import { toastStore, type Toast } from "../stores/toast";
 
-  $: toasts = $toastStore;
+  let toasts = $derived($toastStore);
 
   function handleKeyDown(event: KeyboardEvent, toast: Toast) {
     if (event.key === "Enter" || event.key === " ") {

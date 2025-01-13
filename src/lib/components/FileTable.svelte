@@ -17,16 +17,28 @@
     { key: null, label: "cid", sortable: false }
   ];
 
-  export let files: FileItem[] = [];
-  export let selectedFiles: number[] = [];
-  export let sortConfig: SortConfig;
-  export let handleSort: (key: keyof FileItem) => void;
-  export let onSelectionChange: (selected: number[]) => void;
-  let copiedCid: number | null = null;
-  let hoveredCid: number | null = null;
-  let hoveredPreview: number | null = null;
-  let mouseX = 0;
-  let mouseY = 0;
+  interface Props {
+    files?: FileItem[];
+    selectedFiles?: number[];
+    sortConfig: SortConfig;
+    handleSort: (key: keyof FileItem) => void;
+    onSelectionChange: (selected: number[]) => void;
+    actions?: import('svelte').Snippet<[any]>;
+  }
+
+  let {
+    files = [],
+    selectedFiles = $bindable([]),
+    sortConfig,
+    handleSort,
+    onSelectionChange,
+    actions
+  }: Props = $props();
+  let copiedCid: number | null = $state(null);
+  let hoveredCid: number | null = $state(null);
+  let hoveredPreview: number | null = $state(null);
+  let mouseX = $state(0);
+  let mouseY = $state(0);
   let previewUrls: { [key: number]: string } = {};
 
   function getDisplayCid(file: FileItem): string {
@@ -247,7 +259,7 @@
             </div>
           </td>
           <td class="w-32 px-4 py-3 text-center">
-            <slot name="actions" {file} />
+            {@render actions?.({ file, })}
           </td>
         </tr>
       {/each}

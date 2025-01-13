@@ -190,9 +190,11 @@
   </div>
 
   <FileTable files={paginatedFiles} {selectedFiles} {sortConfig} {handleSort} onSelectionChange={handleSelectionChange}>
-    <svelte:fragment slot="actions" let:file>
-      <FileActions {file} onModerate={handleModeration} onPin={handlePin} />
-    </svelte:fragment>
+    {#snippet actions({ file })}
+      
+        <FileActions {file} onModerate={handleModeration} onPin={handlePin} />
+      
+      {/snippet}
   </FileTable>
 
   <FilePagination {currentPage} {totalPages} {itemsPerPage} totalItems={filteredFiles.length} setPage={(page) => setPage(page)} />
