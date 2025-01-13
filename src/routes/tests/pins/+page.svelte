@@ -3,35 +3,36 @@
   import { CID } from "multiformats/cid";
 
   import { IDBBlockstore } from "blockstore-idb";
+  import { IDBDatastore } from "datastore-idb";
+
   import { createHelia, type Helia } from "helia";
   import { unixfs, type UnixFS } from "@helia/unixfs";
 
-  import FileUpload from "$lib/components/FileUpload.svelte";
   import all from "it-all";
 
   // blocks storage inside browser with indexedDB
   const blockstore = new IDBBlockstore("helia/blockstore");
+  const datastore = new IDBDatastore("helia/datastore");
 
   let helia: Helia;
   let fs: UnixFS;
 
   let files = $state<FileList>();
   let file0 = $derived<File | undefined>(files?.[0]);
-  let cid = $state<string>("");
   let file = $state<string>("");
+  const cids = $state<Array<string>>([]);
 
   onMount(async () => {
     await blockstore.open();
-    helia = await createHelia({ blockstore });
+    await datastore.open();
+    helia = await createHelia({ blockstore, datastore });
     fs = unixfs(helia);
+    await helia.start();
 
-    await pinsList();
+    for await (const pin of helia.pins.ls()) {
+      cids.push(pin.cid.toString());
+    }
   });
-
-  const pinsList = async () => {
-    const pins = await all(helia.pins.ls());
-    console.info("Total pins found:", pins.length);
-  };
 
   const fileRetreive = async (cid?: string) => {
     if (!cid) return "";
@@ -52,15 +53,19 @@
       console.error("Error retrieving file:", error);
     }
   };
-
-  $effect(() => {
-    fileRetreive(cid);
-  });
 </script>
 
 <div class="flex flex-col items-center justify-center space-y-8 p-4">
+  <ul class="pins-list" role="list">
+    {#each cids as cid}
+      <li>
+        <button type="button" onclick={() => fileRetreive(cid)} onkeydown={(e) => e.key === "Enter" && fileRetreive(cid)}>
+          {cid}
+        </button>
+      </li>
+    {/each}
+  </ul>
   <div class="w-full max-w-xl space-y-4">
-    <input type="text" bind:value={cid} placeholder="CID" class=" w-full flex-1 rounded border p-2" />
     {#if file}
       <div class="mt-4 rounded bg-gray-100 p-6">
         {#if file.startsWith("data:")}
@@ -79,3 +84,29 @@
     {/if}
   </div>
 </div>
+
+<style>
+  .pins-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    max-width: 600px;
+  }
+
+  .pins-list li {
+    padding: 12px 16px;
+    margin: 8px 0;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #e9ecef;
+    word-break: break-all;
+  }
+
+  .pins-list li:hover {
+    background-color: #e9ecef;
+    transform: translateX(5px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+</style>

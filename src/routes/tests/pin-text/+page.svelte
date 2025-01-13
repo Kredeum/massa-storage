@@ -6,11 +6,14 @@
   import { strings, type Strings } from "@helia/strings";
 
   import { IDBBlockstore } from "blockstore-idb";
+  import { IDBDatastore } from "datastore-idb";
 
   import all from "it-all";
+  import drain from "it-drain";
 
   // blocks storage inside browser with indexedDB
   const blockstore = new IDBBlockstore("helia/blockstore");
+  const datastore = new IDBDatastore("helia/datastore");
 
   let helia: Helia;
   let s: Strings;
@@ -21,7 +24,8 @@
 
   onMount(async () => {
     await blockstore.open();
-    helia = await createHelia({ blockstore });
+    await datastore.open();
+    helia = await createHelia({ blockstore, datastore });
     s = strings(helia);
   });
 
@@ -32,7 +36,9 @@
     const cid = await s.add(data);
 
     // pin data
-    await helia.pins.add(cid);
+    await drain(helia.pins.add(cid));
+
+    const pins = await all(helia.pins.ls());
 
     // string cid
     cidInput = cid.toString();

@@ -78,9 +78,24 @@ importers:
       helia:
         specifier: ^5.1.1
         version: 5.1.1(bufferutil@4.0.9)(react-native@0.76.6(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(bufferutil@4.0.9)(react@18.3.1))
+      interface-blockstore:
+        specifier: ^5.3.1
+        version: 5.3.1
       it-all:
         specifier: ^3.0.6
         version: 3.0.6
+      it-drain:
+        specifier: ^3.0.7
+        version: 3.0.7
+      it-filter:
+        specifier: ^3.1.1
+        version: 3.1.1
+      it-foreach:
+        specifier: ^2.1.1
+        version: 2.1.1
+      it-merge:
+        specifier: ^3.0.5
+        version: 3.0.5
       lucide-svelte:
         specifier: ^0.469.0
         version: 0.469.0(svelte@5.17.3)

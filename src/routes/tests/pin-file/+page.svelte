@@ -3,14 +3,18 @@
   import { CID } from "multiformats/cid";
 
   import { IDBBlockstore } from "blockstore-idb";
+  import { IDBDatastore } from "datastore-idb";
+
   import { createHelia, type Helia } from "helia";
   import { unixfs, type UnixFS } from "@helia/unixfs";
 
   import FileUpload from "$lib/components/FileUpload.svelte";
   import all from "it-all";
+  import drain from "it-drain";
 
   // blocks storage inside browser with indexedDB
   const blockstore = new IDBBlockstore("helia/blockstore");
+  const datastore = new IDBDatastore("helia/datastore");
 
   let helia: Helia;
   let fs: UnixFS;
@@ -22,7 +26,8 @@
 
   onMount(async () => {
     await blockstore.open();
-    helia = await createHelia({ blockstore });
+    await datastore.open();
+    helia = await createHelia({ blockstore, datastore });
     fs = unixfs(helia);
   });
 
@@ -37,6 +42,9 @@
         path: file0.name,
         content
       });
+      // pin file
+      await drain(helia.pins.add(_cid));
+
       cid = _cid.toString();
     } catch (error) {
       console.error("Error uploading file:", error);
