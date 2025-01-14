@@ -72,18 +72,21 @@
           }
           return true;
         })
-        .map((file) => ({
-          id: Date.now() + Math.random(),
-          name: file.name,
-          size: formatSize(file.size),
-          sizeInBytes: file.size,
-          type: getFileType(file.type),
-          status: "Pending" as const,
-          isPinned: false,
-          lastModified: new Date().toISOString(),
-          blob: file,
-          mimeType: file.type
-        }));
+        .map((file) => {
+          const type = getFileType(file.type);
+          return {
+            id: Date.now() + Math.random(),
+            name: file.name,
+            size: formatSize(file.size),
+            sizeInBytes: file.size,
+            type,
+            status: "Pending" as const,
+            isPinned: false,
+            lastModified: new Date().toISOString(),
+            blob: type === "image" || type === "video" ? file : undefined,
+            mimeType: file.type
+          };
+        });
 
       files = [...files, ...newFiles];
       if (newFiles.length > 0) {

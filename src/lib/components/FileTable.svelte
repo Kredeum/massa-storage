@@ -65,8 +65,8 @@
   }
 
   function handleMouseMove(event: MouseEvent) {
-    mouseX = event.clientX;
-    mouseY = event.clientY;
+    mouseX = event.pageX;
+    mouseY = event.pageY;
   }
 
   onDestroy(() => {
@@ -158,7 +158,19 @@
           {#each columns as column}
             {#if column.key === "name"}
               <td class="w-2/6 whitespace-nowrap px-4 py-4">
-                <div class="flex items-center">
+                <div
+                  class="flex items-center"
+                  role="tooltip"
+                  onmousemove={handleMouseMove}
+                  onmouseenter={() => {
+                    if (file.type === "image" || file.type === "video") {
+                      hoveredPreview = file.id;
+                    }
+                  }}
+                  onmouseleave={() => {
+                    hoveredPreview = null;
+                  }}
+                >
                   {#if file.type === "image"}
                     <Image class="mr-2 h-5 w-5 text-blue-500" />
                   {:else if file.type === "video"}
@@ -169,6 +181,20 @@
                     <FileText class="mr-2 h-5 w-5 text-gray-500" />
                   {/if}
                   <span class="font-medium text-gray-900">{file.name}</span>
+                  {#if hoveredPreview === file.id && (file.type === "image" || file.type === "video")}
+                    <div
+                      class="absolute z-50 rounded-lg border border-gray-200 bg-white p-2 shadow-lg"
+                      style="position: fixed; left: {mouseX}px; top: calc({mouseY}px - 200px); transform: translateX(-50%);"
+                    >
+                      {#if file.type === "image"}
+                        <img src={getPreviewUrl(file)} alt={file.name} class="h-48 w-auto object-contain" />
+                      {:else if file.type === "video"}
+                        <video src={getPreviewUrl(file)} class="h-48 w-auto" controls>
+                          <track kind="captions" label="No captions available" src="data:text/vtt,WEBVTT" />
+                        </video>
+                      {/if}
+                    </div>
+                  {/if}
                 </div>
               </td>
             {:else if column.key === "lastModified"}
@@ -199,28 +225,10 @@
               </td>
             {:else}
               <td class="w-1/6 whitespace-nowrap px-4 py-4 text-center font-mono text-sm text-gray-500">
-                <div class="relative inline-block">
-                  {#if file.cid}
-                    <button
-                      class="relative cursor-pointer"
-                      onclick={(e) => {
-                        e.stopPropagation();
-                        copyToClipboard(file.id);
-                      }}
-                      onmouseenter={() => (hoveredCid = file.id)}
-                      onmouseleave={() => (hoveredCid = null)}
-                    >
-                      {getDisplayCid(file)}
-                    </button>
-                    {#if copiedCid === file.id}
-                      <span class="absolute -top-8 left-1/2 -translate-x-1/2 transform rounded bg-gray-800 px-2 py-1 text-xs text-white">Copied!</span>
-                    {/if}
-                    {#if hoveredCid === file.id}
-                      <span class="absolute -top-8 left-1/2 -translate-x-1/2 transform rounded bg-gray-800 px-2 py-1 text-xs text-white">{file.cid}</span>
-                    {/if}
-                  {:else}
-                    <span class="text-gray-400">N/A</span>
-                  {/if}
+                <div class="relative">
+                  <button class="rounded px-2 py-1 hover:bg-gray-100" onmouseenter={() => (hoveredCid = file.id)} onmouseleave={() => (hoveredCid = null)} onclick={() => copyToClipboard(file.id)}>
+                    {getDisplayCid(file)}
+                  </button>
                 </div>
               </td>
             {/if}
