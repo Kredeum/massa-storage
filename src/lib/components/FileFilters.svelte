@@ -23,6 +23,11 @@
     onTypeFilter(value);
   }
 
+  function handleStatusFilterChange(e: Event) {
+    const value = (e.target as HTMLSelectElement).value as FilterState["status"];
+    filters.status = value;
+  }
+
   function handleSortChange(e: Event) {
     const value = (e.target as HTMLSelectElement).value as keyof FileItem;
     onSort(value);
@@ -50,6 +55,13 @@
       <option value="image">Image</option>
       <option value="video">Video</option>
       <option value="audio">Audio</option>
+    </select>
+
+    <select class="rounded-md border border-gray-300 px-3 py-1.5 text-sm" onchange={handleStatusFilterChange} value={filters.status}>
+      <option value="all">All Status</option>
+      <option value="Approved">Approved</option>
+      <option value="Pending">Pending</option>
+      <option value="Rejected">Rejected</option>
     </select>
 
     <select class="rounded-md border border-gray-300 px-3 py-1.5 text-sm" onchange={handleSortChange} value={sortConfig.key}>

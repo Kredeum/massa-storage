@@ -52,12 +52,11 @@
   }
 
   function compareStatus(statusA: FileStatus, statusB: FileStatus, isDesc: boolean): number {
-    // Define the order of statues
+    // Define the order of status
     const statusOrder: Record<FileStatus, number> = {
       Pending: 0,
       Approved: 1,
-      Rejected: 2,
-      Error: 3
+      Rejected: 2
     };
 
     const comparison = statusOrder[statusA] - statusOrder[statusB];
@@ -222,7 +221,14 @@
     </div>
   </div>
 
-  <FileTable files={paginatedFiles} {selectedFiles} {sortConfig} {handleSort} onSelectionChange={handleSelectionChange}>
+  <FileTable 
+    files={paginatedFiles} 
+    {selectedFiles} 
+    {sortConfig} 
+    {handleSort} 
+    onSelectionChange={handleSelectionChange}
+    filteredFiles={filteredFiles}
+  >
     {#snippet actions(file)}
       <FileActions {file} onModerate={handleModeration} onPin={handlePin} />
     {/snippet}

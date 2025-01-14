@@ -28,15 +28,17 @@
     handleSort: (key: keyof FileItem) => void;
     onSelectionChange: (selected: number[]) => void;
     actions?: import("svelte").Snippet<[FileItem]>;
+    filteredFiles?: FileItem[];
   }
 
-  let { files = [], selectedFiles = $bindable([]), sortConfig, handleSort, onSelectionChange, actions }: Props = $props();
+  let { files = [], selectedFiles = $bindable([]), sortConfig, handleSort, onSelectionChange, actions, filteredFiles = [] }: Props = $props();
   let copiedCid: number | null = $state(null);
   let hoveredCid: number | null = $state(null);
   let hoveredPreview: number | null = $state(null);
   let mouseX = $state(0);
   let mouseY = $state(0);
   let previewUrls: { [key: number]: string } = {};
+  let showSelectionMenu = $state(false);
 
   function getDisplayCid(file: FileItem): string {
     if (!file.cid) return "N/A";
@@ -92,6 +94,28 @@
     mouseY = event.clientY;
   }
 
+  function handleSelectCurrentPage() {
+    const newSelected = files.map((file) => file.id);
+    selectedFiles = newSelected;
+    onSelectionChange(newSelected);
+    showSelectionMenu = false;
+  }
+
+  function handleSelectAllFiles() {
+    const filesToFilter = filteredFiles || files;
+    const approvedFiles = filesToFilter.filter((file) => file.status === "Approved");
+    const newSelected = approvedFiles.map((file) => file.id);
+    selectedFiles = newSelected;
+    onSelectionChange(newSelected);
+    showSelectionMenu = false;
+  }
+
+  function handleClearSelection() {
+    selectedFiles = [];
+    onSelectionChange([]);
+    showSelectionMenu = false;
+  }
+
   onDestroy(() => {
     Object.values(previewUrls).forEach((url) => {
       URL.revokeObjectURL(url);
@@ -104,16 +128,81 @@
     <thead class="bg-gray-50">
       <tr>
         <th class="w-12 px-4 py-3 text-left">
-          <input
-            type="checkbox"
-            class="cursor-pointer rounded text-blue-600"
-            onclick={(e) => {
-              const target = e.target as HTMLInputElement;
-              const newSelected = target.checked ? files.map((file) => file.id) : [];
-              selectedFiles = newSelected;
-              onSelectionChange(newSelected);
-            }}
-          />
+          <div class="relative flex items-center gap-1">
+            <input
+              type="checkbox"
+              class="cursor-pointer rounded text-blue-600"
+              onclick={(e) => {
+                const target = e.target as HTMLInputElement;
+                const newSelected = target.checked ? files.map((file) => file.id) : [];
+                selectedFiles = newSelected;
+                onSelectionChange(newSelected);
+              }}
+            />
+            <button
+              class="rounded p-1 hover:bg-gray-100"
+              onclick={() => (showSelectionMenu = !showSelectionMenu)}
+              onkeydown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  showSelectionMenu = !showSelectionMenu;
+                }
+              }}
+              aria-expanded={showSelectionMenu}
+              aria-haspopup="true"
+              aria-label="Selection menu"
+            >
+              <ChevronDown size={16} />
+            </button>
+
+            {#if showSelectionMenu}
+              <div class="absolute left-0 top-full z-10 mt-1 min-w-[200px] rounded-md border border-gray-200 bg-white py-1 shadow-lg" role="menu" tabindex="-1">
+                <button
+                  type="button"
+                  class="w-full cursor-pointer px-4 py-2 text-left text-sm hover:bg-gray-100"
+                  onclick={handleSelectCurrentPage}
+                  onkeydown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleSelectCurrentPage();
+                    }
+                  }}
+                  role="menuitem"
+                >
+                  Select visible items
+                </button>
+                <button
+                  type="button"
+                  class="w-full cursor-pointer px-4 py-2 text-left text-sm hover:bg-gray-100"
+                  onclick={handleSelectAllFiles}
+                  onkeydown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleSelectAllFiles();
+                    }
+                  }}
+                  role="menuitem"
+                >
+                  Select all approved items
+                </button>
+                <div class="my-1 border-t border-gray-200"></div>
+                <button
+                  type="button"
+                  class="w-full cursor-pointer px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                  onclick={handleClearSelection}
+                  onkeydown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleClearSelection();
+                    }
+                  }}
+                  role="menuitem"
+                >
+                  Clear selection
+                </button>
+              </div>
+            {/if}
+          </div>
         </th>
         {#each columns as column}
           <th
@@ -163,8 +252,17 @@
           class="cursor-pointer hover:bg-gray-50"
           onclick={() => {
             const newSelected = selectedFiles.includes(file.id) ? selectedFiles.filter((id) => id !== file.id) : [...selectedFiles, file.id];
-            onSelectionChange(newSelected);
+            selectedFiles = newSelected;
           }}
+          onkeydown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              const newSelected = selectedFiles.includes(file.id) ? selectedFiles.filter((id) => id !== file.id) : [...selectedFiles, file.id];
+              selectedFiles = newSelected;
+            }
+          }}
+          role="button"
+          tabindex="0"
         >
           <td class="w-12 whitespace-nowrap px-4 py-4">
             <input
@@ -175,8 +273,19 @@
                 e.stopPropagation();
                 const target = e.target as HTMLInputElement;
                 const newSelected = target.checked ? [...selectedFiles, file.id] : selectedFiles.filter((id) => id !== file.id);
+                selectedFiles = newSelected;
                 onSelectionChange(newSelected);
               }}
+              onkeydown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  const target = e.target as HTMLInputElement;
+                  const newSelected = !target.checked ? [...selectedFiles, file.id] : selectedFiles.filter((id) => id !== file.id);
+                  selectedFiles = newSelected;
+                  onSelectionChange(newSelected);
+                }
+              }}
+              aria-label={`Select ${file.name}`}
             />
           </td>
           {#each columns as column}
@@ -195,6 +304,13 @@
                   onmouseleave={() => {
                     hoveredPreview = null;
                   }}
+                  onkeydown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleFileClick(e, file);
+                    }
+                  }}
+                  aria-label={`Preview ${file.name}`}
                 >
                   {#if file.type === "image"}
                     <Image class="mr-2 h-5 w-5 text-blue-500" />
@@ -266,7 +382,19 @@
             {:else}
               <td class="w-1/6 whitespace-nowrap px-4 py-4 text-center font-mono text-sm text-gray-500">
                 <div class="relative">
-                  <button class="rounded px-2 py-1 hover:bg-gray-100" onmouseenter={() => (hoveredCid = file.id)} onmouseleave={() => (hoveredCid = null)} onclick={() => copyToClipboard(file.id)}>
+                  <button
+                    class="rounded px-2 py-1 hover:bg-gray-100"
+                    onmouseenter={() => (hoveredCid = file.id)}
+                    onmouseleave={() => (hoveredCid = null)}
+                    onclick={() => copyToClipboard(file.id)}
+                    onkeydown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        copyToClipboard(file.id);
+                      }
+                    }}
+                    aria-label={`Copy CID for ${file.name}`}
+                  >
                     {getDisplayCid(file)}
                   </button>
                 </div>
