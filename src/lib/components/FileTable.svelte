@@ -2,6 +2,7 @@
   import type { FileItem, SortConfig } from "$lib/types/file";
   import { FileText, Image, Video, Music, ChevronDown, ChevronUp } from "lucide-svelte";
   import { onDestroy } from "svelte";
+  import { storeFileForPreview } from '$lib/stores/filePreviewStore';
 
   type Column = {
     // eslint-disable-next-line no-unused-vars
@@ -11,12 +12,12 @@
   };
 
   const columns: Column[] = [
-    { key: "name", label: "name", sortable: true },
-    { key: "lastModified", label: "date", sortable: true },
-    { key: "size", label: "size", sortable: true },
-    { key: "type", label: "type", sortable: true },
-    { key: "status", label: "status", sortable: true },
-    { key: null, label: "cid", sortable: false }
+    { key: "name", label: "Name", sortable: true },
+    { key: "lastModified", label: "Date", sortable: true },
+    { key: "size", label: "Size", sortable: true },
+    { key: "type", label: "Type", sortable: true },
+    { key: "status", label: "Status", sortable: true },
+    { key: null, label: "CID", sortable: false }
   ];
 
   interface Props {
@@ -47,6 +48,27 @@
       previewUrls[file.id] = URL.createObjectURL(file.blob);
     }
     return previewUrls[file.id];
+  }
+
+  function handleFileClick(event: MouseEvent | KeyboardEvent, file: FileItem) {
+    event.stopPropagation(); // Prevent row selection
+    if (!file.blob) return;
+    
+    // If Ctrl/Cmd is pressed, download directly
+    if ((event as MouseEvent).ctrlKey || (event as MouseEvent).metaKey) {
+      const link = document.createElement('a');
+      link.href = getPreviewUrl(file);
+      link.download = file.name;
+      link.click();
+    } else {
+      // Store the file for preview and open in new tab
+      storeFileForPreview(file.id.toString(), {
+        blob: file.blob,
+        name: file.name,
+        type: file.type
+      });
+      window.open(`/preview/${file.id}`, '_blank');
+    }
   }
 
   async function copyToClipboard(fileId: number) {
@@ -108,7 +130,7 @@
           >
             <button
               type="button"
-              class="flex w-full items-center gap-1 text-xs font-medium uppercase tracking-wider text-gray-500 {column.label === 'cid'
+              class="flex w-full items-center gap-1 text-xs font-medium uppercase tracking-wider text-gray-500 {column.label === 'CID'
                 ? 'cursor-default justify-center'
                 : column.sortable
                   ? 'cursor-pointer justify-center hover:text-gray-700'
@@ -181,7 +203,15 @@
                   {:else}
                     <FileText class="mr-2 h-5 w-5 text-gray-500" />
                   {/if}
-                  <span class="font-medium text-gray-900">{file.name}</span>
+                  <button
+                    type="button"
+                    class="text-left font-medium text-gray-900 hover:underline"
+                    onclick={(e) => handleFileClick(e, file)}
+                    onkeydown={(e) => e.key === "Enter" && handleFileClick(e, file)}
+                    title="Click to open, Ctrl+Click to download"
+                  >
+                    {file.name}
+                  </button>
                   {#if hoveredPreview === file.id && (file.type === "image" || file.type === "video")}
                     <div class="pointer-events-none fixed z-50" style="left: {mouseX - 64}px; top: calc({mouseY - 136}px);">
                       <div class="rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
