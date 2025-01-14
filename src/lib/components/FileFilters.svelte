@@ -56,15 +56,20 @@
       <option value="name">Name</option>
       <option value="lastModified">Date</option>
       <option value="size">Size</option>
+      <option value="tag">Tags</option>
       <option value="type">Type</option>
       <option value="status">Status</option>
     </select>
 
     <select class="rounded-md border border-gray-300 px-3 py-1.5 text-sm" onchange={handleTagSelect} value={filters.tags[0] || ""} disabled={uniqueTags.length === 0}>
-      <option value="">Tags</option>
-      {#each uniqueTags as tag}
-        <option value={tag}>{tag}</option>
-      {/each}
+      <option value="">Search by tag...</option>
+      {#if uniqueTags.length === 0}
+        <option value="" disabled>No tags available</option>
+      {:else}
+        {#each uniqueTags as tag}
+          <option value={tag}>{tag}</option>
+        {/each}
+      {/if}
     </select>
   </div>
 </div>

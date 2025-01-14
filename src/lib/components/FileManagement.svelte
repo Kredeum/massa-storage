@@ -1,5 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: `$:` is not allowed in runes mode, use `$derived` or `$effect` instead
-https://svelte.dev/e/legacy_reactive_statement_invalid -->
 <script lang="ts">
   import type { FileItem, FilterState, SortConfig, FileStatus, FileType } from "$lib/types/file";
   import SearchBar from "./SearchBar.svelte";
