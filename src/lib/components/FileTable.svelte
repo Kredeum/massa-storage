@@ -2,7 +2,7 @@
   import type { FileItem, SortConfig } from "$lib/types/file";
   import { FileText, Image, Video, Music, ChevronDown, ChevronUp } from "lucide-svelte";
   import { onDestroy } from "svelte";
-  import { storeFileForPreview } from '$lib/stores/filePreviewStore';
+  import { storeFileForPreview } from "$lib/stores/filePreviewStore";
 
   type Column = {
     // eslint-disable-next-line no-unused-vars
@@ -13,6 +13,7 @@
 
   const columns: Column[] = [
     { key: "name", label: "Name", sortable: true },
+    { key: "tag", label: "Tags", sortable: true },
     { key: "lastModified", label: "Date", sortable: true },
     { key: "size", label: "Size", sortable: true },
     { key: "type", label: "Type", sortable: true },
@@ -53,10 +54,10 @@
   function handleFileClick(event: MouseEvent | KeyboardEvent, file: FileItem) {
     event.stopPropagation(); // Prevent row selection
     if (!file.blob) return;
-    
+
     // If Ctrl/Cmd is pressed, download directly
     if ((event as MouseEvent).ctrlKey || (event as MouseEvent).metaKey) {
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = getPreviewUrl(file);
       link.download = file.name;
       link.click();
@@ -67,7 +68,7 @@
         name: file.name,
         type: file.type
       });
-      window.open(`/preview/${file.id}`, '_blank');
+      window.open(`/preview/${file.id}`, "_blank");
     }
   }
 
@@ -118,18 +119,19 @@
           <th
             class="{column.key === 'name'
               ? 'w-1/6 text-left'
-              : column.key === 'lastModified'
+              : column.key === 'tag'
                 ? 'w-1/6 text-center'
-                : column.key === 'size'
-                  ? 'w-1/12 text-center'
-                  : column.key === 'type'
+                : column.key === 'lastModified'
+                  ? 'w-1/6 text-center'
+                  : column.key === 'size'
                     ? 'w-1/12 text-center'
-                    : column.key === 'status'
+                    : column.key === 'type'
                       ? 'w-1/12 text-center'
-                      : 'w-1/6 text-center'} px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500"
+                      : column.key === 'status'
+                        ? 'w-1/12 text-center'
+                        : 'w-1/6 text-center'} px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500"
           >
             <button
-              type="button"
               class="flex w-full items-center gap-1 text-xs font-medium uppercase tracking-wider text-gray-500 {column.label === 'CID'
                 ? 'cursor-default justify-center'
                 : column.sortable
@@ -252,6 +254,14 @@
                 >
                   {file.status}
                 </span>
+              </td>
+            {:else if column.key === "tag"}
+              <td class="whitespace-nowrap px-4 py-4 text-center">
+                {#if file.tag}
+                  <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">
+                    {file.tag}
+                  </span>
+                {/if}
               </td>
             {:else}
               <td class="w-1/6 whitespace-nowrap px-4 py-4 text-center font-mono text-sm text-gray-500">

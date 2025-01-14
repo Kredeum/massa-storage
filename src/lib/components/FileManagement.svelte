@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: `$:` is not allowed in runes mode, use `$derived` or `$effect` instead
+https://svelte.dev/e/legacy_reactive_statement_invalid -->
 <script lang="ts">
   import type { FileItem, FilterState, SortConfig, FileStatus, FileType } from "$lib/types/file";
   import SearchBar from "./SearchBar.svelte";
@@ -8,6 +10,7 @@
   import FileSelectionBar from "./FileSelectionBar.svelte";
   import FilePagination from "./FilePagination.svelte";
   import Toast from "./Toast.svelte";
+  import TagInput from "./TagInput.svelte";
   import { toastStore } from "../stores/toast";
 
   const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
@@ -21,7 +24,8 @@
   let uploadFiles = $state<FileList | undefined>();
   let filters: FilterState = $state({
     type: "all",
-    status: "all"
+    status: "all",
+    tags: []
   });
 
   let sortConfig: SortConfig = $state({
@@ -80,6 +84,7 @@
             size: formatSize(file.size),
             sizeInBytes: file.size,
             type,
+            tags: [],
             status: "Pending" as const,
             isPinned: false,
             lastModified: new Date().toISOString(),
@@ -99,10 +104,11 @@
   // Reactive filtering and sorting
   const filteredFiles = $derived(
     files.filter((file) => {
-      const matchesSearch = file.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesType = filters.type === "all" || file.type === filters.type;
       const matchesStatus = filters.status === "all" || file.status === filters.status;
-      return matchesSearch && matchesType && matchesStatus;
+      const matchesTags = filters.tags.length === 0 || (file.tag && filters.tags.includes(file.tag));
+      const matchesSearch = !searchQuery || file.name.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesType && matchesStatus && matchesTags && matchesSearch;
     })
   );
 
@@ -115,23 +121,24 @@
       }
 
       if (sortConfig.key === "name") {
-        return sortConfig.direction === "desc" ? a.name.toLowerCase().localeCompare(b.name.toLowerCase()) : b.name.toLowerCase().localeCompare(a.name.toLowerCase());
+        return sortConfig.direction === "desc" ? b.name.toLowerCase().localeCompare(a.name.toLowerCase()) : a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+      }
+
+      if (sortConfig.key === "tag") {
+        // Mettre les fichiers avec tags en premier si direction est "desc"
+        if (!a.tag && !b.tag) return 0;
+        if (!a.tag) return sortConfig.direction === "desc" ? 1 : -1;
+        if (!b.tag) return sortConfig.direction === "desc" ? -1 : 1;
+        // Trier alphabétiquement les tags
+        return sortConfig.direction === "desc" ? b.tag.toLowerCase().localeCompare(a.tag.toLowerCase()) : a.tag.toLowerCase().localeCompare(b.tag.toLowerCase());
+      }
+
+      if (sortConfig.key === "size") {
+        return sortConfig.direction === "desc" ? b.sizeInBytes - a.sizeInBytes : a.sizeInBytes - b.sizeInBytes;
       }
 
       const direction = sortConfig.direction === "desc" ? 1 : -1;
-      if (sortConfig.key === "size") {
-        return direction * (a.sizeInBytes - b.sizeInBytes);
-      }
-
-      if (sortConfig.key === "status") {
-        return compareStatus(a.status, b.status, sortConfig.direction === "desc");
-      }
-
-      if (sortConfig.key === "type") {
-        return direction * a[sortConfig.key].localeCompare(b[sortConfig.key]);
-      }
-
-      return 0;
+      return direction * String(a[sortConfig.key]).localeCompare(String(b[sortConfig.key]));
     })
   );
 
@@ -173,6 +180,14 @@
     selectedFiles = selected;
   }
 
+  function handleAddTag(tag: string, fileIds: number[]) {
+    if (fileIds.length === 0) return;
+
+    files = files.map((file) => (fileIds.includes(file.id) ? { ...file, tag } : file));
+    // Reset selection after adding tags
+    selectedFiles = [];
+  }
+
   // Bulk actions
   function handleBulkApprove() {
     files = files.map((file) => (selectedFiles.includes(file.id) ? { ...file, status: "Approved" } : file));
@@ -200,11 +215,12 @@
     <div class="flex items-center justify-between gap-4">
       <div class="flex flex-1 items-center gap-4">
         <SearchBar bind:searchTerm={searchQuery} />
+        <TagInput {selectedFiles} {files} onAddTag={handleAddTag} />
         {#if selectedFiles.length > 0}
           <FileSelectionBar selectedCount={selectedFiles.length} onApprove={handleBulkApprove} onReject={handleBulkReject} onPin={handleBulkPin} />
         {/if}
       </div>
-      <FileFilters {filters} {sortConfig} onTypeFilter={handleTypeFilter} onSort={handleSort} />
+      <FileFilters {filters} {sortConfig} {files} onTypeFilter={handleTypeFilter} onSort={handleSort} />
     </div>
   </div>
 

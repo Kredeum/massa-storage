@@ -8,6 +8,7 @@ export interface FileItem {
   size: string;
   sizeInBytes: number;
   type: FileType;
+  tag?: string;
   status: FileStatus;
   isPinned: boolean;
   lastModified: string;
@@ -18,8 +19,9 @@ export interface FileItem {
 }
 
 export interface FilterState {
-  type: "all" | "image" | "video" | "audio" | "document";
+  type: "all" | "image" | "video" | "audio" | "document" | "tag";
   status: "all" | FileStatus;
+  tags: string[];
 }
 
 export interface SortConfig {
