@@ -6,6 +6,7 @@ export interface FileItem {
   id: number;
   name: string;
   size: string;
+  sizeInBytes: number;
   type: FileType;
   status: FileStatus;
   isPinned: boolean;

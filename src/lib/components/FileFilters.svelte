@@ -37,6 +37,7 @@
   <div class="flex items-center space-x-2">
     <select class="rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value={sortConfig.key} onchange={handleSortChange}>
       <option value="name">Name</option>
+      <option value="lastModified">Date</option>
       <option value="size">Size</option>
       <option value="type">Type</option>
       <option value="status">Status</option>

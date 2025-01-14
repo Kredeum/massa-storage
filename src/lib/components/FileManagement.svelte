@@ -26,7 +26,7 @@
 
   let sortConfig: SortConfig = $state({
     key: "lastModified",
-    direction: "asc"
+    direction: "desc"
   });
 
   function getFileType(mimeType: string): FileType {
@@ -49,17 +49,17 @@
     return `${size.toFixed(1)} ${units[unitIndex]}`;
   }
 
-  function sizeToBytes(sizeStr: string): number {
-    const units = {
-      B: 1,
-      KB: 1024,
-      MB: 1024 * 1024,
-      GB: 1024 * 1024 * 1024
+  function compareStatus(statusA: FileStatus, statusB: FileStatus, isDesc: boolean): number {
+    // Define the order of statues
+    const statusOrder: Record<FileStatus, number> = {
+      Pending: 0,
+      Approved: 1,
+      Rejected: 2,
+      Error: 3
     };
-    const matches = sizeStr.match(/^([\d.]+)\s*([A-Z]+)$/);
-    if (!matches) return 0;
-    const [, size, unit] = matches;
-    return parseFloat(size) * (units[unit as keyof typeof units] || 1);
+
+    const comparison = statusOrder[statusA] - statusOrder[statusB];
+    return isDesc ? comparison : -comparison;
   }
 
   $effect(() => {
@@ -76,10 +76,11 @@
           id: Date.now() + Math.random(),
           name: file.name,
           size: formatSize(file.size),
+          sizeInBytes: file.size,
           type: getFileType(file.type),
           status: "Pending" as const,
           isPinned: false,
-          lastModified: new Date(file.lastModified).toISOString(),
+          lastModified: new Date().toISOString(),
           blob: file,
           mimeType: file.type
         }));
@@ -104,24 +105,30 @@
 
   const sortedFiles = $derived(
     [...filteredFiles].sort((a, b) => {
-      const direction = sortConfig.direction === "desc" ? 1 : -1;
+      if (sortConfig.key === "lastModified") {
+        const dateA = new Date(a.lastModified).getTime();
+        const dateB = new Date(b.lastModified).getTime();
+        return sortConfig.direction === "desc" ? dateB - dateA : dateA - dateB;
+      }
 
       if (sortConfig.key === "name") {
-        return direction * a.name.localeCompare(b.name);
+        return sortConfig.direction === "desc" ? a.name.toLowerCase().localeCompare(b.name.toLowerCase()) : b.name.toLowerCase().localeCompare(a.name.toLowerCase());
       }
 
+      const direction = sortConfig.direction === "desc" ? 1 : -1;
       if (sortConfig.key === "size") {
-        const aBytes = sizeToBytes(a.size);
-        const bBytes = sizeToBytes(b.size);
-        return direction * (bBytes - aBytes);
+        return direction * (a.sizeInBytes - b.sizeInBytes);
       }
 
-      if (sortConfig.key === "type" || sortConfig.key === "status") {
+      if (sortConfig.key === "status") {
+        return compareStatus(a.status, b.status, sortConfig.direction === "desc");
+      }
+
+      if (sortConfig.key === "type") {
         return direction * a[sortConfig.key].localeCompare(b[sortConfig.key]);
       }
 
-      // Default (lastModified)
-      return direction * (new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime());
+      return 0;
     })
   );
 
@@ -199,7 +206,7 @@
   </div>
 
   <FileTable files={paginatedFiles} {selectedFiles} {sortConfig} {handleSort} onSelectionChange={handleSelectionChange}>
-    {#snippet actions({ file })}
+    {#snippet actions(file)}
       <FileActions {file} onModerate={handleModeration} onPin={handlePin} />
     {/snippet}
   </FileTable>
