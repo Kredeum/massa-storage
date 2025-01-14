@@ -65,8 +65,8 @@
   }
 
   function handleMouseMove(event: MouseEvent) {
-    mouseX = event.pageX;
-    mouseY = event.pageY;
+    mouseX = event.clientX;
+    mouseY = event.clientY;
   }
 
   onDestroy(() => {
@@ -160,7 +160,8 @@
               <td class="w-2/6 whitespace-nowrap px-4 py-4">
                 <div
                   class="flex items-center"
-                  role="tooltip"
+                  role="button"
+                  tabindex="0"
                   onmousemove={handleMouseMove}
                   onmouseenter={() => {
                     if (file.type === "image" || file.type === "video") {
@@ -182,17 +183,16 @@
                   {/if}
                   <span class="font-medium text-gray-900">{file.name}</span>
                   {#if hoveredPreview === file.id && (file.type === "image" || file.type === "video")}
-                    <div
-                      class="absolute z-50 rounded-lg border border-gray-200 bg-white p-2 shadow-lg"
-                      style="position: fixed; left: {mouseX}px; top: calc({mouseY}px - 200px); transform: translateX(-50%);"
-                    >
-                      {#if file.type === "image"}
-                        <img src={getPreviewUrl(file)} alt={file.name} class="h-48 w-auto object-contain" />
-                      {:else if file.type === "video"}
-                        <video src={getPreviewUrl(file)} class="h-48 w-auto" controls>
-                          <track kind="captions" label="No captions available" src="data:text/vtt,WEBVTT" />
-                        </video>
-                      {/if}
+                    <div class="pointer-events-none fixed z-50" style="left: {mouseX - 64}px; top: calc({mouseY - 136}px);">
+                      <div class="rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
+                        {#if file.type === "image"}
+                          <img src={getPreviewUrl(file)} alt={file.name} class="h-32 w-32 rounded object-cover" />
+                        {:else if file.type === "video"}
+                          <video src={getPreviewUrl(file)} class="h-32 w-32 rounded object-cover" autoplay muted loop playsinline>
+                            <track kind="captions" label="No captions available" src="data:text/vtt,WEBVTT" />
+                          </video>
+                        {/if}
+                      </div>
                     </div>
                   {/if}
                 </div>
