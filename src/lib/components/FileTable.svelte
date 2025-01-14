@@ -188,7 +188,7 @@
                         {#if file.type === "image"}
                           <img src={getPreviewUrl(file)} alt={file.name} class="h-32 w-32 rounded object-cover" />
                         {:else if file.type === "video"}
-                          <video src={getPreviewUrl(file)} class="h-32 w-32 rounded object-cover" autoplay muted loop playsinline>
+                          <video src={getPreviewUrl(file)} class="h-32 w-32 rounded bg-black object-contain" autoplay muted loop playsinline>
                             <track kind="captions" label="No captions available" src="data:text/vtt,WEBVTT" />
                           </video>
                         {/if}
