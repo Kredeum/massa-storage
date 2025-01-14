@@ -3,7 +3,7 @@
   import { page } from "$app/stores";
   import { Download } from "lucide-svelte";
 
-  export let data;
+  let { data } = $props();
   const { file } = data;
 </script>
 
