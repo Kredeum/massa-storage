@@ -225,15 +225,23 @@
                 >
                   <span>{column.label}</span>
                   {#if column.sortable && column.key !== "tags"}
-                    {#if sortConfig.key === column.key}
-                      {#if sortConfig.direction === "desc"}
-                        <ChevronDown size={14} class="text-gray-400" />
+                    <span class="ml-1">
+                      {#if sortConfig.key === column.key}
+                        {#if sortConfig.direction === "desc"}
+                          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                          </svg>
+                        {:else}
+                          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                          </svg>
+                        {/if}
                       {:else}
-                        <ChevronUp size={14} class="text-gray-400" />
+                        <svg class="h-3.5 w-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M4 12h16" />
+                        </svg>
                       {/if}
-                    {:else}
-                      <ChevronDown size={14} class="text-gray-400" />
-                    {/if}
+                    </span>
                   {/if}
                 </button>
               </div>
