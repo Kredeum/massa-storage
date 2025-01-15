@@ -297,27 +297,7 @@
             {#each columns as column}
               {#if column.key === "name"}
                 <td class="w-2/6 whitespace-nowrap px-4 py-4">
-                  <div
-                    class="flex items-center"
-                    role="button"
-                    tabindex="0"
-                    onmousemove={handleMouseMove}
-                    onmouseenter={() => {
-                      if (file.type === "image" || file.type === "video") {
-                        hoveredPreview = file.id;
-                      }
-                    }}
-                    onmouseleave={() => {
-                      hoveredPreview = null;
-                    }}
-                    onkeydown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        handleFileClick(e, file);
-                      }
-                    }}
-                    aria-label={`Preview ${file.name}`}
-                  >
+                  <div class="flex items-center">
                     {#if file.type === "image"}
                       <Image class="mr-2 h-5 w-5 text-blue-500" />
                     {:else if file.type === "video"}
@@ -327,15 +307,52 @@
                     {:else}
                       <FileText class="mr-2 h-5 w-5 text-gray-500" />
                     {/if}
-                    <button
-                      type="button"
-                      class="text-left font-medium text-gray-900 hover:underline"
-                      onclick={(e) => handleFileClick(e, file)}
-                      onkeydown={(e) => e.key === "Enter" && handleFileClick(e, file)}
-                      title="Click to open, Ctrl+Click to download"
+
+                    <a
+                      href={file.blob ? URL.createObjectURL(file.blob) : "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="font-medium text-gray-900 hover:text-blue-600"
+                      onmousemove={handleMouseMove}
+                      onmouseenter={() => {
+                        if (file.type === "image" || file.type === "video") {
+                          hoveredPreview = file.id;
+                        }
+                      }}
+                      onmouseleave={() => {
+                        hoveredPreview = null;
+                      }}
+                      onclick={(e) => {
+                        if (file.blob) {
+                          const url = URL.createObjectURL(file.blob);
+                          window.open(url, "_blank");
+                          // Clean up the URL after opening
+                          setTimeout(() => URL.revokeObjectURL(url), 100);
+                        }
+                      }}
                     >
                       {file.name}
-                    </button>
+                    </a>
+
+                    <a
+                      href={file.blob ? URL.createObjectURL(file.blob) : "#"}
+                      download={file.name}
+                      class="ml-2 text-sm text-gray-500 hover:text-blue-600"
+                      aria-label={`Download ${file.name}`}
+                      onclick={(e) => {
+                        if (file.blob) {
+                          const url = URL.createObjectURL(file.blob);
+                          (e.target as HTMLAnchorElement).href = url;
+                          // Clean up the URL after download starts
+                          setTimeout(() => URL.revokeObjectURL(url), 100);
+                        }
+                      }}
+                    >
+                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                    </a>
+
                     {#if hoveredPreview === file.id && (file.type === "image" || file.type === "video")}
                       <div class="pointer-events-none fixed z-50" style="left: {mouseX - 64}px; top: calc({mouseY - 136}px);">
                         <div class="rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
