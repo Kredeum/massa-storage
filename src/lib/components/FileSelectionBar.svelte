@@ -1,9 +1,13 @@
 <script lang="ts">
   import { Check, X, Pin } from "lucide-svelte";
-  export let selectedCount: number;
-  export let onApprove: () => void;
-  export let onReject: () => void;
-  export let onPin: () => void;
+  interface Props {
+    selectedCount: number;
+    onApprove: () => void;
+    onReject: () => void;
+    onPin: () => void;
+  }
+
+  let { selectedCount, onApprove, onReject, onPin }: Props = $props();
 </script>
 
 {#if selectedCount > 0}

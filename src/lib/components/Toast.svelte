@@ -2,7 +2,7 @@
 <script lang="ts">
   import { toastStore, type Toast } from "../stores/toast";
 
-  $: toasts = $toastStore;
+  let toasts = $derived($toastStore);
 
   function handleKeyDown(event: KeyboardEvent, toast: Toast) {
     if (event.key === "Enter" || event.key === " ") {
@@ -19,8 +19,8 @@
         class:error={toast.type === "error"}
         class:success={toast.type === "success"}
         class:info={toast.type === "info"}
-        on:click={() => toastStore.remove(toast.id)}
-        on:keydown={(e) => handleKeyDown(e, toast)}
+        onclick={() => toastStore.remove(toast.id)}
+        onkeydown={(e) => handleKeyDown(e, toast)}
         type="button"
         aria-label="Fermer la notification"
       >

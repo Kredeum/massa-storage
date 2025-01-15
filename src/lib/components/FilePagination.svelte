@@ -1,9 +1,13 @@
 <script lang="ts">
-  export let currentPage: number;
-  export let totalPages: number;
-  export let itemsPerPage: number;
-  export let totalItems: number;
-  export let setPage: (page: number) => void;
+  interface Props {
+    currentPage: number;
+    totalPages: number;
+    itemsPerPage: number;
+    totalItems: number;
+    setPage: (page: number) => void;
+  }
+
+  let { currentPage, totalPages, itemsPerPage, totalItems, setPage }: Props = $props();
 
   function handlePrevious() {
     if (currentPage > 0) {
