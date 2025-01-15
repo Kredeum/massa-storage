@@ -29,6 +29,9 @@ importers:
       svelte-hot-french-toast:
         specifier: ^1.0.0
         version: 1.0.0(svelte@5.17.3)
+      svelte-portal:
+        specifier: ^2.2.1
+        version: 2.2.1
     devDependencies:
       '@eslint/compat':
         specifier: ^1.2.5
@@ -4323,6 +4326,9 @@ packages:
     resolution: {integrity: sha512-SmJUwq7iHu9m0a794UBhCnp5YBQw0NV54j5z2oG+S/dtMMxbwC1s7bOGPpsPJrtZY7EED6jGV7BuulyorAaXWA==}
     peerDependencies:
       svelte: '>= 5'
+
+  svelte-portal@2.2.1:
+    resolution: {integrity: sha512-uF7is5sM4aq5iN7QF/67XLnTUvQCf2iiG/B1BHTqLwYVY1dsVmTeXZ/LeEyU6dLjApOQdbEG9lkqHzxiQtOLEQ==}
 
   svelte@5.17.3:
     resolution: {integrity: sha512-eLgtpR2JiTgeuNQRCDcLx35Z7Lu9Qe09GPOz+gvtR9nmIZu5xgFd6oFiLGQlxLD0/u7xVyF5AUkjDVyFHe6Bvw==}
@@ -10140,6 +10146,8 @@ snapshots:
   svelte-hot-french-toast@1.0.0(svelte@5.17.3):
     dependencies:
       svelte: 5.17.3
+
+  svelte-portal@2.2.1: {}
 
   svelte@5.17.3:
     dependencies:

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { FileItem, SortConfig } from "$lib/types/file";
+  import type { FileItem, SortConfig, FileStatus } from "$lib/types/file";
   import { FileText, Image, Video, Music, ChevronDown, ChevronUp } from "lucide-svelte";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { storeFileForPreview } from "$lib/stores/filePreviewStore";
 
   type Column = {
@@ -13,7 +13,7 @@
 
   const columns: Column[] = [
     { key: "name", label: "Name", sortable: true },
-    { key: "tag", label: "Tags", sortable: true },
+    { key: "tag", label: "Tags", sortable: false },
     { key: "lastModified", label: "Date", sortable: true },
     { key: "size", label: "Size", sortable: true },
     { key: "type", label: "Type", sortable: true },
@@ -22,16 +22,19 @@
   ];
 
   interface Props {
-    files?: FileItem[];
+    files: FileItem[];
+    paginatedFiles: FileItem[];
     selectedFiles?: number[];
     sortConfig: SortConfig;
     handleSort: (key: keyof FileItem) => void;
     onSelectionChange: (selected: number[]) => void;
+    onFilterChange: (status: FileStatus | "all") => void;
     actions?: import("svelte").Snippet<[FileItem]>;
     filteredFiles?: FileItem[];
   }
 
-  let { files = [], selectedFiles = $bindable([]), sortConfig, handleSort, onSelectionChange, actions, filteredFiles = [] }: Props = $props();
+  let { files = [], paginatedFiles = [], selectedFiles = $bindable([]), sortConfig, handleSort, onSelectionChange, onFilterChange, actions, filteredFiles = [] }: Props = $props();
+
   let copiedCid: number | null = $state(null);
   let hoveredCid: number | null = $state(null);
   let hoveredPreview: number | null = $state(null);
@@ -39,6 +42,8 @@
   let mouseY = $state(0);
   let previewUrls: { [key: number]: string } = {};
   let showSelectionMenu = $state(false);
+  let menuRef = $state<HTMLDivElement | null>(null);
+  let buttonRef = $state<HTMLButtonElement | null>(null);
 
   function getDisplayCid(file: FileItem): string {
     if (!file.cid) return "N/A";
@@ -94,27 +99,63 @@
     mouseY = event.clientY;
   }
 
-  function handleSelectCurrentPage() {
-    const newSelected = files.map((file) => file.id);
-    selectedFiles = newSelected;
-    onSelectionChange(newSelected);
+  // Select all files across all pages
+  function handleSelectAll() {
+    const allFileIds = files.map((file) => file.id);
+    selectedFiles = allFileIds;
+    onSelectionChange(allFileIds);
     showSelectionMenu = false;
   }
 
-  function handleSelectAllFiles() {
-    const filesToFilter = filteredFiles || files;
-    const approvedFiles = filesToFilter.filter((file) => file.status === "Approved");
-    const newSelected = approvedFiles.map((file) => file.id);
-    selectedFiles = newSelected;
-    onSelectionChange(newSelected);
+  // Select only files visible on the current page
+  function handleSelectCurrentPage() {
+    const currentPageIds = paginatedFiles.map((file) => file.id);
+    selectedFiles = currentPageIds;
+    onSelectionChange(currentPageIds);
+    showSelectionMenu = false;
+  }
+
+  // Select approved files from the current view
+  function handleSelectApprovedFiles() {
+    // Select approved files and update filter
+    const approvedFiles = files.filter((file) => file.status === "Approved");
+    const approvedIds = approvedFiles.map((file) => file.id);
+    selectedFiles = approvedIds;
+    onSelectionChange(approvedIds);
+    onFilterChange("Approved");
+    showSelectionMenu = false;
+  }
+
+  // Select pending files from the current view
+  function handleSelectPendingFiles() {
+    // Select pending files and update filter
+    const pendingFiles = files.filter((file) => file.status === "Pending");
+    const pendingIds = pendingFiles.map((file) => file.id);
+    selectedFiles = pendingIds;
+    onSelectionChange(pendingIds);
+    onFilterChange("Pending");
     showSelectionMenu = false;
   }
 
   function handleClearSelection() {
     selectedFiles = [];
     onSelectionChange([]);
+    onFilterChange("all"); // Réinitialiser le filtre
     showSelectionMenu = false;
   }
+
+  function handleClickOutside(event: MouseEvent) {
+    if (showSelectionMenu && menuRef && !menuRef.contains(event.target as Node) && !buttonRef?.contains(event.target as Node)) {
+      showSelectionMenu = false;
+    }
+  }
+
+  onMount(() => {
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  });
 
   onDestroy(() => {
     Object.values(previewUrls).forEach((url) => {
@@ -123,289 +164,313 @@
   });
 </script>
 
-<div class="overflow-x-auto">
-  <table class="min-w-full divide-y divide-gray-200">
-    <thead class="bg-gray-50">
-      <tr>
-        <th class="w-12 px-4 py-3 text-left">
-          <div class="relative flex items-center gap-1">
-            <input
-              type="checkbox"
-              class="cursor-pointer rounded text-blue-600"
-              onclick={(e) => {
-                const target = e.target as HTMLInputElement;
-                const newSelected = target.checked ? files.map((file) => file.id) : [];
-                selectedFiles = newSelected;
-                onSelectionChange(newSelected);
-              }}
-            />
-            <button
-              class="rounded p-1 hover:bg-gray-100"
-              onclick={() => (showSelectionMenu = !showSelectionMenu)}
-              onkeydown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  showSelectionMenu = !showSelectionMenu;
-                }
-              }}
-              aria-expanded={showSelectionMenu}
-              aria-haspopup="true"
-              aria-label="Selection menu"
-            >
-              <ChevronDown size={16} />
-            </button>
-
-            {#if showSelectionMenu}
-              <div class="absolute left-0 top-full z-10 mt-1 min-w-[200px] rounded-md border border-gray-200 bg-white py-1 shadow-lg" role="menu" tabindex="-1">
-                <button
-                  type="button"
-                  class="w-full cursor-pointer px-4 py-2 text-left text-sm hover:bg-gray-100"
-                  onclick={handleSelectCurrentPage}
-                  onkeydown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleSelectCurrentPage();
-                    }
-                  }}
-                  role="menuitem"
-                >
-                  Select visible items
-                </button>
-                <button
-                  type="button"
-                  class="w-full cursor-pointer px-4 py-2 text-left text-sm hover:bg-gray-100"
-                  onclick={handleSelectAllFiles}
-                  onkeydown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleSelectAllFiles();
-                    }
-                  }}
-                  role="menuitem"
-                >
-                  Select all approved items
-                </button>
-                <div class="my-1 border-t border-gray-200"></div>
-                <button
-                  type="button"
-                  class="w-full cursor-pointer px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
-                  onclick={handleClearSelection}
-                  onkeydown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleClearSelection();
-                    }
-                  }}
-                  role="menuitem"
-                >
-                  Clear selection
-                </button>
-              </div>
-            {/if}
-          </div>
-        </th>
-        {#each columns as column}
-          <th
-            class="{column.key === 'name'
-              ? 'w-1/6 text-left'
-              : column.key === 'tag'
-                ? 'w-1/6 text-center'
-                : column.key === 'lastModified'
-                  ? 'w-1/6 text-center'
-                  : column.key === 'size'
-                    ? 'w-1/12 text-center'
-                    : column.key === 'type'
-                      ? 'w-1/12 text-center'
-                      : column.key === 'status'
-                        ? 'w-1/12 text-center'
-                        : 'w-1/6 text-center'} px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500"
-          >
-            <button
-              class="flex w-full items-center gap-1 text-xs font-medium uppercase tracking-wider text-gray-500 {column.label === 'CID'
-                ? 'cursor-default justify-center'
-                : column.sortable
-                  ? 'cursor-pointer justify-center hover:text-gray-700'
-                  : 'justify-center'}"
-              onclick={() => column.key && column.sortable && handleSort(column.key)}
-            >
-              {column.label}
-              {#if column.sortable}
-                {#if sortConfig.key === column.key}
-                  {#if sortConfig.direction === "desc"}
-                    <ChevronDown size={14} class="text-gray-400" />
-                  {:else}
-                    <ChevronUp size={14} class="text-gray-400" />
-                  {/if}
-                {:else}
-                  <ChevronDown size={14} class="text-gray-400" />
-                {/if}
-              {/if}
-            </button>
-          </th>
-        {/each}
-        <th class="w-32 px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500"> Actions </th>
-      </tr>
-    </thead>
-    <tbody class="divide-y divide-gray-200 bg-white">
-      {#each files as file}
-        <tr
-          class="cursor-pointer hover:bg-gray-50"
-          onclick={() => {
-            const newSelected = selectedFiles.includes(file.id) ? selectedFiles.filter((id) => id !== file.id) : [...selectedFiles, file.id];
-            selectedFiles = newSelected;
-          }}
-          onkeydown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              const newSelected = selectedFiles.includes(file.id) ? selectedFiles.filter((id) => id !== file.id) : [...selectedFiles, file.id];
-              selectedFiles = newSelected;
-            }
-          }}
-          role="button"
-          tabindex="0"
-        >
-          <td class="w-12 whitespace-nowrap px-4 py-4">
-            <input
-              type="checkbox"
-              class="cursor-pointer rounded text-blue-600"
-              checked={selectedFiles.includes(file.id)}
-              onclick={(e: MouseEvent) => {
-                e.stopPropagation();
-                const target = e.target as HTMLInputElement;
-                const newSelected = target.checked ? [...selectedFiles, file.id] : selectedFiles.filter((id) => id !== file.id);
-                selectedFiles = newSelected;
-                onSelectionChange(newSelected);
-              }}
-              onkeydown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
+<div class="relative">
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="relative w-12 px-4 py-3 text-left">
+            <div class="relative flex items-center gap-0.5">
+              <input
+                type="checkbox"
+                class="cursor-pointer rounded text-blue-600"
+                checked={selectedFiles.length > 0 && paginatedFiles.every((file) => selectedFiles.includes(file.id))}
+                onclick={(e) => {
                   const target = e.target as HTMLInputElement;
-                  const newSelected = !target.checked ? [...selectedFiles, file.id] : selectedFiles.filter((id) => id !== file.id);
+                  const newSelected = target.checked 
+                    ? [...selectedFiles, ...paginatedFiles.map((file) => file.id).filter(id => !selectedFiles.includes(id))]
+                    : selectedFiles.filter((id) => !paginatedFiles.some((file) => file.id === id));
                   selectedFiles = newSelected;
                   onSelectionChange(newSelected);
-                }
-              }}
-              aria-label={`Select ${file.name}`}
-            />
-          </td>
+                }}
+                aria-label="Select all files on current page"
+              />
+              <button
+                bind:this={buttonRef}
+                class="rounded hover:bg-gray-100"
+                onclick={(e) => {
+                  e.stopPropagation();
+                  showSelectionMenu = !showSelectionMenu;
+                }}
+                aria-expanded={showSelectionMenu}
+                aria-haspopup="true"
+                aria-label="Selection menu"
+              >
+                <ChevronDown size={16} />
+              </button>
+            </div>
+          </th>
           {#each columns as column}
-            {#if column.key === "name"}
-              <td class="w-2/6 whitespace-nowrap px-4 py-4">
-                <div
-                  class="flex items-center"
-                  role="button"
-                  tabindex="0"
-                  onmousemove={handleMouseMove}
-                  onmouseenter={() => {
-                    if (file.type === "image" || file.type === "video") {
-                      hoveredPreview = file.id;
-                    }
-                  }}
-                  onmouseleave={() => {
-                    hoveredPreview = null;
-                  }}
-                  onkeydown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleFileClick(e, file);
-                    }
-                  }}
-                  aria-label={`Preview ${file.name}`}
-                >
-                  {#if file.type === "image"}
-                    <Image class="mr-2 h-5 w-5 text-blue-500" />
-                  {:else if file.type === "video"}
-                    <Video class="mr-2 h-5 w-5 text-purple-500" />
-                  {:else if file.type === "audio"}
-                    <Music class="mr-2 h-5 w-5 text-green-500" />
+            <th
+              class="{column.key === 'name'
+                ? 'w-1/6 text-left'
+                : column.key === 'tag'
+                  ? 'w-1/6 text-center'
+                  : column.key === 'lastModified'
+                    ? 'w-1/6 text-center'
+                    : column.key === 'size'
+                      ? 'w-1/12 text-center'
+                      : column.key === 'type'
+                        ? 'w-1/12 text-center'
+                        : column.key === 'status'
+                          ? 'w-1/12 text-center'
+                          : 'w-1/6 text-center'} px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500"
+            >
+              <button
+                class="flex w-full items-center gap-1 text-xs font-medium uppercase tracking-wider text-gray-500 {column.label === 'CID'
+                  ? 'cursor-default justify-center'
+                  : column.sortable
+                    ? 'cursor-pointer justify-center hover:text-gray-700'
+                    : 'justify-center'}"
+                onclick={() => column.key && column.sortable && handleSort(column.key)}
+              >
+                {column.label}
+                {#if column.sortable}
+                  {#if sortConfig.key === column.key}
+                    {#if sortConfig.direction === "desc"}
+                      <ChevronDown size={14} class="text-gray-400" />
+                    {:else}
+                      <ChevronUp size={14} class="text-gray-400" />
+                    {/if}
                   {:else}
-                    <FileText class="mr-2 h-5 w-5 text-gray-500" />
+                    <ChevronDown size={14} class="text-gray-400" />
                   {/if}
-                  <button
-                    type="button"
-                    class="text-left font-medium text-gray-900 hover:underline"
-                    onclick={(e) => handleFileClick(e, file)}
-                    onkeydown={(e) => e.key === "Enter" && handleFileClick(e, file)}
-                    title="Click to open, Ctrl+Click to download"
-                  >
-                    {file.name}
-                  </button>
-                  {#if hoveredPreview === file.id && (file.type === "image" || file.type === "video")}
-                    <div class="pointer-events-none fixed z-50" style="left: {mouseX - 64}px; top: calc({mouseY - 136}px);">
-                      <div class="rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
-                        {#if file.type === "image"}
-                          <img src={getPreviewUrl(file)} alt={file.name} class="h-32 w-32 rounded object-cover" />
-                        {:else if file.type === "video"}
-                          <video src={getPreviewUrl(file)} class="h-32 w-32 rounded bg-black object-contain" autoplay muted loop playsinline>
-                            <track kind="captions" label="No captions available" src="data:text/vtt,WEBVTT" />
-                          </video>
-                        {/if}
-                      </div>
-                    </div>
-                  {/if}
-                </div>
-              </td>
-            {:else if column.key === "lastModified"}
-              <td class="w-1/6 px-4 py-4 text-center text-sm text-gray-500">
-                {new Date(file.lastModified).toLocaleString()}
-              </td>
-            {:else if column.key === "size"}
-              <td class="w-1/12 px-4 py-4 text-center text-sm text-gray-500">
-                {file.size}
-              </td>
-            {:else if column.key === "type"}
-              <td class="w-1/12 px-4 py-4 text-center text-sm text-gray-500">
-                {file.type}
-              </td>
-            {:else if column.key === "status"}
-              <td class="w-1/12 px-4 py-4 text-center">
-                <span
-                  class="inline-flex rounded-full px-2 text-xs font-semibold leading-5 {file.status === 'Approved'
-                    ? 'bg-green-100 text-green-800'
-                    : file.status === 'Rejected'
-                      ? 'bg-red-100 text-red-800'
-                      : file.status === 'Error'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-yellow-100 text-yellow-800'}"
-                >
-                  {file.status}
-                </span>
-              </td>
-            {:else if column.key === "tag"}
-              <td class="whitespace-nowrap px-4 py-4 text-center">
-                {#if file.tag}
-                  <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">
-                    {file.tag}
-                  </span>
                 {/if}
-              </td>
-            {:else}
-              <td class="w-1/6 whitespace-nowrap px-4 py-4 text-center font-mono text-sm text-gray-500">
-                <div class="relative">
-                  <button
-                    class="rounded px-2 py-1 hover:bg-gray-100"
-                    onmouseenter={() => (hoveredCid = file.id)}
-                    onmouseleave={() => (hoveredCid = null)}
-                    onclick={() => copyToClipboard(file.id)}
+              </button>
+            </th>
+          {/each}
+          <th class="w-32 px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500"> Actions </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200 bg-white">
+        {#each paginatedFiles as file}
+          <tr
+            class="cursor-pointer hover:bg-gray-50"
+            onclick={() => {
+              const newSelected = selectedFiles.includes(file.id) ? selectedFiles.filter((id) => id !== file.id) : [...selectedFiles, file.id];
+              selectedFiles = newSelected;
+              onSelectionChange(newSelected);
+            }}
+            onkeydown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                const newSelected = selectedFiles.includes(file.id) ? selectedFiles.filter((id) => id !== file.id) : [...selectedFiles, file.id];
+                selectedFiles = newSelected;
+                onSelectionChange(newSelected);
+              }
+            }}
+            role="button"
+            tabindex="0"
+          >
+            <td class="w-12 whitespace-nowrap px-4 py-4">
+              <input
+                type="checkbox"
+                class="cursor-pointer rounded text-blue-600"
+                checked={selectedFiles.includes(file.id)}
+                onclick={(e: MouseEvent) => {
+                  e.stopPropagation();
+                  const target = e.target as HTMLInputElement;
+                  const newSelected = target.checked ? [...selectedFiles, file.id] : selectedFiles.filter((id) => id !== file.id);
+                  selectedFiles = newSelected;
+                  onSelectionChange(newSelected);
+                }}
+                onkeydown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    const target = e.target as HTMLInputElement;
+                    const newSelected = !target.checked ? [...selectedFiles, file.id] : selectedFiles.filter((id) => id !== file.id);
+                    selectedFiles = newSelected;
+                    onSelectionChange(newSelected);
+                  }
+                }}
+                aria-label={`Select ${file.name}`}
+              />
+            </td>
+            {#each columns as column}
+              {#if column.key === "name"}
+                <td class="w-2/6 whitespace-nowrap px-4 py-4">
+                  <div
+                    class="flex items-center"
+                    role="button"
+                    tabindex="0"
+                    onmousemove={handleMouseMove}
+                    onmouseenter={() => {
+                      if (file.type === "image" || file.type === "video") {
+                        hoveredPreview = file.id;
+                      }
+                    }}
+                    onmouseleave={() => {
+                      hoveredPreview = null;
+                    }}
                     onkeydown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
-                        copyToClipboard(file.id);
+                        handleFileClick(e, file);
                       }
                     }}
-                    aria-label={`Copy CID for ${file.name}`}
+                    aria-label={`Preview ${file.name}`}
                   >
-                    {getDisplayCid(file)}
-                  </button>
-                </div>
-              </td>
-            {/if}
-          {/each}
-          <td class="w-32 px-4 py-3 text-center">
-            {@render actions?.(file)}
-          </td>
-        </tr>
-      {/each}
-    </tbody>
-  </table>
+                    {#if file.type === "image"}
+                      <Image class="mr-2 h-5 w-5 text-blue-500" />
+                    {:else if file.type === "video"}
+                      <Video class="mr-2 h-5 w-5 text-purple-500" />
+                    {:else if file.type === "audio"}
+                      <Music class="mr-2 h-5 w-5 text-green-500" />
+                    {:else}
+                      <FileText class="mr-2 h-5 w-5 text-gray-500" />
+                    {/if}
+                    <button
+                      type="button"
+                      class="text-left font-medium text-gray-900 hover:underline"
+                      onclick={(e) => handleFileClick(e, file)}
+                      onkeydown={(e) => e.key === "Enter" && handleFileClick(e, file)}
+                      title="Click to open, Ctrl+Click to download"
+                    >
+                      {file.name}
+                    </button>
+                    {#if hoveredPreview === file.id && (file.type === "image" || file.type === "video")}
+                      <div class="pointer-events-none fixed z-50" style="left: {mouseX - 64}px; top: calc({mouseY - 136}px);">
+                        <div class="rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
+                          {#if file.type === "image"}
+                            <img src={getPreviewUrl(file)} alt={file.name} class="h-32 w-32 rounded object-cover" />
+                          {:else if file.type === "video"}
+                            <video src={getPreviewUrl(file)} class="h-32 w-32 rounded bg-black object-contain" autoplay muted loop playsinline>
+                              <track kind="captions" label="No captions available" src="data:text/vtt,WEBVTT" />
+                            </video>
+                          {/if}
+                        </div>
+                      </div>
+                    {/if}
+                  </div>
+                </td>
+              {:else if column.key === "lastModified"}
+                <td class="w-1/6 px-4 py-4 text-center text-sm text-gray-500">
+                  {new Date(file.lastModified).toLocaleString()}
+                </td>
+              {:else if column.key === "size"}
+                <td class="w-1/12 px-4 py-4 text-center text-sm text-gray-500">
+                  {file.size}
+                </td>
+              {:else if column.key === "type"}
+                <td class="w-1/12 px-4 py-4 text-center text-sm text-gray-500">
+                  {file.type}
+                </td>
+              {:else if column.key === "status"}
+                <td class="w-1/12 px-4 py-4 text-center">
+                  <span
+                    class="inline-flex rounded-full px-2 text-xs font-semibold leading-5 {file.status === 'Approved'
+                      ? 'bg-green-100 text-green-800'
+                      : file.status === 'Rejected'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-yellow-100 text-yellow-800'}"
+                  >
+                    {file.status}
+                  </span>
+                </td>
+              {:else if column.key === "tag"}
+                <td class="whitespace-nowrap px-4 py-4 text-center">
+                  {#if file.tag}
+                    <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">
+                      {file.tag}
+                    </span>
+                  {/if}
+                </td>
+              {:else}
+                <td class="w-1/6 whitespace-nowrap px-4 py-4 text-center font-mono text-sm text-gray-500">
+                  <div class="relative">
+                    <button
+                      class="rounded px-2 py-1 hover:bg-gray-100"
+                      onmouseenter={() => (hoveredCid = file.id)}
+                      onmouseleave={() => (hoveredCid = null)}
+                      onclick={() => copyToClipboard(file.id)}
+                      onkeydown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          copyToClipboard(file.id);
+                        }
+                      }}
+                      aria-label={`Copy CID for ${file.name}`}
+                    >
+                      {getDisplayCid(file)}
+                    </button>
+                  </div>
+                </td>
+              {/if}
+            {/each}
+            <td class="w-32 px-4 py-3 text-center">
+              {@render actions?.(file)}
+            </td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </div>
+
+  {#if showSelectionMenu && buttonRef}
+    <div
+      bind:this={menuRef}
+      class="fixed w-44 rounded-md border border-gray-200 bg-white py-0.5 shadow-lg"
+      role="menu"
+      tabindex="-1"
+      style="left: {buttonRef.getBoundingClientRect().right}px; top: {buttonRef.getBoundingClientRect().top}px; z-index: 9999;"
+    >
+      <button
+        type="button"
+        class="w-full cursor-pointer px-3 py-1.5 text-left text-sm text-gray-700 hover:bg-gray-100"
+        onclick={(e) => {
+          e.stopPropagation();
+          handleSelectAll();
+        }}
+        role="menuitem"
+      >
+        Select All
+      </button>
+      <button
+        type="button"
+        class="w-full cursor-pointer px-3 py-1.5 text-left text-sm text-gray-700 hover:bg-gray-100"
+        onclick={(e) => {
+          e.stopPropagation();
+          handleSelectCurrentPage();
+        }}
+        role="menuitem"
+      >
+        Select All On Page
+      </button>
+      <button
+        type="button"
+        class="w-full cursor-pointer px-3 py-1.5 text-left text-sm text-gray-700 hover:bg-gray-100"
+        onclick={(e) => {
+          e.stopPropagation();
+          handleSelectApprovedFiles();
+        }}
+        role="menuitem"
+      >
+        Select All Approved
+      </button>
+      <button
+        type="button"
+        class="w-full cursor-pointer px-3 py-1.5 text-left text-sm text-gray-700 hover:bg-gray-100"
+        onclick={(e) => {
+          e.stopPropagation();
+          handleSelectPendingFiles();
+        }}
+        role="menuitem"
+      >
+        Select All Pending
+      </button>
+      <!-- svelte-ignore element_invalid_self_closing_tag -->
+      <div class="my-0.5 border-t border-gray-200" />
+      <button
+        type="button"
+        class="w-full cursor-pointer px-3 py-1.5 text-left text-sm text-gray-700 hover:bg-gray-100"
+        onclick={(e) => {
+          e.stopPropagation();
+          handleClearSelection();
+        }}
+        role="menuitem"
+      >
+        Clear selection
+      </button>
+    </div>
+  {/if}
 </div>

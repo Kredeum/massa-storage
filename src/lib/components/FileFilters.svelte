@@ -28,11 +28,6 @@
     filters.status = value;
   }
 
-  function handleSortChange(e: Event) {
-    const value = (e.target as HTMLSelectElement).value as keyof FileItem;
-    onSort(value);
-  }
-
   function handleTagSelect(e: Event) {
     const value = (e.target as HTMLSelectElement).value;
     if (value) {
@@ -62,15 +57,6 @@
       <option value="Approved">Approved</option>
       <option value="Pending">Pending</option>
       <option value="Rejected">Rejected</option>
-    </select>
-
-    <select class="rounded-md border border-gray-300 px-3 py-1.5 text-sm" onchange={handleSortChange} value={sortConfig.key}>
-      <option value="name">Name</option>
-      <option value="lastModified">Date</option>
-      <option value="size">Size</option>
-      <option value="tag">Tags</option>
-      <option value="type">Type</option>
-      <option value="status">Status</option>
     </select>
 
     <select class="rounded-md border border-gray-300 px-3 py-1.5 text-sm" onchange={handleTagSelect} value={filters.tags[0] || ""} disabled={uniqueTags.length === 0}>

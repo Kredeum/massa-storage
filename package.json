@@ -74,6 +74,7 @@
     "buffer": "^6.0.3",
     "ipfs-unixfs": "^11.2.0",
     "multiformats": "^13.3.1",
-    "svelte-hot-french-toast": "^1.0.0"
+    "svelte-hot-french-toast": "^1.0.0",
+    "svelte-portal": "^2.2.1"
   }
 }

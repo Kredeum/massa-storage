@@ -185,6 +185,11 @@
     selectedFiles = [];
   }
 
+  function handleFilterChange(status: FileStatus | "all") {
+    filters.status = status;
+    currentPage = 0; // Reset to first page when filter changes
+  }
+
   // Bulk actions
   function handleBulkApprove() {
     files = files.map((file) => (selectedFiles.includes(file.id) ? { ...file, status: "Approved" } : file));
@@ -222,13 +227,14 @@
   </div>
 
   <FileTable 
-    files={paginatedFiles} 
+    files={files} 
+    paginatedFiles={paginatedFiles} 
     {selectedFiles} 
     {sortConfig} 
     {handleSort} 
-    onSelectionChange={handleSelectionChange}
-    filteredFiles={filteredFiles}
-  >
+    onSelectionChange={handleSelectionChange} 
+    onFilterChange={handleFilterChange}
+    {filteredFiles}>
     {#snippet actions(file)}
       <FileActions {file} onModerate={handleModeration} onPin={handlePin} />
     {/snippet}

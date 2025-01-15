@@ -1,6 +1,6 @@
 export type FileType = "image" | "video" | "audio" | "document";
 
-export type FileStatus = "Pending" | "Approved" | "Rejected" | "Error";
+export type FileStatus = "Pending" | "Approved" | "Rejected";
 
 export interface FileItem {
   id: number;
@@ -15,7 +15,6 @@ export interface FileItem {
   blob?: Blob; // Optional blob for image preview
   mimeType?: string; // Store original MIME type for proper handling
   cid?: string; // IPFS Content Identifier - optional because it might not be available in case of error
-  error?: string; // Error message if status is "Error"
 }
 
 export interface FilterState {
