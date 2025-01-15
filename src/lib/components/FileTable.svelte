@@ -216,27 +216,27 @@
                           ? 'w-1/12 text-center'
                           : 'w-1/6 text-center'} px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500"
             >
-              <button
-                class="flex w-full items-center gap-1 text-xs font-medium uppercase tracking-wider text-gray-500 {column.label === 'CID'
-                  ? 'cursor-default justify-center'
-                  : column.sortable
-                    ? 'cursor-pointer justify-center hover:text-gray-700'
-                    : 'justify-center'}"
-                onclick={() => column.key && column.sortable && handleSort(column.key)}
-              >
-                {column.label}
-                {#if column.sortable}
-                  {#if sortConfig.key === column.key}
-                    {#if sortConfig.direction === "desc"}
-                      <ChevronDown size={14} class="text-gray-400" />
+              <div class="flex w-full {column.key === 'name' ? 'justify-start' : 'justify-center'}">
+                <button
+                  class="inline-flex items-center gap-1 text-xs font-medium uppercase tracking-wider {column.key === 'tags'
+                    ? 'cursor-default text-gray-500'
+                    : `text-gray-500 ${column.sortable ? 'hover:text-gray-700' : ''} ${!column.sortable ? 'cursor-default' : ''}`}"
+                  onclick={() => column.key && column.sortable && handleSort(column.key)}
+                >
+                  <span>{column.label}</span>
+                  {#if column.sortable && column.key !== "tags"}
+                    {#if sortConfig.key === column.key}
+                      {#if sortConfig.direction === "desc"}
+                        <ChevronDown size={14} class="text-gray-400" />
+                      {:else}
+                        <ChevronUp size={14} class="text-gray-400" />
+                      {/if}
                     {:else}
-                      <ChevronUp size={14} class="text-gray-400" />
+                      <ChevronDown size={14} class="text-gray-400" />
                     {/if}
-                  {:else}
-                    <ChevronDown size={14} class="text-gray-400" />
                   {/if}
-                {/if}
-              </button>
+                </button>
+              </div>
             </th>
           {/each}
           <th class="w-32 px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500"> Actions </th>
