@@ -20,7 +20,7 @@
 
 <div class="container mx-auto py-6">
   <div class="mx-auto max-w-7xl">
-    <h1 class="text-3xl font-bold text-gray-800 mb-8">Moderator Management</h1>
+    <h1 class="mb-8 text-3xl font-bold text-gray-800">Profile Management</h1>
     <ModeratorList {moderators} />
   </div>
 </div>

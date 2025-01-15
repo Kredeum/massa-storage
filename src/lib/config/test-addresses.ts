@@ -5,5 +5,5 @@ export const TEST_ADDRESSES = {
   // Modérateur
   moderator: "AS12moder3ator4address5massa6blockchain7moder8ator9address0",
   // Utilisateur normal
-  normalUser: "AS12normal3user4address5massa6blockchain7normal8user9address0",
+  normalUser: "AS12normal3user4address5massa6blockchain7normal8user9address0"
 } as const;

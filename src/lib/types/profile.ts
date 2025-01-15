@@ -1,4 +1,4 @@
-import { TEST_ADDRESSES } from '$lib/config/test-addresses';
+import { TEST_ADDRESSES } from "$lib/config/test-addresses";
 
 export type ModeratorAddress = (typeof TEST_ADDRESSES)[keyof typeof TEST_ADDRESSES];
 
