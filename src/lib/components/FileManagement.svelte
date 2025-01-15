@@ -51,18 +51,6 @@
     return `${size.toFixed(1)} ${units[unitIndex]}`;
   }
 
-  function compareStatus(statusA: FileStatus, statusB: FileStatus, isDesc: boolean): number {
-    // Define the order of status
-    const statusOrder: Record<FileStatus, number> = {
-      Pending: 0,
-      Approved: 1,
-      Rejected: 2
-    };
-
-    const comparison = statusOrder[statusA] - statusOrder[statusB];
-    return isDesc ? comparison : -comparison;
-  }
-
   $effect(() => {
     if (uploadFiles) {
       const newFiles: FileItem[] = Array.from(uploadFiles)
@@ -103,7 +91,7 @@
     files.filter((file) => {
       const matchesType = filters.type === "all" || file.type === filters.type;
       const matchesStatus = filters.status === "all" || file.status === filters.status;
-      const matchesTags = filters.tags.length === 0 || (file.tags && file.tags.some(tag => filters.tags.includes(tag)));
+      const matchesTags = filters.tags.length === 0 || (file.tags && file.tags.some((tag) => filters.tags.includes(tag)));
       const matchesSearch = !searchQuery || file.name.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesType && matchesStatus && matchesTags && matchesSearch;
     })
@@ -118,11 +106,11 @@
       }
 
       if (sortConfig.key === "name") {
-        return sortConfig.direction === "desc" ? b.name.toLowerCase().localeCompare(a.name.toLowerCase()) : a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+        return sortConfig.direction === "asc" ? b.name.toLowerCase().localeCompare(a.name.toLowerCase()) : a.name.toLowerCase().localeCompare(b.name.toLowerCase());
       }
 
       if (sortConfig.key === "size") {
-        return sortConfig.direction === "desc" ? b.sizeInBytes - a.sizeInBytes : a.sizeInBytes - b.sizeInBytes;
+        return sortConfig.direction === "asc" ? b.sizeInBytes - a.sizeInBytes : a.sizeInBytes - b.sizeInBytes;
       }
 
       const direction = sortConfig.direction === "desc" ? 1 : -1;

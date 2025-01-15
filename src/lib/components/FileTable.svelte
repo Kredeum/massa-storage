@@ -468,8 +468,7 @@
       >
         Select All Pending
       </button>
-      <!-- svelte-ignore element_invalid_self_closing_tag -->
-      <div class="my-0.5 border-t border-gray-200" />
+      <div class="my-0.5 border-t border-gray-200"></div>
       <button
         type="button"
         class="w-full cursor-pointer px-3 py-1.5 text-left text-sm text-gray-700 hover:bg-gray-100"
