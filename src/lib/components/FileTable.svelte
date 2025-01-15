@@ -13,7 +13,7 @@
 
   const columns: Column[] = [
     { key: "name", label: "Name", sortable: true },
-    { key: "tag", label: "Tags", sortable: false },
+    { key: "tags", label: "Tags", sortable: false },
     { key: "lastModified", label: "Date", sortable: true },
     { key: "size", label: "Size", sortable: true },
     { key: "type", label: "Type", sortable: true },
@@ -177,8 +177,8 @@
                 checked={selectedFiles.length > 0 && paginatedFiles.every((file) => selectedFiles.includes(file.id))}
                 onclick={(e) => {
                   const target = e.target as HTMLInputElement;
-                  const newSelected = target.checked 
-                    ? [...selectedFiles, ...paginatedFiles.map((file) => file.id).filter(id => !selectedFiles.includes(id))]
+                  const newSelected = target.checked
+                    ? [...selectedFiles, ...paginatedFiles.map((file) => file.id).filter((id) => !selectedFiles.includes(id))]
                     : selectedFiles.filter((id) => !paginatedFiles.some((file) => file.id === id));
                   selectedFiles = newSelected;
                   onSelectionChange(newSelected);
@@ -204,7 +204,7 @@
             <th
               class="{column.key === 'name'
                 ? 'w-1/6 text-left'
-                : column.key === 'tag'
+                : column.key === 'tags'
                   ? 'w-1/6 text-center'
                   : column.key === 'lastModified'
                     ? 'w-1/6 text-center'
@@ -343,9 +343,19 @@
                     {/if}
                   </div>
                 </td>
+              {:else if column.key === "tags"}
+                <td class="w-1/6 px-4 py-4 text-center text-sm">
+                  <div class="flex flex-wrap justify-center gap-1">
+                    {#each file.tags || [] as tag}
+                      <span class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                        {tag}
+                      </span>
+                    {/each}
+                  </div>
+                </td>
               {:else if column.key === "lastModified"}
                 <td class="w-1/6 px-4 py-4 text-center text-sm text-gray-500">
-                  {new Date(file.lastModified).toLocaleString()}
+                  {new Date(file.lastModified).toLocaleDateString()}
                 </td>
               {:else if column.key === "size"}
                 <td class="w-1/12 px-4 py-4 text-center text-sm text-gray-500">
@@ -366,14 +376,6 @@
                   >
                     {file.status}
                   </span>
-                </td>
-              {:else if column.key === "tag"}
-                <td class="whitespace-nowrap px-4 py-4 text-center">
-                  {#if file.tag}
-                    <span class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">
-                      {file.tag}
-                    </span>
-                  {/if}
                 </td>
               {:else}
                 <td class="w-1/6 whitespace-nowrap px-4 py-4 text-center font-mono text-sm text-gray-500">

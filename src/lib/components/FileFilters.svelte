@@ -16,7 +16,7 @@
   } = $props();
 
   // Get unique tags from files
-  const uniqueTags: string[] = $derived(Array.from(new Set(files.map((f) => f.tag).filter((tag): tag is string => Boolean(tag)))));
+  const uniqueTags: string[] = $derived(Array.from(new Set(files.flatMap((f) => f.tags || []))));
 
   function handleTypeFilterChange(e: Event) {
     const value = (e.target as HTMLSelectElement).value as FilterState["type"];

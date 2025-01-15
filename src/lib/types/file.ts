@@ -8,7 +8,7 @@ export interface FileItem {
   size: string;
   sizeInBytes: number;
   type: FileType;
-  tag?: string;
+  tags: string[];
   status: FileStatus;
   isPinned: boolean;
   lastModified: string;

@@ -103,7 +103,7 @@
     files.filter((file) => {
       const matchesType = filters.type === "all" || file.type === filters.type;
       const matchesStatus = filters.status === "all" || file.status === filters.status;
-      const matchesTags = filters.tags.length === 0 || (file.tag && filters.tags.includes(file.tag));
+      const matchesTags = filters.tags.length === 0 || (file.tags && file.tags.some(tag => filters.tags.includes(tag)));
       const matchesSearch = !searchQuery || file.name.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesType && matchesStatus && matchesTags && matchesSearch;
     })
@@ -119,15 +119,6 @@
 
       if (sortConfig.key === "name") {
         return sortConfig.direction === "desc" ? b.name.toLowerCase().localeCompare(a.name.toLowerCase()) : a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-      }
-
-      if (sortConfig.key === "tag") {
-        // Mettre les fichiers avec tags en premier si direction est "desc"
-        if (!a.tag && !b.tag) return 0;
-        if (!a.tag) return sortConfig.direction === "desc" ? 1 : -1;
-        if (!b.tag) return sortConfig.direction === "desc" ? -1 : 1;
-        // Trier alphabétiquement les tags
-        return sortConfig.direction === "desc" ? b.tag.toLowerCase().localeCompare(a.tag.toLowerCase()) : a.tag.toLowerCase().localeCompare(b.tag.toLowerCase());
       }
 
       if (sortConfig.key === "size") {
@@ -180,7 +171,7 @@
   function handleAddTag(tag: string, fileIds: number[]) {
     if (fileIds.length === 0) return;
 
-    files = files.map((file) => (fileIds.includes(file.id) ? { ...file, tag } : file));
+    files = files.map((file) => (fileIds.includes(file.id) ? { ...file, tags: [...file.tags, tag] } : file));
     // Reset selection after adding tags
     selectedFiles = [];
   }
@@ -226,15 +217,7 @@
     </div>
   </div>
 
-  <FileTable 
-    files={files} 
-    paginatedFiles={paginatedFiles} 
-    {selectedFiles} 
-    {sortConfig} 
-    {handleSort} 
-    onSelectionChange={handleSelectionChange} 
-    onFilterChange={handleFilterChange}
-    {filteredFiles}>
+  <FileTable {files} {paginatedFiles} {selectedFiles} {sortConfig} {handleSort} onSelectionChange={handleSelectionChange} onFilterChange={handleFilterChange} {filteredFiles}>
     {#snippet actions(file)}
       <FileActions {file} onModerate={handleModeration} onPin={handlePin} />
     {/snippet}
