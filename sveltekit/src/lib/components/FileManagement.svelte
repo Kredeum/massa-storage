@@ -10,6 +10,10 @@
   import Toast from "./Toast.svelte";
   import TagInput from "./TagInput.svelte";
   import { toastStore } from "../stores/toast";
+  import { createKuboClient } from "$lib/ts/kubo";
+  import all from "it-all";
+  import { CID } from "multiformats";
+  import { onMount } from "svelte";
 
   const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
@@ -20,6 +24,9 @@
   let selectedFiles = $state<number[]>([]);
   let searchQuery = $state("");
   let uploadFiles = $state<FileList | undefined>();
+
+  let kubo: ReturnType<typeof createKuboClient>;
+
   let filters: FilterState = $state({
     type: "all",
     status: "all",
@@ -51,40 +58,79 @@
     return `${size.toFixed(1)} ${units[unitIndex]}`;
   }
 
+  onMount(async () => {
+    kubo = createKuboClient();
+  });
+
   $effect(() => {
     if (uploadFiles) {
-      const newFiles: FileItem[] = Array.from(uploadFiles)
-        .filter((file) => {
-          if (file.size > MAX_FILE_SIZE) {
-            toastStore.add(`File ${file.name} exceeds maximum size of ${formatSize(MAX_FILE_SIZE)}`, "error");
-            return false;
-          }
-          return true;
-        })
-        .map((file) => {
-          const type = getFileType(file.type);
-          return {
-            id: Date.now() + Math.random(),
-            name: file.name,
-            size: formatSize(file.size),
-            sizeInBytes: file.size,
-            type,
-            tags: [],
-            status: "Pending" as const,
-            isPinned: false,
-            lastModified: new Date().toISOString(),
-            blob: type === "image" || type === "video" ? file : undefined,
-            mimeType: file.type
-          };
-        });
+      (async () => {
+        const newFiles: FileItem[] = await Promise.all(
+          Array.from(uploadFiles)
+            .filter((file) => {
+              if (file.size > MAX_FILE_SIZE) {
+                toastStore.add(`File ${file.name} exceeds maximum size of ${formatSize(MAX_FILE_SIZE)}`, "error");
+                return false;
+              }
+              return true;
+            })
+            .map(async (file) => {
+              const arrayBuffer = await file.arrayBuffer();
+              console.log("arrayBuffer:", arrayBuffer);
 
-      files = [...files, ...newFiles];
-      if (newFiles.length > 0) {
-        toastStore.add(`Successfully added ${newFiles.length} file${newFiles.length > 1 ? "s" : ""}`, "success");
-      }
-      uploadFiles = undefined;
+              const mimeType = file.type;
+              console.log("mimeType:", mimeType);
+
+              const content = new Uint8Array(arrayBuffer);
+              console.log("content:", content);
+
+              // let cid = (await kubo.addAndPin(content)).toString();
+              // console.log("cid:", cid);
+
+              const fileType = getFileType(mimeType);
+              return {
+                id: Date.now() + Math.random(),
+                name: file.name,
+                size: formatSize(file.size),
+                sizeInBytes: file.size,
+                type: fileType,
+                tags: [],
+                status: "Pending",
+                isPinned: false,
+                lastModified: new Date(file.lastModified).toISOString(),
+                blob: file,
+                mimeType,
+                // cid: cid,
+                arrayBuffer: arrayBuffer,
+                file
+              };
+            })
+        );
+        files = [...files, ...newFiles];
+        if (newFiles.length > 0) {
+          toastStore.add(`Successfully added ${newFiles.length} file${newFiles.length > 1 ? "s" : ""}`, "success");
+        }
+        uploadFiles = undefined;
+      })();
     }
   });
+
+  // const getCidForFileItem = async (file: FileItem): Promise<string | undefined> => {
+  //   if (!file.name) return;
+
+  //   try {
+  //     const content = new Uint8Array(await file.arrayBuffer);
+  //     console.log("fileHandle ~ content:", content.length);
+  //     const kubo = createKuboClient();
+
+  //     const cid = (await kubo.addAndPin(content)).toString();
+  //     console.log("fileHandle ~ cid:", cid);
+
+  //     return cid;
+  //   } catch (error) {
+  //     console.error("Error uploading file:", error);
+  //   }
+  // };
 
   // Reactive filtering and sorting
   const filteredFiles = $derived(
