@@ -5,7 +5,7 @@ import {
   type AddOptions,
   type ImportCandidate,
   type PinAddOptions,
-  type PinLsOptions,
+  type PinLsOptions
 } from "kubo-rpc-client";
 
 const createKuboClient = () => {
@@ -35,9 +35,8 @@ const createKuboClient = () => {
     pin: ipfs.pin.add,
     cat: ipfs.cat,
     pins,
-    addAndPin,
+    addAndPin
   };
-
 };
 
 export { createKuboClient };

@@ -8,7 +8,7 @@
 {#await import.meta.glob("./**/+page.svelte") then modules}
   <ul class="list-disc space-y-2 pl-5">
     {#each Object.keys(modules) as path}
-      {@const pageName = path.replace(/^\.\/|\/\+page\.svelte$/g, '')}
+      {@const pageName = path.replace(/^\.\/|\/\+page\.svelte$/g, "")}
       {@render pageTest(pageName)}
     {/each}
   </ul>

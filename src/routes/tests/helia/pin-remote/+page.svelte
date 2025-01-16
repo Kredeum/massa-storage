@@ -1,5 +1,5 @@
 <script lang="ts">
-  // NOT WORKING :-(  
+  // NOT WORKING :-(
 
   import { onMount } from "svelte";
   import { heliaWithRemotePins } from "@helia/remote-pinning";
