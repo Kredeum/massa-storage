@@ -1,0 +1,4 @@
+packages:
+  - sveltekit
+  - wasm
+  - common
