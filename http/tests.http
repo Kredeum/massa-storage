@@ -1,0 +1,29 @@
+### Helia conformant PSA
+http://127.0.0.1:5005/pins
+
+
+### Helia conformant PSA
+http://127.0.0.1:5005/pin/
+
+
+### Kubo id
+POST http://127.0.0.1:5001/api/v0/id
+
+
+### Kubo not conformant to API Pinning Service Spec !!!
+
+### Kubo files ls
+POST http://127.0.0.1:5001/api/v0/files/ls
+
+
+
+### Kubo show config
+POST http://127.0.0.1:5001/api/v0/config/show
+
+### Kubo pin ls
+POST http://127.0.0.1:5001/api/v0/pin/ls
+
+### Kubo pin add
+POST http://127.0.0.1:5001/api/v0/pin/add
+dsfdf
+

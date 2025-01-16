@@ -1,6 +1,23 @@
 <script lang="ts">
-	import '../app.css';
-	let { children } = $props();
+  import "$styles/app.css";
+  import "tailwindcss/tailwind.css";
+  import { Toaster } from "svelte-hot-french-toast";
+  import Toast from "$lib/components/Toast.svelte";
+
+  let { children } = $props();
 </script>
 
-{@render children()}
+<title>Bearby Connect test</title>
+
+<Toaster />
+<Toast />
+<div class="container">
+  {@render children()}
+</div>
+
+<style>
+  :global(body) {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+  }
+</style>

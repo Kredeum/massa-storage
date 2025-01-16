@@ -1,10 +1,31 @@
-import { defineConfig } from 'vitest/config';
-import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from "vite";
+import { sveltekit } from "@sveltejs/kit/vite";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 export default defineConfig({
-	plugins: [sveltekit()],
-
-	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}']
-	}
+  plugins: [sveltekit(), nodePolyfills()],
+  resolve: {
+    alias: {
+      $lib: "/src/lib",
+      $styles: "/src/styles",
+      lodash: "lodash-es"
+    }
+  },
+  server: { open: true },
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: "globalThis"
+      }
+    }
+  },
+  define: {
+    global: {}
+  },
+  build: {
+    rollupOptions: {
+      external: ["lodash"]
+    }
+  },
+  assetsInclude: ["**/*.svg"]
 });
