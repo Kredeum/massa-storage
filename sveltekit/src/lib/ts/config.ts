@@ -11,6 +11,19 @@ const COUNTER_ADDRESS = (networkName: NetworkName = "buildnet" as NetworkName) =
   throw new Error(`Invalid network name ${networkName}`);
 };
 
+const GREETING_ADDRESS = "AS15R8LW3sbDpGqqbJyee7zJCXbFTjVDWg56JWz59muHxLdtSZQP";
+const GREETING_KEY = "greeting_key";
+
+const IPFS_ADDRESS = "AS1XuunGJHs4DWWhsicaUVDtqqLngzgaDSXk9iP1itZE8GEVzTvQ";
+const IPFS_MODERATORS_KEY = "moderators";
+
 const BURNER_WALLET_KEY = String(env.PUBLIC_BURNER_WALLET_KEY || "");
 
-export { COUNTER_ADDRESS, BURNER_WALLET_KEY };
+export {
+  IPFS_ADDRESS,
+  IPFS_MODERATORS_KEY,
+  COUNTER_ADDRESS,
+  GREETING_ADDRESS,
+  GREETING_KEY,
+  BURNER_WALLET_KEY
+};

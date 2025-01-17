@@ -7,7 +7,7 @@ import type { EmptyObject } from "$lib/ts/types";
 import { shortenString } from "$lib/ts/utils";
 
 class Client {
-  #isMassaWallet = () => this.walletName === "MASSASTATION";
+  #isMassaWallet = () => this.walletName === "MASSA WALLET";
 
   // PROVIDER
   provider = $state<Provider | EmptyObject>({});
