@@ -307,7 +307,6 @@
                     {:else}
                       <FileText class="mr-2 h-5 w-5 text-gray-500" />
                     {/if}
-
                     <a
                       href={file.blob ? URL.createObjectURL(file.blob) : "#"}
                       target="_blank"
@@ -348,9 +347,6 @@
                         }
                       }}
                     >
-                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
                     </a>
 
                     {#if hoveredPreview === file.id && (file.type === "image" || file.type === "video")}
