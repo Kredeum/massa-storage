@@ -47,7 +47,7 @@
 
   function getDisplayCid(file: FileItem): string {
     if (!file.cid) return "N/A";
-    return `${file.cid.slice(0, 4)}...${file.cid.slice(-4)}`;
+    return `${file.cid.slice(0, 6)}...${file.cid.slice(-4)}`;
   }
 
   function getPreviewUrl(file: FileItem): string {
