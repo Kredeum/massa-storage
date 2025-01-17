@@ -84,8 +84,8 @@
               const content = new Uint8Array(arrayBuffer);
               console.log("content:", content);
 
-              // let cid = (await kubo.addAndPin(content)).toString();
-              // console.log("cid:", cid);
+              let cid = (await kubo.addAndPin(content)).toString();
+              console.log("cid:", cid);
 
               const fileType = getFileType(mimeType);
               return {
@@ -100,7 +100,7 @@
                 lastModified: new Date(file.lastModified).toISOString(),
                 blob: file,
                 mimeType,
-                // cid: cid,
+                cid: cid,
                 arrayBuffer: arrayBuffer,
                 file
               };
