@@ -115,23 +115,6 @@
     }
   });
 
-  // const getCidForFileItem = async (file: FileItem): Promise<string | undefined> => {
-  //   if (!file.name) return;
-
-  //   try {
-  //     const content = new Uint8Array(await file.arrayBuffer);
-  //     console.log("fileHandle ~ content:", content.length);
-  //     const kubo = createKuboClient();
-
-  //     const cid = (await kubo.addAndPin(content)).toString();
-  //     console.log("fileHandle ~ cid:", cid);
-
-  //     return cid;
-  //   } catch (error) {
-  //     console.error("Error uploading file:", error);
-  //   }
-  // };
-
   // Reactive filtering and sorting
   const filteredFiles = $derived(
     files.filter((file) => {
