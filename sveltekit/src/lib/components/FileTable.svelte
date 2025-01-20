@@ -45,6 +45,7 @@
   let buttonRef = $state<HTMLButtonElement | null>(null);
   let copiedMessage = $state("");
   let tooltipCid = $state("");
+  let tooltipElement: HTMLDivElement;
 
   function getDisplayCid(file: FileItem): string {
     if (!file.cid) return "N/A";
@@ -98,6 +99,27 @@
   function handleMouseMove(event: MouseEvent) {
     mouseX = event.clientX;
     mouseY = event.clientY;
+  }
+
+  function updateTooltipPosition(e: MouseEvent) {
+    if (tooltipElement) {
+      const rect = tooltipElement.getBoundingClientRect();
+      const offset = 10;
+
+      // Position au-dessus du curseur
+      let top = e.clientY - rect.height - offset;
+      let left = e.clientX - rect.width / 2;
+
+      // Garde le tooltip dans la fenêtre
+      if (top < 0) top = e.clientY + offset;
+      if (left < 0) left = offset;
+      if (left + rect.width > window.innerWidth) {
+        left = window.innerWidth - rect.width - offset;
+      }
+
+      tooltipElement.style.top = `${top}px`;
+      tooltipElement.style.left = `${left}px`;
+    }
   }
 
   // Select all files across all pages
@@ -411,19 +433,21 @@
                       onmouseenter={(e) => {
                         hoveredCid = file.id;
                         tooltipCid = file.cid ?? "";
-                        const tooltip = document.getElementById("tooltip");
-                        if (tooltip) {
-                          tooltip.style.left = `${e.clientX}px`;
-                          tooltip.style.top = `${e.clientY - tooltip.offsetHeight - 5}px`;
-                          tooltip.style.display = "block";
+                        if (tooltipElement) {
+                          tooltipElement.style.display = "block";
+                          updateTooltipPosition(e);
+                        }
+                      }}
+                      onmousemove={(e) => {
+                        if (tooltipElement && tooltipElement.style.display === "block") {
+                          updateTooltipPosition(e);
                         }
                       }}
                       onmouseleave={() => {
                         hoveredCid = null;
                         tooltipCid = "";
-                        const tooltip = document.getElementById("tooltip");
-                        if (tooltip) {
-                          tooltip.style.display = "none";
+                        if (tooltipElement) {
+                          tooltipElement.style.display = "none";
                         }
                       }}
                       onclick={(e) => {
@@ -456,7 +480,9 @@
     </table>
   </div>
 
-  <div id="tooltip" class="absolute rounded border-none bg-gray-700 p-1 text-sm text-white" style="display: none;">{tooltipCid}</div>
+  <div bind:this={tooltipElement} class="pointer-events-none fixed rounded border-none bg-gray-700 p-2 text-sm text-white" style="display: none; z-index: 9999;">
+    {tooltipCid}
+  </div>
 
   {#if showSelectionMenu && buttonRef}
     <div
