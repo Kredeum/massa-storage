@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import ModeratorList from "$lib/components/profiles/ModeratorList.svelte";
   import type { ModeratorProfile } from "$lib/types/profile";
   import { TEST_ADDRESSES } from "$lib/config/test-addresses";

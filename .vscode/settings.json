@@ -1,0 +1,20 @@
+{
+  "favorites.resources": [
+    {
+      "filePath": "sveltekit/src/lib",
+      "group": "Default"
+    },
+    {
+      "filePath": "sveltekit/src/routes",
+      "group": "Default"
+    },
+    {
+      "filePath": "wasm/src",
+      "group": "Default"
+    },
+    {
+      "filePath": "wasm/assembly/contracts",
+      "group": "Default"
+    }
+  ]
+}

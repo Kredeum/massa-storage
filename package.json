@@ -19,11 +19,14 @@
   "scripts": {
     "all": "pnpm run clean && pnpm install && turbo start",
     "clean": "pnpm -r clean && rm -rf node_modules .turbo pnpm-lock.yaml",
-    "deploy": "pnpm run --filter wasm deploy:local"
+    "deploy": "pnpm run --filter wasm deploy"
   },
   "packageManager": "pnpm@9.12.3",
   "engines": {
     "node": "^22",
     "pnpm": "^9"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3"
   }
 }

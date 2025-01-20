@@ -86,7 +86,7 @@ test.describe("File Management Component", () => {
 
       // Verify items changed
       const newItems = await page.locator("tr").count();
-      expect(newItems).toBeGreaterThan(0);
+      expect(newItems).toBeGreaterThan(initialItems);
     }
   });
 

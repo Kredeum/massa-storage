@@ -1,0 +1,18 @@
+{
+  "extends": [
+    "//"
+  ],
+  "tasks": {
+    "deploy": {
+      "dependsOn": [
+        "build"
+      ],
+      "cache": false,
+      "persistent": true,
+      "inputs": [
+        "src/**"
+      ],
+      "outputLogs": "new-only"
+    }
+  }
+}
