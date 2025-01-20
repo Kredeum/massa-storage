@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import {
   Account,
+  Args,
   Mas,
   SmartContract,
   Web3Provider,
@@ -8,27 +9,20 @@ import {
 import { getScByteCode } from './utils';
 
 const account = await Account.fromEnv();
-
-// const provider = Web3Provider.fromRPCUrl('http://127.0.0.1:33035', account);
-// const provider = Web3Provider.mainnet(account);
 const provider = Web3Provider.buildnet(account);
 
 console.log('Deploying contract...');
 
-const byteCode = getScByteCode('build', 'ipfs.wasm');
-const deployer = process.env.DEPLOYER_ADDRESS;
-console.log('deployer:', deployer);
+const byteCode = getScByteCode('build', 'greeting.wasm');
 
-if (!deployer) {
-  console.error('Deployer address not provided');
-  process.exit(1);
-}
+let greetingArg = new Args().addString('Bonjour all').serialize();
 
-const contract = await SmartContract.deploy(provider, byteCode, undefined, {
-  coins: Mas.fromString('1'),
+const contract = await SmartContract.deploy(provider, byteCode, greetingArg, {
+  coins: Mas.fromString('0.02'),
 });
 
 console.log('Contract deployed at:', contract.address);
+// AS1ueXM6LiDhwWgnDrtwRNJYmLbxnk7YtnozucXCdnXJFowGGusC
 
 const events = await provider.getEvents({
   smartContractAddress: contract.address,

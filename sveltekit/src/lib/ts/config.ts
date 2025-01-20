@@ -12,18 +12,9 @@ const COUNTER_ADDRESS = (networkName: NetworkName = "buildnet" as NetworkName) =
 };
 
 const GREETING_ADDRESS = "AS15R8LW3sbDpGqqbJyee7zJCXbFTjVDWg56JWz59muHxLdtSZQP";
-const GREETING_KEY = "greeting_key";
 
-const IPFS_ADDRESS = "AS1XuunGJHs4DWWhsicaUVDtqqLngzgaDSXk9iP1itZE8GEVzTvQ";
-const IPFS_MODERATORS_KEY = "moderators";
+const IPFS_ADDRESS = "AS16C9kVrqjwNFoqVzw9Ft1SWnBzoo7D3mGJyYjiDaeQNBx6gYuR";
 
 const BURNER_WALLET_KEY = String(env.PUBLIC_BURNER_WALLET_KEY || "");
 
-export {
-  IPFS_ADDRESS,
-  IPFS_MODERATORS_KEY,
-  COUNTER_ADDRESS,
-  GREETING_ADDRESS,
-  GREETING_KEY,
-  BURNER_WALLET_KEY
-};
+export { IPFS_ADDRESS, COUNTER_ADDRESS, GREETING_ADDRESS, BURNER_WALLET_KEY };

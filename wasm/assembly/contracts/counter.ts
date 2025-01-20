@@ -1,6 +1,6 @@
 import { Storage, Context, generateEvent } from '@massalabs/massa-as-sdk';
 import { Args, u64ToBytes, stringToBytes } from '@massalabs/as-types';
-import { setOwner, onlyOwner } from './utils/ownership';
+import { ownership } from '@massalabs/sc-standards';
 
 /**
  * @notice Initializes the contract with the deployer's address as the owner.
@@ -9,7 +9,7 @@ import { setOwner, onlyOwner } from './utils/ownership';
  */
 export function constructor(deployer: StaticArray<u8>): void {
   assert(Context.isDeployingContract(), "Constructor can only be called during deployment");
-  setOwner(deployer); // Set the deployer as the owner
+  ownership.setOwner(deployer); // Set the deployer as the owner
   initialize(); // Set initial counter value
 }
 
@@ -64,6 +64,6 @@ export function increment(n: StaticArray<u8>): void {
  * @dev Only the contract owner can call this function.
  */
 export function reset(): void {
-  onlyOwner(); // Ensure the caller is the owner
+  ownership.onlyOwner(); // Ensure the caller is the owner
   setCount(u64ToBytes(0)); // Reset the counter to 0
 }

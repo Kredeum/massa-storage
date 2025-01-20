@@ -1,6 +1,7 @@
 import { Client } from "./client.svelte";
 import { type Provider, bytesToStr, JsonRPCClient } from "@massalabs/massa-web3";
-import { GREETING_ADDRESS, GREETING_KEY } from "$lib/ts/config";
+import { GREETING_ADDRESS } from "$lib/ts/config";
+import { GREETING_KEY } from "../../../../common/src/constants";
 
 import type { Wallet } from "@massalabs/wallet-provider";
 

@@ -1,4 +1,3 @@
-import all from "it-all";
 import {
   CID,
   create,

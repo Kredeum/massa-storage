@@ -3,6 +3,10 @@
   "globalDependencies": [
     ".envrc"
   ],
+  "globalPassThroughEnv": [
+    "PRIVATE_KEY",
+    "DEPLOYER_ADDRESS"
+  ],
   "envMode": "strict",
   "ui": "stream",
   "tasks": {

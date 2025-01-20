@@ -1,42 +1,48 @@
-import { Context, generateEvent, Storage } from '@massalabs/massa-as-sdk';
-import { Args, stringToBytes, bytesToString } from '@massalabs/as-types';
-import { setOwner, onlyOwner } from './utils/ownership';
+import { Address, Context, generateEvent } from '@massalabs/massa-as-sdk';
+import { Args } from '@massalabs/as-types';
+import { ownership } from '@massalabs/sc-standards';
+import {
+  _addModerator,
+  _deleteModerator,
+  _isModerator,
+  _getModerators,
+} from './ipfs-internals';
 
-export function constructor(deployer: StaticArray<u8>): void {
+export function constructor(_: StaticArray<u8>): void {
   assert(Context.isDeployingContract());
 
-  setOwner(deployer);
+  const caller = Context.caller().serialize();
 
-  addModerator(deployer);
+  ownership.setOwner(caller);
+  addModerator(caller);
 }
 
 export function addModerator(moderator: StaticArray<u8>): void {
-  onlyOwner();
-  const moderatorStr = bytesToString(moderator);
+  ownership.onlyOwner();
 
-  // Get existing moderators or initialize empty string
-  const moderatorsKey = 'moderators';
-  let moderators = Storage.has(moderatorsKey) ? Storage.get(moderatorsKey) : '';
+  const success = _addModerator(_str(moderator));
 
-  // Check if moderator already exists
-  if (moderators.includes(moderatorStr)) {
-    return;
-  }
-
-  // Add new moderator to the list
-  moderators =
-    moderators.length > 0 ? moderators + ',' + moderatorStr : moderatorStr;
-  Storage.set(moderatorsKey, moderators);
-
-  generateEvent(`Moderator added: ${moderatorStr}`);
+  if (success) generateEvent(`Moderator added: ${_str(moderator)}`);
 }
 
-export function getModerators(): string {
-  return Storage.has('moderators') ? Storage.get('moderators') : '';
+export function deleteModerator(moderator: StaticArray<u8>): void {
+  ownership.onlyOwner();
+
+  const success = _deleteModerator(_str(moderator));
+
+  if (success) generateEvent(`Moderator deleted: ${_str(moderator)}`);
 }
 
-export function isModerator(address: StaticArray<u8>): bool {
-  const addressStr = bytesToString(address);
-  const moderators = getModerators();
-  return moderators.includes(addressStr);
+export function getModerators(): StaticArray<u8> {
+  return new Args().add(_getModerators()).serialize();
+}
+
+export function isModerator(moderator: StaticArray<u8>): StaticArray<u8> {
+  return new Args().add(_isModerator(_str(moderator))).serialize();
+}
+
+function _str(moderatorArg: StaticArray<u8>): string {
+  return new Address(
+    new Args(moderatorArg).nextString().expect('Invalid address'),
+  ).toString();
 }
