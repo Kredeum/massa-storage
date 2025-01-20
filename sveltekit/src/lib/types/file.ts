@@ -16,7 +16,7 @@ export interface FileItem {
   blob?: Blob; // Optional blob for image preview
   file?: File | undefined; // Original File object
   mimeType?: string; // Store original MIME type for proper handling
-  cid?: string; // IPFS Content Identifier - optional because it might not be available in case of error
+  cid: string | undefined; // IPFS Content Identifier - optional because it might not be available in case of error
 }
 
 export interface FilterState {

@@ -35,15 +35,16 @@
 
   let { files = [], paginatedFiles = [], selectedFiles = $bindable([]), sortConfig, handleSort, onSelectionChange, onFilterChange, actions, filteredFiles = [] }: Props = $props();
 
-  let copiedCid: number | null = $state(null);
-  let hoveredCid: number | null = $state(null);
-  let hoveredPreview: number | null = $state(null);
+  let hoveredCid = $state<number | null>(null);
+  let hoveredPreview = $state<number | null>(null);
   let mouseX = $state(0);
   let mouseY = $state(0);
   let previewUrls: { [key: number]: string } = {};
   let showSelectionMenu = $state(false);
   let menuRef = $state<HTMLDivElement | null>(null);
   let buttonRef = $state<HTMLButtonElement | null>(null);
+  let copiedMessage = $state("");
+  let tooltipCid = $state("");
 
   function getDisplayCid(file: FileItem): string {
     if (!file.cid) return "N/A";
@@ -85,9 +86,9 @@
       if (!file?.cid) return;
 
       await navigator.clipboard.writeText(file.cid);
-      copiedCid = fileId;
+      copiedMessage = "Copied!";
       setTimeout(() => {
-        copiedCid = null;
+        copiedMessage = "";
       }, 1000);
     } catch (err) {
       console.error("Failed to copy to clipboard:", err);
@@ -170,7 +171,7 @@
       <thead class="bg-gray-50">
         <tr>
           <th class="relative w-12 px-4 py-3 text-left">
-            <div class="relative flex items-center gap-0.5">
+            <div class="relative flex items-center">
               <input
                 type="checkbox"
                 class="cursor-pointer rounded text-blue-600"
@@ -196,7 +197,11 @@
                 aria-haspopup="true"
                 aria-label="Selection menu"
               >
-                <ChevronDown size={16} />
+                {#if showSelectionMenu}
+                  <ChevronUp size={16} />
+                {:else}
+                  <ChevronDown size={16} />
+                {/if}
               </button>
             </div>
           </th>
@@ -403,9 +408,28 @@
                   <div class="relative">
                     <button
                       class="rounded px-2 py-1 hover:bg-gray-100"
-                      onmouseenter={() => (hoveredCid = file.id)}
-                      onmouseleave={() => (hoveredCid = null)}
-                      onclick={() => copyToClipboard(file.id)}
+                      onmouseenter={(e) => {
+                        hoveredCid = file.id;
+                        tooltipCid = file.cid ?? "";
+                        const tooltip = document.getElementById("tooltip");
+                        if (tooltip) {
+                          tooltip.style.left = `${e.clientX}px`;
+                          tooltip.style.top = `${e.clientY - tooltip.offsetHeight - 5}px`;
+                          tooltip.style.display = "block";
+                        }
+                      }}
+                      onmouseleave={() => {
+                        hoveredCid = null;
+                        tooltipCid = "";
+                        const tooltip = document.getElementById("tooltip");
+                        if (tooltip) {
+                          tooltip.style.display = "none";
+                        }
+                      }}
+                      onclick={(e) => {
+                        e.stopPropagation(); // Prevent checkbox from being selected
+                        copyToClipboard(file.id);
+                      }}
                       onkeydown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
@@ -415,6 +439,9 @@
                       aria-label={`Copy CID for ${file.name}`}
                     >
                       {getDisplayCid(file)}
+                      {#if copiedMessage}
+                        <span class="text-green-500">{copiedMessage}</span>
+                      {/if}
                     </button>
                   </div>
                 </td>
@@ -428,6 +455,8 @@
       </tbody>
     </table>
   </div>
+
+  <div id="tooltip" class="absolute rounded border-none bg-gray-700 p-1 text-sm text-white" style="display: none;">{tooltipCid}</div>
 
   {#if showSelectionMenu && buttonRef}
     <div
