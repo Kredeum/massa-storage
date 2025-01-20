@@ -24,6 +24,7 @@
   let selectedFiles = $state<number[]>([]);
   let searchQuery = $state("");
   let uploadFiles = $state<FileList | undefined>();
+  let cid = $state<string>("");
 
   let kubo: ReturnType<typeof createKuboClient>;
 
@@ -59,7 +60,12 @@
   }
 
   onMount(async () => {
-    kubo = createKuboClient();
+    try {
+      kubo = createKuboClient();
+    } catch (error) {
+      console.error(error);
+      toastStore.error("Failed to access IPFS server. Please check your connection.");
+    }
   });
 
   $effect(() => {
@@ -84,8 +90,21 @@
               const content = new Uint8Array(arrayBuffer);
               console.log("content:", content);
 
-              let cid = (await kubo.addAndPin(content)).toString();
-              console.log("cid:", cid);
+              console.log("kubo:", kubo.addAndPin);
+
+              try {
+                const result = await kubo.addAndPin(content);
+                if (result) {
+                  cid = result.toString();
+                  console.log("CID:", cid);
+                } else {
+                  console.error("Result from addAndPin is undefined");
+                  toastStore.error("Failed to add and pin file. Unexpected result from IPFS.");
+                }
+              } catch (error) {
+                console.error("Error in addAndPin:", error);
+                toastStore.error("Failed to add and pin file. IPFS operation error.");
+              }
 
               const fileType = getFileType(mimeType);
               return {

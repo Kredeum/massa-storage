@@ -77,7 +77,7 @@
       e.stopPropagation();
       handleDownload();
     }}
-    class="cursor-pointer text-gray-600 transition-colors hover:text-blue-900"
+    class="cursor-pointer text-gray-500 transition-colors hover:text-blue-900"
     aria-label="Download file"
   >
     <svg class="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

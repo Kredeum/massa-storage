@@ -1,4 +1,3 @@
-<!-- Toast.svelte -->
 <script lang="ts">
   import { toastStore, type Toast } from "../stores/toast";
 

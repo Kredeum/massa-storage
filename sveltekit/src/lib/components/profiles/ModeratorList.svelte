@@ -1,12 +1,16 @@
 <script lang="ts">
   import { Trash2 } from "lucide-svelte";
   import type { ModeratorProfile, ModeratorAddress } from "$lib/types/profile";
-  import { TEST_ADDRESSES } from "$lib/config/test-addresses";
   import { toastStore } from "$lib/stores/toast";
+  import { shortenString } from "$lib/ts/utils";
 
-  export let moderators: ModeratorProfile[] = [];
+  interface Props {
+    moderators?: ModeratorProfile[];
+  }
 
-  let newModeratorAddress: ModeratorAddress | "" = "";
+  let { moderators = $bindable([]) }: Props = $props();
+
+  let newModeratorAddress: ModeratorAddress | "" = $state("");
 
   function validateAddress(address: string): boolean {
     // Accept addresses starting with AU and having the correct length (53 characters total)
@@ -15,11 +19,7 @@
   }
 
   function formatDate(timestamp: number): string {
-    return new Date(timestamp).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    });
+    return new Date(timestamp).toLocaleDateString();
   }
 
   async function handleSubmit(e: Event) {
@@ -65,7 +65,7 @@
 
 <div class="space-y-8">
   <!-- Form Section -->
-  <div class="mx-auto rounded-lg bg-white p-6 shadow-lg ring-1 ring-gray-900/10">
+  <div class="mx-auto rounded-lg bg-white p-6 shadow-lg">
     <h2 class="mb-4 text-xl font-semibold text-gray-700">Add New Moderator</h2>
     <form onsubmit={handleSubmit} class="flex gap-4">
       <input
@@ -80,7 +80,7 @@
   </div>
 
   <!-- Table Section -->
-  <div class="overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-gray-900/10">
+  <div class="overflow-hidden rounded-lg bg-white shadow-lg">
     <h2 class="border-b p-6 text-xl font-semibold text-gray-700">Moderators List</h2>
     <div class="overflow-x-auto">
       <table class="w-full">
@@ -96,7 +96,7 @@
           {#each moderators as moderator (moderator.address)}
             <tr class="hover:bg-gray-50">
               <td class="whitespace-nowrap px-6 py-4 font-mono text-sm text-gray-900">
-                {moderator.address}
+                {shortenString(moderator.address)}
               </td>
               <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                 {formatDate(moderator.addedAt)}
