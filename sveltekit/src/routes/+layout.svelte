@@ -7,7 +7,7 @@
   let { children } = $props();
 </script>
 
-<title>Bearby Connect test</title>
+<title>Massa Storage</title>
 
 <Toaster />
 <Toast />

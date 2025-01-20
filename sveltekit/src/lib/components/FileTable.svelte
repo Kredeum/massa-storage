@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { FileItem, SortConfig, FileStatus } from "$lib/types/file";
-  import { FileText, Image, Video, Music, ChevronDown, ChevronUp } from "lucide-svelte";
+  import { FileText, Image, Video, Music, ChevronDown, ChevronUp, X } from "lucide-svelte";
   import { onDestroy, onMount } from "svelte";
   import { storeFileForPreview } from "$lib/stores/filePreviewStore";
 
@@ -171,6 +171,11 @@
     if (showSelectionMenu && menuRef && !menuRef.contains(event.target as Node) && !buttonRef?.contains(event.target as Node)) {
       showSelectionMenu = false;
     }
+  }
+
+  function removeTag(file: FileItem, tagToRemove: string) {
+    const updatedTags = (file.tags || []).filter((tag) => tag !== tagToRemove);
+    file.tags = updatedTags;
   }
 
   onMount(() => {
@@ -392,11 +397,21 @@
                   </div>
                 </td>
               {:else if column.key === "tags"}
-                <td class="w-1/6 px-4 py-4 text-center text-sm">
-                  <div class="flex flex-wrap justify-center gap-1">
+                <td class="w-1/6 px-4 py-4">
+                  <div class="flex h-full flex-wrap items-center justify-center gap-1">
                     {#each file.tags || [] as tag}
-                      <span class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
-                        {tag}
+                      <span class="flex items-center justify-center rounded-full bg-blue-100 pl-1.5 text-sm text-blue-800">
+                        <span class="flex items-center justify-center">{tag}</span>
+                        <button
+                          class="ml-1.5 flex h-4 w-4 items-center justify-center rounded-full hover:bg-blue-200"
+                          onclick={(e) => {
+                            e.stopPropagation();
+                            removeTag(file, tag);
+                          }}
+                          aria-label={`Remove tag ${tag}`}
+                        >
+                          <X class="h-3 w-3" />
+                        </button>
                       </span>
                     {/each}
                   </div>

@@ -3,11 +3,13 @@
   import Header from "$lib/components/Header.svelte";
   import "$styles/toast.css";
 
+
   let { children } = $props();
 </script>
 
-<Header />
+<Header/>
 
-{@render children()}
+{@render children() }
+
 
 <Footer />
