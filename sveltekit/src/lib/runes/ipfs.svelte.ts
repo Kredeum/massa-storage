@@ -14,62 +14,67 @@ import toast from "svelte-hot-french-toast";
 import { shortenString } from "$lib/ts/utils";
 
 class Ipfs extends Client {
-  #moderators = $state<string[]>([]);
+  #mods = $state<string[]>([]);
+  #cids = $state<string[]>([]);
 
-  isModerator = async (moderator: string): Promise<boolean | undefined> => {
+  has = async (type: string, value: string): Promise<boolean | undefined> => {
     if (!this.provider.readSC) return;
 
     const result: ReadSCData = await this.provider.readSC({
       target: IPFS_ADDRESS,
-      func: "isModerator",
-      parameter: new Args().addString(moderator).serialize()
+      func: `${type}Has`,
+      parameter: new Args().addString(value).serialize()
     });
     if (result.info.error) {
-      toast.error("isModerator ERROR " + result.info.error);
+      toast.error(`${type}Has ERROR ${result.info.error}`);
       return;
     }
 
-    const isMod = new Args(result.value).nextBool();
-    console.log("isModerator moderator:", moderator, isMod);
+    const has = new Args(result.value).nextBool();
+    console.log(`${type}Has ${value}: ${has}`);
 
-    return isMod;
+    return has;
   };
+  modHas = async (value: string): Promise<boolean | undefined> => await this.has("mod", value);
+  cidHas = async (value: string): Promise<boolean | undefined> => await this.has("cid", value);
 
-  addModerator = async (moderator: string) => {
+  add = async (type: string, value: string) => {
     try {
       const op = await this.provider.callSC({
         target: IPFS_ADDRESS,
-        func: "addModerator",
-        parameter: new Args().addString(moderator).serialize()
+        func: `${type}Add`,
+        parameter: new Args().addString(value).serialize()
       });
 
       const txHash = op.id;
-      toast.success("Transaction sent: " + shortenString(txHash));
+      toast.success(`Transaction sent: ${shortenString(txHash)}`);
       console.log(`https://massexplo.io/tx/${txHash}`);
       // console.log(`https://explorer.massa.net/mainnet/operation/${txHash}`);
 
       const status = await op.waitSpeculativeExecution();
       if (status !== OperationStatus.SpeculativeSuccess) {
-        console.error("addModerator Failed to add moderator ~ status:", status);
-        return toast.error("Failed to add moderator");
+        console.error(`${type}Add Failed to add mod ~ status: ${status}`);
+        return toast.error(`Failed to ${type}Add`);
       }
 
-      await this.getModerators();
-      toast.success(`Moderator add ok`);
+      await this.modsGet();
+      toast.success(`${type}Add ok`);
     } catch (error) {
-      toast.error("Error adding moderator");
+      toast.error(`Error ${type}Add`);
       console.error("Error:", error);
     }
   };
+  modAdd = async (value: string) => await this.add("mod", value);
+  cidAdd = async (value: string) => await this.add("cid", value);
 
-  deleteModerator = async (moderator: string) => {
+  del = async (type: string, value: string) => {
     try {
       const op = await this.provider.callSC({
-        parameter: new Args().addString(moderator).serialize(),
-        func: "deleteModerator",
+        parameter: new Args().addString(value).serialize(),
+        func: `${type}Del`,
         target: IPFS_ADDRESS
       });
-      // console.info("addModerator ~ op:", op);
+      // console.info(`del${type} ~ op: op`);
 
       const txHash = op.id;
       toast.success("Transaction sent: " + shortenString(txHash));
@@ -77,39 +82,46 @@ class Ipfs extends Client {
       // console.log(`https://explorer.massa.net/mainnet/operation/${txHash}`);
 
       const status = await op.waitSpeculativeExecution();
-      if (status !== OperationStatus.SpeculativeSuccess)
-        return toast.error("Failed to delete moderator");
+      if (status !== OperationStatus.SpeculativeSuccess) return toast.error(`Failed to ${type}Del`);
 
-      await this.getModerators();
-      toast.success(`Moderator delete ok`);
+      await this.modsGet();
+      toast.success(`${type}Del ok`);
     } catch (error) {
-      toast.error("Error deleting moderator");
+      toast.error(`Error ${type}Del`);
       console.error("Error:", error);
     }
   };
+  modDel = async (value: string) => await this.del("mod", value);
+  cidDel = async (value: string) => await this.del("cid", value);
 
-  getModerators = async () => {
+  get = async (type: string) => {
     if (!this.provider.readSC) return;
 
-    console.log("Moderators read");
+    console.log(`${type}sGet`);
 
     const result: ReadSCData = await this.provider.readSC({
-      func: "getModerators",
+      func: `${type}sGet`,
       target: IPFS_ADDRESS
     });
     if (result.info.error) {
-      toast.error("getModerators ERROR " + result.info.error);
+      toast.error(`${type}sGet ERROR ` + result.info.error);
       return;
     }
 
-    const moderators: string[] = new Args(result.value).nextArray(ArrayTypes.STRING);
-    console.log("getModerator moderators:", moderators);
+    const items: string[] = new Args(result.value).nextArray(ArrayTypes.STRING);
+    console.log(`${type}Get mods`);
 
-    this.#moderators = moderators;
+    if (type === "mod") this.#mods = items;
+    if (type === "cid") this.#cids = items;
   };
+  modsGet = async () => await this.get("mod");
+  cidsGet = async () => await this.get("cid");
 
-  get moderators() {
-    return this.#moderators;
+  get mods() {
+    return this.#mods;
+  }
+  get cids() {
+    return this.#cids;
   }
 
   constructor(walletOrProvider?: Wallet | Provider, accountNum = 0, walletNum = 0) {

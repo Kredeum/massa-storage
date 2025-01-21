@@ -1,5 +1,5 @@
 import { Args, stringToBytes } from '@massalabs/as-types';
-import { constructor, hello, NAME_KEY } from '../contracts/name';
+import { constructor, hello, NAME_KEY } from '../contracts/tests/name';
 import { setDeployContext, Storage } from '@massalabs/massa-as-sdk';
 
 const NAME = 'Massillian';
