@@ -1,11 +1,21 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import { setContext } from "svelte";
+  import { Ipfs } from "$lib/runes/ipfs.svelte";
+  import Connect from "$lib/components/Connect.svelte";
+
+  const ipfs = new Ipfs();
+  setContext("ipfs", ipfs);
+
   // console.info("page:", $state.snapshot(page));
   let { children } = $props();
 </script>
 
 <div class="flex min-h-screen flex-col">
   <div class="p-8">
+    <h1 class="mb-6 text-2xl">
+      <Connect client={ipfs} />
+    </h1>
     <h1 class="mb-6 text-2xl font-bold">
       <div class="flex items-center gap-10">
         <a href="/app">App</a>

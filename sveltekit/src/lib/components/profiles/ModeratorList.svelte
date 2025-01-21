@@ -3,12 +3,15 @@
   import type { ModeratorProfile, ModeratorAddress } from "$lib/types/profile";
   import { toastStore } from "$lib/stores/toast";
   import { shortenString } from "$lib/ts/utils";
+  import { getContext, onMount } from "svelte";
+  import type { Ipfs } from "$lib/runes/ipfs.svelte";
 
-  interface Props {
-    moderators?: ModeratorProfile[];
-  }
+  const ipfs: Ipfs = getContext("ipfs");
 
-  let { moderators = $bindable([]) }: Props = $props();
+  const refresh = async () => {
+    await ipfs?.getModerators();
+  };
+  onMount(refresh);
 
   let newModeratorAddress: ModeratorAddress | "" = $state("");
 
@@ -22,45 +25,8 @@
     return new Date(timestamp).toLocaleDateString();
   }
 
-  async function handleSubmit(e: Event) {
-    e.preventDefault();
-
-    if (!validateAddress(newModeratorAddress)) {
-      toastStore.error("Please enter a valid blockchain address");
-      return;
-    }
-
-    if (moderators.some((mod) => mod.address === newModeratorAddress)) {
-      toastStore.error("This address is already a moderator");
-      return;
-    }
-
-    try {
-      moderators = [
-        ...moderators,
-        {
-          address: newModeratorAddress as ModeratorAddress,
-          addedAt: Date.now(),
-          active: true
-        }
-      ];
-      newModeratorAddress = "";
-      toastStore.success("Moderator added successfully!");
-    } catch (err) {
-      console.error("Failed to add moderator:", err);
-      toastStore.error("Failed to add moderator");
-    }
-  }
-
-  async function removeModerator(address: ModeratorAddress) {
-    try {
-      moderators = moderators.filter((mod) => mod.address !== address);
-      toastStore.success("Moderator removed successfully!");
-    } catch (err) {
-      console.error("Failed to remove moderator:", err);
-      toastStore.error("Failed to remove moderator");
-    }
-  }
+  const handleSubmit = async (event: SubmitEvent) => {};
+  const removeModerator = async (address: string) => {};
 </script>
 
 <div class="space-y-8">
@@ -93,27 +59,20 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
-          {#each moderators as moderator (moderator.address)}
+          {#each ipfs?.moderators as moderator}
             <tr class="hover:bg-gray-50">
               <td class="whitespace-nowrap px-6 py-4 font-mono text-sm text-gray-900">
-                {shortenString(moderator.address)}
+                {shortenString(moderator)}
               </td>
-              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                {formatDate(moderator.addedAt)}
-              </td>
-              <td class="whitespace-nowrap px-6 py-4">
-                <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5 {moderator.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                  {moderator.active ? "Active" : "Inactive"}
-                </span>
-              </td>
+
               <td class="whitespace-nowrap px-6 py-4 text-center">
-                <button onclick={() => removeModerator(moderator.address)} class="text-red-600 transition duration-200 hover:text-red-900" aria-label="Delete moderator">
+                <button onclick={() => removeModerator(moderator)} class="text-red-600 transition duration-200 hover:text-red-900" aria-label="Delete moderator">
                   <Trash2 class="h-5 w-5" />
                 </button>
               </td>
             </tr>
           {/each}
-          {#if moderators.length === 0}
+          {#if ipfs?.moderators.length === 0}
             <tr>
               <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">
                 <div class="flex flex-col items-center space-y-2">

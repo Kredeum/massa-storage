@@ -1,11 +1,12 @@
 <!-- Header.svelte -->
 <script lang="ts">
   import { base } from "$app/paths";
-  import { Client } from "$lib/runes/client.svelte";
+  import { Ipfs } from "$lib/runes/ipfs.svelte";
   import logoMassa from "$lib/assets/logoMassa.svg";
   import Connect from "$lib/components/Connect.svelte";
+  import type { Client } from "$lib/runes/client.svelte";
 
-  const client = new Client();
+  let { client }: { client: Client } = $props();
 </script>
 
 <header class="flex h-16 w-full items-center border-b border-gray-200 bg-white px-4 shadow-sm">
@@ -16,7 +17,7 @@
         Massa Storage
       </a>
       <a href="{base}/app" class="text-sm text-gray-600 hover:text-gray-900">Files</a>
-      <a href="{base}/app/profiles" class="text-sm text-gray-600 hover:text-gray-900">Profiles</a>
+      <a href="{base}/app/profiles" class="text-sm text-gray-600 hover:text-gray-900">Moderators</a>
       <a href="{base}/tests" class="text-sm text-gray-600 hover:text-gray-900">Tests</a>
       <a href="https://github.com/kredeum/massa-storage" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-600 hover:text-gray-900"> GitHub </a>
     </div>

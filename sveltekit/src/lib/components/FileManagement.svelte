@@ -11,10 +11,7 @@
   import TagInput from "./TagInput.svelte";
   import { toastStore } from "../stores/toast";
   import { createKuboClient } from "$lib/ts/kubo";
-  import all from "it-all";
-  import { CID } from "multiformats";
   import { onMount } from "svelte";
-  import { Client } from "$lib/runes/client.svelte";
 
   const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
@@ -236,8 +233,8 @@
 </script>
 
 <Toast />
+
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
-  <!-- {#if client.connected} -->
   <div class="mb-6 flex flex-col gap-4">
     <div class="mb-8">
       <FileUpload bind:files={uploadFiles} />
@@ -261,10 +258,4 @@
   </FileTable>
 
   <FilePagination {currentPage} {totalPages} {itemsPerPage} totalItems={filteredFiles.length} setPage={(page) => setPage(page)} />
-  <!-- {:else} -->
-  <div class="flex flex-col items-center justify-center p-8 text-center">
-    <p class="mb-4 text-lg font-medium text-gray-700">Please log in to access the files</p>
-    <p class="text-sm text-gray-500">Use the "Connect" button at the top of the page to log in with your wallet</p>
-  </div>
-  <!-- {/if} -->
 </div>
