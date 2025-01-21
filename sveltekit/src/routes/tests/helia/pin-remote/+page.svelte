@@ -3,12 +3,10 @@
 
   import { onMount } from "svelte";
   import { heliaWithRemotePins } from "@helia/remote-pinning";
-  import { CID } from "multiformats";
 
   import { createHelia, type Helia } from "helia";
   import { strings, type Strings } from "@helia/strings";
 
-  import all from "it-all";
   import drain from "it-drain";
 
   let helia: Helia;
@@ -16,7 +14,6 @@
 
   let dataInput = $state<string>("");
   let cidInput = $state<string>("");
-  let dataRetrieved = $state<string>("");
   let pinStatus = $state<string>("");
 
   const PINNING_ENDPOINT = "http://127.0.0.1:5005";

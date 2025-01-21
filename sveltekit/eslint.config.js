@@ -9,6 +9,9 @@ const gitignorePath = fileURLToPath(new URL("./.gitignore", import.meta.url));
 
 export default ts.config(
   includeIgnoreFile(gitignorePath),
+  {
+    ignores: ["deprecated/**"]
+  },
   js.configs.recommended,
   ...ts.configs.recommended,
   ...svelte.configs["flat/recommended"],

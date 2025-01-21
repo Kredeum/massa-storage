@@ -1,22 +1,35 @@
 {
-  "extends": ["//"],
-  "globalPassThroughEnv": ["PUBLIC_BURNER_WALLET_KEY", "PUBLIC_COUNTER_ADDRESS"],
+  "extends": [
+    "//"
+  ],
+  "globalPassThroughEnv": [
+    "PUBLIC_BURNER_WALLET_KEY",
+    "PUBLIC_COUNTER_ADDRESS"
+  ],
   "tasks": {
     "dev": {
       "cache": false,
       "persistent": true,
-      "inputs": ["src/**"],
+      "inputs": [
+        "src/**"
+      ],
       "outputLogs": "new-only"
     },
     "start": {
-      "dependsOn": ["check"],
+      "dependsOn": [
+        "check"
+      ],
       "cache": false,
       "persistent": true,
-      "inputs": ["src/**"],
+      "inputs": [
+        "src/**"
+      ],
       "outputLogs": "new-only"
     },
     "preview": {
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "cache": false,
       "persistent": true,
       "outputLogs": "new-only"

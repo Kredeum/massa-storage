@@ -1,23 +1,29 @@
 // Handles smart contract operations on the Massa blockchain
 type BearbyContract = {
-  getFilteredSCOutputEvent: (_filter: EventFilter) => Promise<FilterResponse>;
-  readSmartContract: (_params: ContractReadParams) => Promise<FilterResponse>;
-  call: (_params: ContractCallParams) => Promise<string>;
-  deploy: (_params: ContractDeployParams) => Promise<string>;
-  getDatastoreEntries: (_params: { address: string; key: string }) => Promise<FilterResponse>;
+  getFilteredSCOutputEvent: (filter: EventFilter) => Promise<FilterResponse>;
+  readSmartContract: (params: ContractReadParams) => Promise<FilterResponse>;
+  call: (params: ContractCallParams) => Promise<string>;
+  deploy: (params: ContractDeployParams) => Promise<string>;
+  getDatastoreEntries: ({
+    address,
+    key
+  }: {
+    address: string;
+    key: string;
+  }) => Promise<FilterResponse>;
   types: ContractTypes;
 };
 
 // Core Massa blockchain interaction methods
 type BearbyMassa = {
   getNodesStatus: () => Promise<NodeStatusResponse>;
-  getAddresses: (_publicKey: string) => Promise<AddressResponse>;
+  getAddresses: (publicKey: string) => Promise<AddressResponse>;
 };
 
 // Low-level provider for direct wallet interactions
 type BearbyProvider = {
   requestPubKey: () => Promise<string>;
-  signMessage: (_message: string) => Promise<string>;
+  signMessage: (message: string) => Promise<string>;
 };
 
 // Represents a Massa blockchain account
@@ -38,7 +44,7 @@ type BearbyWallet = {
   disconnect: () => Promise<boolean>;
   network: string;
   getPublicKey: () => Promise<string>;
-  signMessage: (_message: string) => Promise<string>;
+  signMessage: (message: string) => Promise<string>;
   provider: BearbyProvider;
   requestPubKey: () => Promise<string>;
 };

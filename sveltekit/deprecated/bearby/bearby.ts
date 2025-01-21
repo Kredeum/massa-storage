@@ -195,6 +195,7 @@ const getNodesStatus = async () => {
 
 export {
   USDC,
+  initBearby,
   connect,
   disconnect,
   accountBalance,

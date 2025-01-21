@@ -38,7 +38,7 @@
     // pin data
     await drain(helia.pins.add(cid));
 
-    const pins = await all(helia.pins.ls());
+    await all(helia.pins.ls());
 
     // string cid
     cidInput = cid.toString();
