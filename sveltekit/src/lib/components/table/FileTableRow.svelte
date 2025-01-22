@@ -1,0 +1,135 @@
+<script lang="ts">
+  import type { FileItem } from "$lib/ts/types";
+  import { columns } from "$lib/constants/files";
+  import FileIcon from "./FileIcon.svelte";
+  import FileCidCell from "./FileCidCell.svelte";
+  import FilePreview from "$lib/components/table/FilePreview.svelte";
+
+  let {
+    file,
+    selectedFiles = [],
+    onSelect,
+    actions,
+    onTooltipShow,
+    onTooltipHide
+  } = $props<{
+    file: FileItem;
+    selectedFiles: number[];
+    onSelect: (id: number) => void;
+    actions?: import("svelte").Snippet<[FileItem]>;
+    onTooltipShow: (content: string, event: MouseEvent) => void;
+    onTooltipHide: () => void;
+  }>();
+
+  let hoveredPreview = $state(false);
+
+  function handleRowClick() {
+    onSelect(file.id);
+  }
+
+  function handleCheckboxClick(e: Event) {
+    e.stopPropagation();
+    onSelect(file.id);
+  }
+
+  function handleMouseEnter(e: MouseEvent) {
+    if (file.type === "image") {
+      hoveredPreview = true;
+    }
+  }
+
+  function handleMouseLeave() {
+    hoveredPreview = false;
+  }
+</script>
+
+<tr
+  class="cursor-pointer"
+  onclick={handleRowClick}
+  onkeydown={(e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleRowClick();
+    }
+  }}
+  role="button"
+  tabindex="0"
+>
+  <td class="w-12 px-4 py-4">
+    <input
+      type="checkbox"
+      class="cursor-pointer rounded text-blue-600"
+      checked={selectedFiles.includes(file.id)}
+      onclick={handleCheckboxClick}
+      onkeydown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleCheckboxClick(e);
+        }
+      }}
+      aria-label={`Select ${file.name}`}
+    />
+  </td>
+
+  {#each columns as column}
+    {#if column.key === "name"}
+      <td class="w-[25%] px-4 py-4">
+        <div class="flex items-center">
+          <FileIcon type={file.type} />
+          <span class="ml-2 cursor-pointer truncate hover:text-blue-600 hover:underline" onmouseenter={handleMouseEnter} onmouseleave={handleMouseLeave} role="button" tabindex="0">
+            {file.name}
+          </span>
+          {#if hoveredPreview}
+            <FilePreview {file} />
+          {/if}
+        </div>
+      </td>
+    {:else if column.key === "tags"}
+      <td class="w-[15%] px-4 py-4 text-center">
+        <div class="flex flex-wrap items-center justify-center gap-1">
+          {#each file.tags || [] as tag}
+            <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-800">
+              {tag}
+            </span>
+          {/each}
+        </div>
+      </td>
+    {:else if column.key === "lastModified"}
+      <td class="w-[15%] px-4 py-4 text-center text-sm text-gray-500">
+        {new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(file.lastModified))}
+      </td>
+    {:else if column.key === "size"}
+      <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
+        {(file.size / (1024 * 1024)).toFixed(2)} MB
+      </td>
+    {:else if column.key === "type"}
+      <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
+        {file.type}
+      </td>
+    {:else if column.key === "status"}
+      <td class="w-[8%] px-4 py-4 text-center">
+        <span
+          class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
+          class:bg-yellow-100={file.status === "Pending"}
+          class:text-yellow-800={file.status === "Pending"}
+          class:bg-green-100={file.status === "Approved"}
+          class:text-green-800={file.status === "Approved"}
+          class:bg-red-100={file.status === "Rejected"}
+          class:text-red-800={file.status === "Rejected"}
+        >
+          {file.status}
+        </span>
+      </td>
+    {:else if !column.key}
+      <td class="w-[13%] px-4 py-4 text-center">
+        <FileCidCell cid={file.cid} fileName={file.name} {onTooltipShow} {onTooltipHide} />
+      </td>
+    {/if}
+  {/each}
+
+  <td class="w-[8%] px-4 py-4 text-center">
+    <div class="flex items-center justify-center space-x-2">
+      {@render actions?.(file)}
+    </div>
+  </td>
+</tr>

@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { FileItem, FilterState, SortConfig, FileStatus, FileType } from "$lib/types/file";
+  import { toast } from "svelte-hot-french-toast";
+  import { onMount } from "svelte";
+  import { createKuboClient } from "$lib/ts/kubo";
+
   import SearchBar from "./SearchBar.svelte";
   import FileFilters from "./FileFilters.svelte";
   import FileTable from "./FileTable.svelte";
@@ -7,13 +10,12 @@
   import FileUpload from "./FileUpload.svelte";
   import FileSelectionBar from "./FileSelectionBar.svelte";
   import FilePagination from "./FilePagination.svelte";
-  import Toast from "./Toast.svelte";
   import TagInput from "./TagInput.svelte";
-  import { toastStore } from "../stores/toast";
-  import { createKuboClient } from "$lib/ts/kubo";
-  import { onMount } from "svelte";
 
-  const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+  import { FileStore } from "$lib/stores/files";
+  import { MAX_FILE_SIZE } from "$lib/constants/files";
+  import type { FileItem, FilterState, SortConfig, FileStatus } from "$lib/ts/types";
+  import { formatSize, validateFiles, getFileType } from "$lib/ts/utils";
 
   // Global state
   let currentPage = $state(0);
@@ -37,32 +39,12 @@
     direction: "desc"
   });
 
-  function getFileType(mimeType: string): FileType {
-    if (mimeType.startsWith("image/")) return "image";
-    if (mimeType.startsWith("video/")) return "video";
-    if (mimeType.startsWith("audio/")) return "audio";
-    return "document";
-  }
-
-  function formatSize(bytes: number): string {
-    const units = ["B", "KB", "MB", "GB"];
-    let size = bytes;
-    let unitIndex = 0;
-
-    while (size >= 1024 && unitIndex < units.length - 1) {
-      size /= 1024;
-      unitIndex++;
-    }
-
-    return `${size.toFixed(1)} ${units[unitIndex]}`;
-  }
-
   onMount(async () => {
     try {
       kubo = createKuboClient();
     } catch (error) {
       console.error(error);
-      toastStore.error("Failed to access IPFS server. Please check your connection.");
+      toast.error("Failed to access IPFS server. Please check your connection.");
     }
   });
 
@@ -73,7 +55,7 @@
           Array.from(uploadFiles)
             .filter((file) => {
               if (file.size > MAX_FILE_SIZE) {
-                toastStore.add(`File ${file.name} exceeds maximum size of ${formatSize(MAX_FILE_SIZE)}`, "error");
+                toast.error(`File ${file.name} exceeds maximum size of ${formatSize(MAX_FILE_SIZE)}`);
                 return false;
               }
               return true;
@@ -97,12 +79,16 @@
                   console.log("CID:", cid);
                 } else {
                   console.error("Result from addAndPin is undefined");
-                  toastStore.error("Failed to add and pin file. Unexpected result from IPFS.");
+                  toast.error("Failed to add and pin file. Unexpected result from IPFS.");
                 }
               } catch (error) {
                 console.error("Error in addAndPin:", error);
-                toastStore.error("Failed to add and pin file. IPFS operation error.");
+                toast.error("Failed to add and pin file. Check your IPFS server connection.");
               }
+
+              // if (cid === "") {
+              //   return;
+              // }
 
               const fileType = getFileType(mimeType);
               return {
@@ -125,7 +111,7 @@
         );
         files = [...files, ...newFiles];
         if (newFiles.length > 0) {
-          toastStore.add(`Successfully added ${newFiles.length} file${newFiles.length > 1 ? "s" : ""}`, "success");
+          toast.success(`Successfully added ${newFiles.length} file${newFiles.length > 1 ? "s" : ""}`);
         }
         uploadFiles = undefined;
       })();
@@ -231,8 +217,6 @@
     selectedFiles = [];
   }
 </script>
-
-<Toast />
 
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 flex flex-col gap-4">

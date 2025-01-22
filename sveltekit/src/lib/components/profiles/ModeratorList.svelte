@@ -1,10 +1,9 @@
 <script lang="ts">
+  import { toast } from "svelte-hot-french-toast";
   import { Trash2 } from "lucide-svelte";
-  import type { ModeratorProfile, ModeratorAddress } from "$lib/types/profile";
-  import { toastStore } from "$lib/stores/toast";
-  import { shortenString } from "$lib/ts/utils";
   import { getContext, onMount } from "svelte";
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
+  import { copyToClipboard } from "$lib/ts/utils";
 
   const ipfs: Ipfs = getContext("ipfs");
 
@@ -13,20 +12,35 @@
   };
   onMount(refresh);
 
-  let newModeratorAddress: ModeratorAddress | "" = $state("");
+  let newModeratorAddress: string = $state("");
 
-  function validateAddress(address: string): boolean {
-    // Accept addresses starting with AU and having the correct length (53 characters total)
-    const regex = /^AU[\dA-Za-z]{51}$/;
-    return regex.test(address);
-  }
+  // function validateAddress(address: string): boolean {
+  //   // Accept addresses starting with AU and having the correct length (53 characters total)
+  //   const regex = /^AU[\dA-Za-z]{51}$/;
+  //   return regex.test(address);
+  // }
 
-  function formatDate(timestamp: number): string {
-    return new Date(timestamp).toLocaleDateString();
-  }
+  const handleSubmit = async (event: SubmitEvent) => {
+    event.preventDefault();
+    // if (!validateAddress(newModeratorAddress)) {
+    //   toast.error("Invalid address");
+    //   return;
+    // }
+    try {
+      await ipfs?.modAdd(newModeratorAddress);
+      newModeratorAddress = "";
+      await refresh();
+    } catch (error) {}
+  };
 
-  const handleSubmit = async (event: SubmitEvent) => {};
-  const removeModerator = async (address: string) => {};
+  const deleteModerator = async (address: string) => {
+    await ipfs?.modDelete(address);
+    await refresh();
+  };
+
+  const handleCopyAddress = async (address: string) => {
+    await copyToClipboard(address, "Address copied!");
+  };
 </script>
 
 <div class="space-y-8">
@@ -53,20 +67,26 @@
         <thead class="bg-gray-50">
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Address</th>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Date Added</th>
-            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
+
             <th class="w-20 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
-          {#each ipfs?.mods as mod}
-            <tr class="hover:bg-gray-50">
-              <td class="whitespace-nowrap px-6 py-4 font-mono text-sm text-gray-900">
-                {shortenString(mod)}
+          {#each ipfs?.mods as moderator}
+            <tr>
+              <td class="whitespace-nowrap px-6 py-4">
+                <button
+                  type="button"
+                  class="font-mono text-sm text-gray-900 hover:text-gray-700 focus:outline-none"
+                  onclick={() => handleCopyAddress(moderator)}
+                  onkeydown={(e) => e.key === "Enter" && handleCopyAddress(moderator)}
+                >
+                  {moderator}
+                </button>
               </td>
 
               <td class="whitespace-nowrap px-6 py-4 text-center">
-                <button onclick={() => removeModerator(mod)} class="text-red-600 transition duration-200 hover:text-red-900" aria-label="Delete moderator">
+                <button onclick={() => deleteModerator(moderator)} class="text-red-600 transition duration-200 hover:text-red-900" aria-label="Delete moderator">
                   <Trash2 class="h-5 w-5" />
                 </button>
               </td>

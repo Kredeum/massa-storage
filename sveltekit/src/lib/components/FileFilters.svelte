@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { FilterState, SortConfig, FileItem } from "$lib/types/file";
+  import type { FilterState, SortConfig, FileItem } from "$lib/ts/types";
 
   let {
     filters,

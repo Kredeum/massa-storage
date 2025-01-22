@@ -86,7 +86,7 @@ class Ipfs extends Client {
       if (status !== OperationStatus.SpeculativeSuccess) return toast.error(`Failed to ${type}Del`);
 
       await this.modsGet();
-      toast.success(`${type}Del ok`);
+      toast.success(`Moderator delete ok`);
     } catch (error) {
       toast.error(`Error ${type}Del`);
       console.error("Error:", error);
