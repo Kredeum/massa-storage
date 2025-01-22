@@ -3,9 +3,18 @@
     "//"
   ],
   "tasks": {
+    "compile": {
+      "dependsOn": [
+        "check"
+      ],
+      "inputs": [
+        "assembly/contracts/*.ts"
+      ],
+      "outputLogs": "new-only"
+    },
     "deploy": {
       "dependsOn": [
-        "build"
+        "check"
       ],
       "cache": false,
       "persistent": true,

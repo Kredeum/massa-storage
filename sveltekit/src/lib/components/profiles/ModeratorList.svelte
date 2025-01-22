@@ -9,7 +9,7 @@
   const ipfs: Ipfs = getContext("ipfs");
 
   const refresh = async () => {
-    await ipfs?.getModerators();
+    await ipfs?.modsGet();
   };
   onMount(refresh);
 
@@ -59,20 +59,20 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
-          {#each ipfs?.moderators as moderator}
+          {#each ipfs?.mods as mod}
             <tr class="hover:bg-gray-50">
               <td class="whitespace-nowrap px-6 py-4 font-mono text-sm text-gray-900">
-                {shortenString(moderator)}
+                {shortenString(mod)}
               </td>
 
               <td class="whitespace-nowrap px-6 py-4 text-center">
-                <button onclick={() => removeModerator(moderator)} class="text-red-600 transition duration-200 hover:text-red-900" aria-label="Delete moderator">
+                <button onclick={() => removeModerator(mod)} class="text-red-600 transition duration-200 hover:text-red-900" aria-label="Delete moderator">
                   <Trash2 class="h-5 w-5" />
                 </button>
               </td>
             </tr>
           {/each}
-          {#if ipfs?.moderators.length === 0}
+          {#if ipfs?.mods.length === 0}
             <tr>
               <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">
                 <div class="flex flex-col items-center space-y-2">
