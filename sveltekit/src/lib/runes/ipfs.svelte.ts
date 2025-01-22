@@ -12,6 +12,7 @@ import { IPFS_ADDRESS } from "$lib/ts/config";
 import type { Wallet } from "@massalabs/wallet-provider";
 import toast from "svelte-hot-french-toast";
 import { shortenString } from "$lib/ts/utils";
+import { MODERATOR, CID } from "../../../../common/src/constants";
 
 class Ipfs extends Client {
   #mods = $state<string[]>([]);
@@ -35,8 +36,8 @@ class Ipfs extends Client {
 
     return has;
   };
-  modHas = async (value: string): Promise<boolean | undefined> => await this.has("mod", value);
-  cidHas = async (value: string): Promise<boolean | undefined> => await this.has("cid", value);
+  modHas = async (value: string): Promise<boolean | undefined> => await this.has(MODERATOR, value);
+  cidHas = async (value: string): Promise<boolean | undefined> => await this.has(CID, value);
 
   add = async (type: string, value: string) => {
     try {
@@ -64,15 +65,15 @@ class Ipfs extends Client {
       console.error("Error:", error);
     }
   };
-  modAdd = async (value: string) => await this.add("mod", value);
-  cidAdd = async (value: string) => await this.add("cid", value);
+  modAdd = async (value: string) => await this.add(MODERATOR, value);
+  cidAdd = async (value: string) => await this.add(CID, value);
 
   del = async (type: string, value: string) => {
     try {
       const op = await this.provider.callSC({
-        parameter: new Args().addString(value).serialize(),
+        target: IPFS_ADDRESS,
         func: `${type}Del`,
-        target: IPFS_ADDRESS
+        parameter: new Args().addString(value).serialize()
       });
       // console.info(`del${type} ~ op: op`);
 
@@ -91,31 +92,35 @@ class Ipfs extends Client {
       console.error("Error:", error);
     }
   };
-  modDel = async (value: string) => await this.del("mod", value);
-  cidDel = async (value: string) => await this.del("cid", value);
+  modDelete = async (value: string) => await this.del(MODERATOR, value);
+  cidDelete = async (value: string) => await this.del(CID, value);
 
   get = async (type: string) => {
     if (!this.provider.readSC) return;
 
-    console.log(`${type}sGet`);
+    const func = `${type}sGet`;
+    console.log(func, $state.snapshot(this.#mods), $state.snapshot(this.#cids));
+    console.log(func, "~ IPFS_ADDRESS:", IPFS_ADDRESS);
 
     const result: ReadSCData = await this.provider.readSC({
-      func: `${type}sGet`,
-      target: IPFS_ADDRESS
+      target: IPFS_ADDRESS,
+      func,
+      parameter: new Args().addString("").serialize()
     });
     if (result.info.error) {
-      toast.error(`${type}sGet ERROR ` + result.info.error);
+      console.log(`${func} ERROR ${result.info.error}`);
+      toast.error(`${func} ERROR`);
       return;
     }
 
     const items: string[] = new Args(result.value).nextArray(ArrayTypes.STRING);
-    console.log(`${type}Get mods`);
+    console.log(`${func} ${items}`);
 
-    if (type === "mod") this.#mods = items;
-    if (type === "cid") this.#cids = items;
+    if (type === MODERATOR) this.#mods = items;
+    if (type === CID) this.#cids = items;
   };
-  modsGet = async () => await this.get("mod");
-  cidsGet = async () => await this.get("cid");
+  modsGet = async () => await this.get(MODERATOR);
+  cidsGet = async () => await this.get(CID);
 
   get mods() {
     return this.#mods;

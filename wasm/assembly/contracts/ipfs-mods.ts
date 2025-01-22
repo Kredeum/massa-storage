@@ -1,47 +1,39 @@
-import { Address, generateEvent } from '@massalabs/massa-as-sdk';
+import { generateEvent } from '@massalabs/massa-as-sdk';
 import { Args } from '@massalabs/as-types';
 import { ownership } from '@massalabs/sc-standards';
-import { _addValue, _deleteValue, _hasValue, _getValues } from './ipfs-values';
-import { IPFS_mod_KEY } from '../../../common/src/constants';
+import { modMap } from './boolean-map';
+import { _addressArgToString, _stringArgToString } from './utils';
 
-// Calculate the cost for storage based on the mod address length
 export function modAdd(modArg: StaticArray<u8>): void {
   ownership.onlyOwner();
 
-  // const storageCost = u64(modArg.length) * u64(1_000_000); // 1 coin per byte
-  // Context.requireCoins(storageCost);
+  const mod = _addressArgToString(modArg);
 
-  const mod = _str(modArg);
+  const success = modMap.add(mod);
 
-  const success = _addValue(IPFS_mod_KEY + mod);
-
-  if (success) generateEvent(`mod added: ${mod}`);
+  if (success) generateEvent(`Moderator added: ${mod}`);
 }
 
-export function modDel(modArg: StaticArray<u8>): void {
+export function modDelete(modArg: StaticArray<u8>): void {
   ownership.onlyOwner();
 
-  const mod = _str(modArg);
+  const mod = _addressArgToString(modArg);
 
-  const success = _deleteValue(IPFS_mod_KEY + mod);
+  const success = modMap.del(mod);
 
-  if (success) generateEvent(`mod deleted: ${mod}`);
+  if (success) generateEvent(`Moderator deleted: ${mod}`);
 }
 
-export function modsGet(): StaticArray<u8> {
-  return new Args().add(_getValues(IPFS_mod_KEY)).serialize();
+export function modsGet(prefixArg: StaticArray<u8>): StaticArray<u8> {
+  const prefix = _stringArgToString(prefixArg);
+
+  return new Args().add(modMap.values(prefix)).serialize();
 }
 
 export function modHas(modArg: StaticArray<u8>): StaticArray<u8> {
-  const mod = _str(modArg);
+  const mod = _addressArgToString(modArg);
 
-  const hasValue = _hasValue(IPFS_mod_KEY + mod);
+  const hasValue = modMap.has(mod);
 
   return new Args().add(hasValue).serialize();
-}
-
-function _str(modArg: StaticArray<u8>): string {
-  return new Address(
-    new Args(modArg).nextString().expect('Invalid address'),
-  ).toString();
 }

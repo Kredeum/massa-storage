@@ -33,7 +33,7 @@
     <div class="mt-4 flex flex-col items-center gap-2">
       <div class="flex gap-2">
         <button onclick={() => ipfs?.cidAdd(cid)} class="button-standard"> Add cid </button>
-        <button onclick={() => ipfs?.cidDel(cid)} class="button-standard"> Delete cid </button>
+        <button onclick={() => ipfs?.cidDelete(cid)} class="button-standard"> Delete cid </button>
         <button onclick={refresh} class="button-standard"> Refresh </button>
       </div>
     </div>

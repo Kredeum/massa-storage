@@ -1,7 +1,8 @@
 const GREETING_KEY = "GREETING";
 
-const IPFS_KEY_LENGTH = 3;
-const IPFS_mod_KEY = "MOD";
-const IPFS_CID_KEY = "CID";
+const PREFIX_LENGTH = 3;
 
-export { IPFS_KEY_LENGTH, IPFS_mod_KEY, IPFS_CID_KEY, GREETING_KEY };
+const MODERATOR = "mod";  
+const CID = "cid";
+
+export { PREFIX_LENGTH, MODERATOR, CID, GREETING_KEY };

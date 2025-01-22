@@ -4,14 +4,15 @@
   import { getContext } from "svelte";
 
   const ipfs: Ipfs = getContext("ipfs");
+
   let mod = $state<string>("");
 
-  let modHas = $state<boolean>(false);
+  // let modHas = $state<boolean>(false);
 
   const refresh = async () => {
     await ipfs?.modsGet();
-    const _modHas = await ipfs?.modHas(mod);
-    if (_modHas !== undefined) modHas = _modHas;
+    // const _modHas = await ipfs?.modHas(mod);
+    // if (_modHas !== undefined) modHas = _modHas;
   };
 
   onMount(refresh);
@@ -28,12 +29,12 @@
     <div class="mt-4">
       <input type="text" bind:value={mod} placeholder="Enter mod address" class="w-full rounded border p-3 text-lg" />
     </div>
-    Is mod {modHas}
+    <!-- Is mod {modHas} -->
 
     <div class="mt-4 flex flex-col items-center gap-2">
       <div class="flex gap-2">
         <button onclick={() => ipfs?.modAdd(mod)} class="button-standard"> Add mod </button>
-        <button onclick={() => ipfs?.modDel(mod)} class="button-standard"> Delete mod </button>
+        <button onclick={() => ipfs?.modDelete(mod)} class="button-standard"> Delete mod </button>
         <button onclick={refresh} class="button-standard"> Refresh </button>
       </div>
     </div>
