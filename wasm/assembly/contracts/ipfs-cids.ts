@@ -17,7 +17,7 @@ export function cidDelete(cidArg: StaticArray<u8>): void {
 
   const cid = _stringArgToString(cidArg);
 
-  const success = cidMap.del(cid);
+  const success = cidMap.delete(cid);
 
   if (success) generateEvent(`CID deleted: ${cid}`);
 }

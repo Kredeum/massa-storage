@@ -19,7 +19,7 @@ export function modDelete(modArg: StaticArray<u8>): void {
 
   const mod = _addressArgToString(modArg);
 
-  const success = modMap.del(mod);
+  const success = modMap.delete(mod);
 
   if (success) generateEvent(`Moderator deleted: ${mod}`);
 }

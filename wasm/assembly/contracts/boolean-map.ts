@@ -3,7 +3,7 @@
 // 2. Massa (https://github.com/massalabs/massa-as-sdk/blob/main/assembly/collections/persistentMap.ts)
 //
 
-import { generateEvent, Storage } from '@massalabs/massa-as-sdk';
+import { Storage } from '@massalabs/massa-as-sdk';
 import { stringToBytes, boolToByte, bytesToString } from '@massalabs/as-types';
 import { PREFIX_LENGTH, MODERATOR, CID } from '../../../common/src/constants';
 
@@ -45,7 +45,7 @@ class BooleanMap {
     this._size += 1;
     return true;
   }
-  del(key: string): bool {
+  delete(key: string): bool {
     if (!this.has(key)) return false;
     Storage.del(this.key(key));
     this._size -= 1;
