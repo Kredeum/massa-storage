@@ -2,7 +2,7 @@
 <script lang="ts">
   interface Props {
     selectedFiles: number[];
-    files: import("$lib/types/file").FileItem[];
+    files: import("$lib/ts/types").FileItem[];
     onAddTag: (tag: string, fileIds: number[]) => void;
   }
 

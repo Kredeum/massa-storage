@@ -1,5 +1,5 @@
 import toast from "svelte-hot-french-toast";
-import type { FileType } from "$lib/types/file";
+import type { FileType } from "$lib/ts/types";
 
 const shortenString = (addr: string) => addr?.slice(0, 9) + "..." + addr?.slice(-5);
 

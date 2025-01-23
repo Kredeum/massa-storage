@@ -30,7 +30,10 @@
       await ipfs?.modAdd(newModeratorAddress);
       newModeratorAddress = "";
       await refresh();
-    } catch (error) {}
+    } catch (error) {
+      console.error("Failed to add moderator:", error);
+      toast.error("Failed to add moderator");
+    }
   };
 
   const deleteModerator = async (address: string) => {

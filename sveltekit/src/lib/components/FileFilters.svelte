@@ -3,15 +3,13 @@
 
   let {
     filters,
-    sortConfig,
     onTypeFilter,
     onSort,
     files = []
   }: {
     filters: FilterState;
-    sortConfig: SortConfig;
     onTypeFilter: (value: FilterState["type"]) => void;
-    onSort: (key: keyof FileItem) => void;
+    onSort: (config: SortConfig) => void;
     files: FileItem[];
   } = $props();
 

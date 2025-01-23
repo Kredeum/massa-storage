@@ -1,8 +1,4 @@
 <script lang="ts">
-  import { toast } from "svelte-hot-french-toast";
-  import { onMount } from "svelte";
-  import { createKuboClient } from "$lib/ts/kubo";
-
   import SearchBar from "./SearchBar.svelte";
   import FileFilters from "./FileFilters.svelte";
   import FileTable from "./FileTable.svelte";
@@ -12,234 +8,74 @@
   import FilePagination from "./FilePagination.svelte";
   import TagInput from "./TagInput.svelte";
 
-  import { FileStore } from "$lib/stores/files";
-  import { MAX_FILE_SIZE } from "$lib/constants/files";
-  import type { FileItem, FilterState, SortConfig, FileStatus } from "$lib/ts/types";
-  import { formatSize, validateFiles, getFileType } from "$lib/ts/utils";
+  import { FileStore } from "$lib/stores/FileStore.svelte";
+  import { FilterStore } from "$lib/stores/FilterStore.svelte";
+  import { UploadStore } from "$lib/stores/UploadStore.svelte";
+  import type { FileStatus } from "$lib/ts/types";
 
-  // Global state
-  let currentPage = $state(0);
-  const itemsPerPage = 20;
-  let files = $state<FileItem[]>([]);
-  let selectedFiles = $state<number[]>([]);
-  let searchQuery = $state("");
-  let uploadFiles = $state<FileList | undefined>();
-  let cid = $state<string>("");
-
-  let kubo: ReturnType<typeof createKuboClient>;
-
-  let filters: FilterState = $state({
-    type: "all",
-    status: "all",
-    tags: []
-  });
-
-  let sortConfig: SortConfig = $state({
-    key: "lastModified",
-    direction: "desc"
-  });
-
-  onMount(async () => {
-    try {
-      kubo = createKuboClient();
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to access IPFS server. Please check your connection.");
-    }
-  });
+  const fileStore = new FileStore();
+  const filterStore = new FilterStore();
+  const uploadStore = new UploadStore();
 
   $effect(() => {
-    if (uploadFiles) {
+    if (uploadStore.uploadFiles) {
       (async () => {
-        const newFiles: FileItem[] = await Promise.all(
-          Array.from(uploadFiles)
-            .filter((file) => {
-              if (file.size > MAX_FILE_SIZE) {
-                toast.error(`File ${file.name} exceeds maximum size of ${formatSize(MAX_FILE_SIZE)}`);
-                return false;
-              }
-              return true;
-            })
-            .map(async (file) => {
-              const arrayBuffer = await file.arrayBuffer();
-              console.log("arrayBuffer:", arrayBuffer);
-
-              const mimeType = file.type;
-              console.log("mimeType:", mimeType);
-
-              const content = new Uint8Array(arrayBuffer);
-              console.log("content:", content);
-
-              console.log("kubo:", kubo.addAndPin);
-
-              try {
-                const result = await kubo.addAndPin(content);
-                if (result) {
-                  cid = result.toString();
-                  console.log("CID:", cid);
-                } else {
-                  console.error("Result from addAndPin is undefined");
-                  toast.error("Failed to add and pin file. Unexpected result from IPFS.");
-                }
-              } catch (error) {
-                console.error("Error in addAndPin:", error);
-                toast.error("Failed to add and pin file. Check your IPFS server connection.");
-              }
-
-              // if (cid === "") {
-              //   return;
-              // }
-
-              const fileType = getFileType(mimeType);
-              return {
-                id: Date.now() + Math.random(),
-                name: file.name,
-                size: formatSize(file.size),
-                sizeInBytes: file.size,
-                type: fileType,
-                tags: [],
-                status: "Pending",
-                isPinned: false,
-                lastModified: new Date(file.lastModified).toISOString(),
-                blob: file,
-                mimeType,
-                cid: cid,
-                arrayBuffer: arrayBuffer,
-                file
-              };
-            })
-        );
-        files = [...files, ...newFiles];
-        if (newFiles.length > 0) {
-          toast.success(`Successfully added ${newFiles.length} file${newFiles.length > 1 ? "s" : ""}`);
-        }
-        uploadFiles = undefined;
+        const newFiles = await uploadStore.processUploadedFiles();
+        fileStore.addFiles(newFiles);
       })();
     }
   });
 
-  // Reactive filtering and sorting
-  const filteredFiles = $derived(
-    files.filter((file) => {
-      const matchesType = filters.type === "all" || file.type === filters.type;
-      const matchesStatus = filters.status === "all" || file.status === filters.status;
-      const matchesTags = filters.tags.length === 0 || (file.tags && file.tags.some((tag) => filters.tags.includes(tag)));
-      const matchesSearch = !searchQuery || file.name.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesType && matchesStatus && matchesTags && matchesSearch;
-    })
-  );
-
-  const sortedFiles = $derived(
-    [...filteredFiles].sort((a, b) => {
-      if (sortConfig.key === "lastModified") {
-        const dateA = new Date(a.lastModified).getTime();
-        const dateB = new Date(b.lastModified).getTime();
-        return sortConfig.direction === "desc" ? dateB - dateA : dateA - dateB;
-      }
-
-      if (sortConfig.key === "name") {
-        return sortConfig.direction === "asc" ? b.name.toLowerCase().localeCompare(a.name.toLowerCase()) : a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-      }
-
-      if (sortConfig.key === "size") {
-        return sortConfig.direction === "asc" ? b.sizeInBytes - a.sizeInBytes : a.sizeInBytes - b.sizeInBytes;
-      }
-
-      const direction = sortConfig.direction === "desc" ? 1 : -1;
-      return direction * String(a[sortConfig.key]).localeCompare(String(b[sortConfig.key]));
-    })
-  );
-
-  const paginatedFiles = $derived(sortedFiles.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage));
-
-  const totalPages = $derived(Math.ceil(sortedFiles.length / itemsPerPage));
-
-  // Actions
-  function handleSort(key: keyof FileItem) {
-    if (sortConfig.key === key) {
-      sortConfig.direction = sortConfig.direction === "asc" ? "desc" : "asc";
-    } else {
-      sortConfig = { key, direction: "desc" };
-    }
-  }
-
-  function handlePin(id: number) {
-    // Toggle pin status
-    files = files.map((file) => (file.id === id ? { ...file, isPinned: !file.isPinned } : file));
-  }
-
-  function handleModeration(data: { id: number; status: FileStatus }) {
-    // Update file status based on moderation action
-    files = files.map((file) => (file.id === data.id ? { ...file, status: data.status } : file));
-  }
-
-  function handleTypeFilter(value: FilterState["type"]) {
-    filters = {
-      ...filters,
-      type: value
-    };
-  }
-
-  function setPage(page: number) {
-    currentPage = page;
-  }
-
-  function handleSelectionChange(selected: number[]) {
-    selectedFiles = selected;
-  }
-
-  function handleAddTag(tag: string, fileIds: number[]) {
-    if (fileIds.length === 0) return;
-
-    files = files.map((file) => (fileIds.includes(file.id) ? { ...file, tags: [...file.tags, tag] } : file));
-    // Reset selection after adding tags
-    selectedFiles = [];
-  }
-
-  function handleFilterChange(status: FileStatus | "all") {
-    filters.status = status;
-    currentPage = 0; // Reset to first page when filter changes
-  }
-
-  // Bulk actions
-  function handleBulkApprove() {
-    files = files.map((file) => (selectedFiles.includes(file.id) ? { ...file, status: "Approved" } : file));
-    selectedFiles = [];
-  }
-
-  function handleBulkReject() {
-    files = files.map((file) => (selectedFiles.includes(file.id) ? { ...file, status: "Rejected" } : file));
-    selectedFiles = [];
-  }
-
-  function handleBulkPin() {
-    files = files.map((file) => (selectedFiles.includes(file.id) ? { ...file, isPinned: true } : file));
-    selectedFiles = [];
-  }
+  const filteredFiles = $derived(filterStore.filterFiles(fileStore.files));
+  const paginatedFiles = $derived(filterStore.getPaginatedFiles(fileStore.files));
+  const totalPages = $derived(filterStore.getTotalPages(fileStore.files));
 </script>
 
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 flex flex-col gap-4">
     <div class="mb-8">
-      <FileUpload bind:files={uploadFiles} />
+      <FileUpload bind:files={uploadStore.uploadFiles} />
     </div>
     <div class="flex items-center justify-between gap-4">
       <div class="flex flex-1 items-center gap-4">
-        <SearchBar bind:searchTerm={searchQuery} />
-        <TagInput {selectedFiles} {files} onAddTag={handleAddTag} />
-        {#if selectedFiles.length > 0}
-          <FileSelectionBar selectedCount={selectedFiles.length} onApprove={handleBulkApprove} onReject={handleBulkReject} onPin={handleBulkPin} />
+        <SearchBar bind:searchTerm={filterStore.searchQuery} />
+        <TagInput selectedFiles={fileStore.selectedFiles} files={fileStore.files} onAddTag={fileStore.addTag.bind(fileStore)} />
+        {#if fileStore.selectedFiles.length > 0}
+          <FileSelectionBar
+            selectedCount={fileStore.selectedFiles.length}
+            onApprove={fileStore.bulkApprove.bind(fileStore)}
+            onReject={fileStore.bulkReject.bind(fileStore)}
+            onPin={fileStore.bulkPin.bind(fileStore)}
+          />
         {/if}
       </div>
-      <FileFilters {filters} {sortConfig} {files} onTypeFilter={handleTypeFilter} onSort={handleSort} />
+      <FileFilters filters={filterStore.filters} files={fileStore.files} onTypeFilter={filterStore.setTypeFilter.bind(filterStore)} onSort={(config) => filterStore.setSortConfig(config)} />
     </div>
   </div>
 
-  <FileTable {files} {paginatedFiles} {selectedFiles} {sortConfig} {handleSort} onSelectionChange={handleSelectionChange} onFilterChange={handleFilterChange} {filteredFiles}>
+  <FileTable
+    files={fileStore.files}
+    {paginatedFiles}
+    selectedFiles={fileStore.selectedFiles}
+    sortConfig={filterStore.sortConfig}
+    handleSort={(key) => {
+      if (filterStore.sortConfig.key === key) {
+        filterStore.setSortConfig({
+          key,
+          direction: filterStore.sortConfig.direction === "asc" ? "desc" : "asc"
+        });
+      } else {
+        filterStore.setSortConfig({ key, direction: "desc" });
+      }
+    }}
+    onSelectionChange={fileStore.setSelectedFiles.bind(fileStore)}
+    onFilterChange={(status: FileStatus | "all") => filterStore.setStatusFilter(status)}
+    {filteredFiles}
+  >
     {#snippet actions(file)}
-      <FileActions {file} onModerate={handleModeration} onPin={handlePin} />
+      <FileActions {file} onModerate={(data) => fileStore.updateFileStatus(data.id, data.status)} onPin={(id) => fileStore.togglePin(id)} />
     {/snippet}
   </FileTable>
 
-  <FilePagination {currentPage} {totalPages} {itemsPerPage} totalItems={filteredFiles.length} setPage={(page) => setPage(page)} />
+  <FilePagination currentPage={filterStore.currentPage} {totalPages} itemsPerPage={filterStore.itemsPerPage} totalItems={filteredFiles.length} setPage={filterStore.setPage.bind(filterStore)} />
 </div>

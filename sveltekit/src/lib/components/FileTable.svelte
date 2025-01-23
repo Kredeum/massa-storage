@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { FileItem, PropsFileTable } from "$lib/ts/types";
+  import type { PropsFileTable } from "$lib/ts/types";
   import FileTableHeader from "./table/FileTableHeader.svelte";
   import FileTableRow from "./table/FileTableRow.svelte";
   import FileSelectionMenu from "./table/FileSelectionMenu.svelte";
