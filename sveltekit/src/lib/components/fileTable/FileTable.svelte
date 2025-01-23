@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { PropsFileTable } from "$lib/ts/types";
-  import FileTableHeader from "./table/FileTableHeader.svelte";
-  import FileTableRow from "./table/FileTableRow.svelte";
-  import FileSelectionMenu from "./table/FileSelectionMenu.svelte";
-  import FileTooltip from "./table/FileTooltip.svelte";
+  import FileTableHeader from "./FileTableHeader.svelte";
+  import FileTableRow from "./FileTableRow.svelte";
+  import FileSelectionMenu from "./FileSelectionMenu.svelte";
+  import FileTooltip from "./FileTooltip.svelte";
 
   let { files = [], paginatedFiles = [], selectedFiles = $bindable([]), sortConfig, handleSort, onSelectionChange, onFilterChange, actions, filteredFiles = [] }: PropsFileTable = $props();
 

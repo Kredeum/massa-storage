@@ -3,7 +3,7 @@
   import { columns } from "$lib/constants/files";
   import FileIcon from "./FileIcon.svelte";
   import FileCidCell from "./FileCidCell.svelte";
-  import FilePreview from "$lib/components/table/FilePreview.svelte";
+  import FilePreview from "$lib/components/fileTable/FilePreview.svelte";
   import TimeTooltip from "./TimeTooltip.svelte";
 
   let {

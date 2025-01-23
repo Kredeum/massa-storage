@@ -1,7 +1,7 @@
 <script lang="ts">
   import SearchBar from "./SearchBar.svelte";
   import FileFilters from "./FileFilters.svelte";
-  import FileTable from "./FileTable.svelte";
+  import FileTable from "../fileTable/FileTable.svelte";
   import FileActions from "./FileActions.svelte";
   import FileUpload from "./FileUpload.svelte";
   import FileSelectionBar from "./FileSelectionBar.svelte";
