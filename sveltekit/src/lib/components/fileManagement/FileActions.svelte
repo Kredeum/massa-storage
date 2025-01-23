@@ -1,7 +1,7 @@
 <script lang="ts">
+  import { getContext } from "svelte";
   import type { FileItem } from "$lib/ts/types";
   import { Check, X, Pin } from "lucide-svelte";
-  import { getContext } from "svelte";
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
   import toast from "svelte-hot-french-toast";
 
@@ -10,14 +10,14 @@
   let userAddress = $state<string>("");
   let isModerator = $state<boolean>(false);
 
-  const checkIfModerator = async () => {
+  const checkModerator = async () => {
     userAddress = ipfs?.address ?? "";
     if (!userAddress) toast.error("User address not found");
     isModerator = (await ipfs?.modHas(userAddress)) ?? false;
   };
 
   $effect(() => {
-    checkIfModerator();
+    checkModerator();
   });
 
   let {

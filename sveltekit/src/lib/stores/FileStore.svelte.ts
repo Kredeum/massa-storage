@@ -30,6 +30,14 @@ export class FileStore {
     this.selectedFiles = [];
   }
 
+  removeTag(tag: string, fileIds: number[]) {
+    if (fileIds.length === 0) return;
+    this.files = this.files.map((file) =>
+      fileIds.includes(file.id) ? { ...file, tags: file.tags.filter((t) => t !== tag) } : file
+    );
+    this.selectedFiles = [];
+  }
+
   bulkApprove() {
     this.files = this.files.map((file) =>
       this.selectedFiles.includes(file.id) ? { ...file, status: "Approved" } : file

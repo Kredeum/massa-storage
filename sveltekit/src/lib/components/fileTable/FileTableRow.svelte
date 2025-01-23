@@ -5,6 +5,10 @@
   import FileCidCell from "./FileCidCell.svelte";
   import FilePreview from "$lib/components/fileTable/FilePreview.svelte";
   import TimeTooltip from "./TimeTooltip.svelte";
+  import { X } from "lucide-svelte";
+  import { FileStore } from "$lib/stores/FileStore.svelte";
+
+  const fileStore = new FileStore();
 
   let {
     file,
@@ -41,6 +45,10 @@
 
   function handleMouseLeave() {
     hoveredPreview = false;
+  }
+
+  function handleTagRemove(tag: string, fileIds: number[]) {
+    fileStore.removeTag(tag, fileIds);
   }
 </script>
 
@@ -89,9 +97,20 @@
       <td class="w-[15%] px-4 py-4 text-center">
         <div class="flex flex-wrap items-center justify-center gap-1">
           {#each file.tags || [] as tag}
-            <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-800">
-              {tag}
-            </span>
+            <div class="inline-flex items-center rounded-full bg-blue-100 px-2 text-xs text-blue-800">
+              <span class="flex items-center justify-center">
+                {tag}
+              </span>
+              <button
+                class="cursor-pointer text-gray-500 transition-colors hover:text-blue-900"
+                onclick={(e) => {
+                  e.stopPropagation();
+                  handleTagRemove(tag, [file.id]);
+                }}
+              >
+                <X size={10} strokeWidth={2} />
+              </button>
+            </div>
           {/each}
         </div>
       </td>

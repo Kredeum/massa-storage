@@ -1,8 +1,11 @@
+import { Ipfs } from "$lib/runes/ipfs.svelte";
+import { createKuboClient } from "$lib/ts/kubo";
 import type { FileItem } from "$lib/ts/types";
 import { toast } from "svelte-hot-french-toast";
-import { createKuboClient } from "$lib/ts/kubo";
 import { MAX_FILE_SIZE } from "$lib/constants/files";
 import { formatSize, getFileType } from "$lib/ts/utils";
+
+const ipfs = new Ipfs();
 
 export class UploadStore {
   uploadFiles = $state<FileList | undefined>();
@@ -17,7 +20,7 @@ export class UploadStore {
     const hours = String(now.getHours()).padStart(2, "0");
     const minutes = String(now.getMinutes()).padStart(2, "0");
     const seconds = String(now.getSeconds()).padStart(2, "0");
-  
+
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
@@ -42,6 +45,7 @@ export class UploadStore {
             const result = await this.kubo.addAndPin(content);
             if (result) {
               this.cid = result.toString();
+              await ipfs?.cidAdd(this.cid);
             } else {
               console.error("Result from addAndPin is undefined");
               toast.error("Failed to add and pin file. Unexpected result from IPFS.");
