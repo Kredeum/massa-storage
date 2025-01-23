@@ -9,6 +9,18 @@ export class UploadStore {
   cid = $state<string>("");
   private kubo = createKuboClient();
 
+  private formatDate(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+  
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
   async processUploadedFiles(): Promise<FileItem[]> {
     if (!this.uploadFiles) return [];
 
@@ -49,7 +61,7 @@ export class UploadStore {
             tags: [],
             status: "Pending",
             isPinned: false,
-            lastModified: new Date(file.lastModified).toISOString(),
+            uploadDate: this.formatDate(),
             blob: file,
             mimeType,
             cid: this.cid,

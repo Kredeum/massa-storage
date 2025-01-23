@@ -12,7 +12,7 @@ export class FilterStore {
   });
 
   sortConfig: SortConfig = $state({
-    key: "lastModified",
+    key: "uploadDate",
     direction: "desc"
   });
 
@@ -59,9 +59,9 @@ export class FilterStore {
 
   sortFiles(files: FileItem[]): FileItem[] {
     return [...files].sort((a, b) => {
-      if (this.sortConfig.key === "lastModified") {
-        const dateA = new Date(a.lastModified).getTime();
-        const dateB = new Date(b.lastModified).getTime();
+      if (this.sortConfig.key === "uploadDate") {
+        const dateA = new Date(a.uploadDate).getTime();
+        const dateB = new Date(b.uploadDate).getTime();
         return this.sortConfig.direction === "desc" ? dateB - dateA : dateA - dateB;
       }
 

@@ -4,6 +4,7 @@
   import FileIcon from "./FileIcon.svelte";
   import FileCidCell from "./FileCidCell.svelte";
   import FilePreview from "$lib/components/table/FilePreview.svelte";
+  import TimeTooltip from "./TimeTooltip.svelte";
 
   let {
     file,
@@ -76,7 +77,7 @@
       <td class="w-[25%] px-4 py-4">
         <div class="flex items-center">
           <FileIcon type={file.type} />
-          <span class="ml-2 cursor-pointer truncate hover:text-blue-600 hover:underline" onmouseenter={handleMouseEnter} onmouseleave={handleMouseLeave} role="button" tabindex="0">
+          <span class="ml-2 cursor-pointer truncate hover:text-blue-600" onmouseenter={handleMouseEnter} onmouseleave={handleMouseLeave} role="button" tabindex="0">
             {file.name}
           </span>
           {#if hoveredPreview}
@@ -94,20 +95,20 @@
           {/each}
         </div>
       </td>
-    {:else if column.key === "lastModified"}
+    {:else if column.key === "uploadDate"}
       <td class="w-[15%] px-4 py-4 text-center text-sm text-gray-500">
-        {new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(file.lastModified))}
+        <TimeTooltip text={file.uploadDate.split(" ")[0].split("-").reverse().join("/")} tooltip={file.uploadDate.split(" ")[1]} />
       </td>
     {:else if column.key === "size"}
-      <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
-        {(file.size / (1024 * 1024)).toFixed(2)} MB
+      <td class="w-[8%] cursor-default px-4 py-4 text-center text-sm text-gray-500">
+        {file.size}
       </td>
     {:else if column.key === "type"}
-      <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
+      <td class="w-[8%] cursor-default px-4 py-4 text-center text-sm text-gray-500">
         {file.type}
       </td>
     {:else if column.key === "status"}
-      <td class="w-[8%] px-4 py-4 text-center">
+      <td class="w-[8%] cursor-default px-4 py-4 text-center">
         <span
           class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
           class:bg-yellow-100={file.status === "Pending"}

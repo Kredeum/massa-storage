@@ -16,7 +16,7 @@ export interface FileItem {
   tags: string[];
   status: FileStatus;
   isPinned: boolean;
-  lastModified: string;
+  uploadDate: string;
   blob?: Blob;
   file?: File | undefined;
   cid: string | undefined;
@@ -49,5 +49,5 @@ export interface PropsFileTable {
   onSelectionChange: (selected: number[]) => void;
   onFilterChange: (status: FileStatus | "all") => void;
   actions?: import("svelte").Snippet<[FileItem]>;
-  filteredFiles?: FileItem[];
+  filteredFiles: FileItem[];
 }

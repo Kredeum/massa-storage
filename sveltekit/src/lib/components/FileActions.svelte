@@ -58,7 +58,7 @@
   }
 </script>
 
-<div class="flex items-center justify-end gap-3.5">
+<div class="flex items-center justify-end gap-2">
   {#if isModerator}
     <button
       onclick={(e) => {

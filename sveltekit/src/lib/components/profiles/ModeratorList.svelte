@@ -36,8 +36,8 @@
     }
   };
 
-  const deleteModerator = async (address: string) => {
-    await ipfs?.modDelete(address);
+  const deleteModerator = async (moderator: string) => {
+    await ipfs?.modDelete(moderator);
     await refresh();
   };
 

@@ -62,7 +62,7 @@
         class="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500"
         class:text-left={column.key === "name"}
         class:text-center={column.key !== "name"}
-        style="width: {column.key === 'name' ? '25%' : column.key === 'tags' || column.key === 'lastModified' ? '15%' : column.key === null ? '13%' : '8%'}"
+        style="width: {column.key === 'name' ? '25%' : column.key === 'tags' || column.key === 'uploadDate' ? '15%' : column.key === null ? '13%' : '8%'}"
       >
         <button
           class="inline-flex items-center gap-1"
@@ -91,7 +91,5 @@
         </button>
       </th>
     {/each}
-
-    <th scope="col" class="w-[8%] px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500"> Actions </th>
   </tr>
 </thead>
