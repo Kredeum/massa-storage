@@ -7,8 +7,7 @@
 
   const ipfs: Ipfs = getContext("ipfs");
 
-  let userAddress = $state<string>("");
-  let isModerator = $derived(() => ipfs?.isModeratorFunc(userAddress));
+  let isModerator = $derived.by(() => ipfs?.isModeratorFunc(ipfs?.address));
 
   let {
     file,
@@ -20,6 +19,7 @@
     onPin: (id: number) => void;
   } = $props();
 
+  
   function handleModerate(status: FileItem["status"]) {
     onModerate({ id: file.id, status });
   }
