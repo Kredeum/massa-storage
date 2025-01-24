@@ -35,9 +35,14 @@ class BooleanMap {
     return Storage.getKeys(this.key(prefix));
   }
   values(prefix: string): string[] {
-    return this.keys(prefix).map<string>((key: StaticArray<u8>) =>
-      bytesToString(key).slice(PREFIX_LENGTH),
-    );
+    const prefixLength = this.key(prefix).length;
+    const keys = this.keys(prefix);
+    const values: string[] = [];
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      values.push(bytesToString(key).slice(prefixLength));
+    }
+    return values;
   }
   add(key: string): bool {
     if (this.has(key)) return false;
