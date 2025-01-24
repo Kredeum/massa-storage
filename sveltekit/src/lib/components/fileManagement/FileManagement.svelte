@@ -8,9 +8,9 @@
   import FilePagination from "./FilePagination.svelte";
   import TagInput from "./TagInput.svelte";
 
-  import { FileStore } from "$lib/stores/FileStore.svelte";
-  import { FilterStore } from "$lib/stores/FilterStore.svelte";
-  import { UploadStore } from "$lib/stores/UploadStore.svelte";
+  import { FileStore } from "$lib/runes/FileStore.svelte";
+  import { FilterStore } from "$lib/runes/FilterStore.svelte";
+  import { UploadStore } from "$lib/runes/UploadStore.svelte";
   import type { FileStatus } from "$lib/ts/types";
 
   const fileStore = new FileStore();

@@ -6,7 +6,7 @@
   import FilePreview from "$lib/components/fileTable/FilePreview.svelte";
   import TimeTooltip from "./TimeTooltip.svelte";
   import { X } from "lucide-svelte";
-  import { FileStore } from "$lib/stores/FileStore.svelte";
+  import { FileStore } from "$lib/runes/FileStore.svelte";
 
   const fileStore = new FileStore();
 
