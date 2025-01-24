@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getContext, onMount } from "svelte";
   import SearchBar from "./SearchBar.svelte";
   import FileFilters from "./FileFilters.svelte";
   import FileTable from "../fileTable/FileTable.svelte";
@@ -11,11 +12,13 @@
   import { FileStore } from "$lib/runes/FileStore.svelte";
   import { FilterStore } from "$lib/runes/FilterStore.svelte";
   import { UploadStore } from "$lib/runes/UploadStore.svelte";
-  import type { FileStatus } from "$lib/ts/types";
+  import type { FileItem, FileStatus } from "$lib/ts/types";
+  import { Ipfs } from "$lib/runes/ipfs.svelte";
 
   const fileStore = new FileStore();
   const filterStore = new FilterStore();
   const uploadStore = new UploadStore();
+  const ipfs: Ipfs = getContext("ipfs");
 
   $effect(() => {
     if (uploadStore.uploadFiles) {
@@ -24,6 +27,22 @@
         fileStore.addFiles(newFiles);
       })();
     }
+  });
+
+  const getCids = async () => {
+    await ipfs?.cidsGet();
+    const cids = ipfs.cids;
+    cids.forEach((cid) => {
+      const file: FileItem = {
+        cid: cid,
+        name: cid
+      };
+      fileStore.files.push(file);
+    });
+  };
+
+  onMount(() => {
+    getCids();
   });
 
   const filteredFiles = $derived(filterStore.filterFiles(fileStore.files));

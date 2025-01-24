@@ -116,7 +116,7 @@
       </td>
     {:else if column.key === "uploadDate"}
       <td class="w-[15%] px-4 py-4 text-center text-sm text-gray-500">
-        <TimeTooltip text={file.uploadDate.split(" ")[0].split("-").reverse().join("/")} tooltip={file.uploadDate.split(" ")[1]} />
+        <!-- <TimeTooltip text={file.uploadDate.split(" ")[0].split("-").reverse().join("/")} tooltip={file.uploadDate.split(" ")[1]} /> -->
       </td>
     {:else if column.key === "size"}
       <td class="w-[8%] cursor-default px-4 py-4 text-center text-sm text-gray-500">

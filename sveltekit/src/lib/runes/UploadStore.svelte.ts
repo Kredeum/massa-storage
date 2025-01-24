@@ -55,13 +55,12 @@ export class UploadStore {
             toast.error("Failed to add and pin file. Check your IPFS server connection.");
           }
 
-          const fileType = getFileType(mimeType);
           return {
             id: Date.now() + Math.random(),
             name: file.name,
             size: formatSize(file.size),
             sizeInBytes: file.size,
-            type: fileType,
+            type: getFileType(mimeType),
             tags: [],
             status: "Pending",
             isPinned: false,

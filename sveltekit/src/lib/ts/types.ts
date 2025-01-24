@@ -7,20 +7,20 @@ export type FileType = "image" | "video" | "audio" | "document";
 export type FileStatus = "Pending" | "Approved" | "Rejected";
 
 export interface FileItem {
-  arrayBuffer: ArrayBuffer;
-  id: number;
-  name: string;
-  size: string;
-  sizeInBytes: number;
-  type: FileType;
-  tags: string[];
-  status: FileStatus;
-  isPinned: boolean;
-  uploadDate: string;
+  arrayBuffer?: ArrayBuffer;
+  id?: number;
+  name?: string;
+  size?: string;
+  sizeInBytes?: number;
+  type?: FileType;
+  tags?: string[];
+  status?: FileStatus;
+  isPinned?: boolean;
+  uploadDate?: string;
   blob?: Blob;
   file?: File | undefined;
-  cid: string | undefined;
-  mimeType: string;
+  cid?: string | undefined;
+  mimeType?: string;
 }
 
 export interface FilterState {
