@@ -1,13 +1,13 @@
-import { Ipfs } from "$lib/runes/ipfs.svelte";
 import { createKuboClient } from "$lib/ts/kubo";
 import type { FileItem } from "$lib/ts/types";
 import { toast } from "svelte-hot-french-toast";
 import { MAX_FILE_SIZE } from "$lib/constants/files";
 import { formatSize, getFileType } from "$lib/ts/utils";
+import { getContext } from "svelte";
 
-const ipfs = new Ipfs();
 
 export class UploadStore {
+
   uploadFiles = $state<FileList | undefined>();
   cid = $state<string>("");
   private kubo = createKuboClient();
@@ -26,6 +26,8 @@ export class UploadStore {
 
   async processUploadedFiles(): Promise<FileItem[]> {
     if (!this.uploadFiles) return [];
+
+    const ipfs = getContext("ipfs");
 
     const newFiles: FileItem[] = await Promise.all(
       Array.from(this.uploadFiles)
