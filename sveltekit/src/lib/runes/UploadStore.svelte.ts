@@ -5,9 +5,7 @@ import { MAX_FILE_SIZE } from "$lib/constants/files";
 import { formatSize, getFileType } from "$lib/ts/utils";
 import { getContext } from "svelte";
 
-
 export class UploadStore {
-
   uploadFiles = $state<FileList | undefined>();
   cid = $state<string>("");
   private kubo = createKuboClient();

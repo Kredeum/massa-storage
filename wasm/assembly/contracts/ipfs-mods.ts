@@ -1,39 +1,39 @@
 import { generateEvent } from '@massalabs/massa-as-sdk';
 import { Args } from '@massalabs/as-types';
 import { ownership } from '@massalabs/sc-standards';
-import { modMap } from './boolean-map';
+import { moderatorMap } from './boolean-map';
 import { _addressArgToString, _stringArgToString } from './utils';
 
-export function modAdd(modArg: StaticArray<u8>): void {
+export function moderatorAdd(modArg: StaticArray<u8>): void {
   ownership.onlyOwner();
 
   const mod = _addressArgToString(modArg);
 
-  const success = modMap.add(mod);
+  const success = moderatorMap.add(mod);
 
   if (success) generateEvent(`Moderator added: ${mod}`);
 }
 
-export function modDelete(modArg: StaticArray<u8>): void {
+export function moderatorDelete(modArg: StaticArray<u8>): void {
   ownership.onlyOwner();
 
   const mod = _addressArgToString(modArg);
 
-  const success = modMap.delete(mod);
+  const success = moderatorMap.delete(mod);
 
   if (success) generateEvent(`Moderator deleted: ${mod}`);
 }
 
-export function modsGet(prefixArg: StaticArray<u8>): StaticArray<u8> {
+export function moderatorsGet(prefixArg: StaticArray<u8>): StaticArray<u8> {
   const prefix = _stringArgToString(prefixArg);
 
-  return new Args().add(modMap.values(prefix)).serialize();
+  return new Args().add(moderatorMap.values(prefix)).serialize();
 }
 
-export function modHas(modArg: StaticArray<u8>): StaticArray<u8> {
+export function moderatorHas(modArg: StaticArray<u8>): StaticArray<u8> {
   const mod = _addressArgToString(modArg);
 
-  const hasValue = modMap.has(mod);
+  const hasValue = moderatorMap.has(mod);
 
   return new Args().add(hasValue).serialize();
 }

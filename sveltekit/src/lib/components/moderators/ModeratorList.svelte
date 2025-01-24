@@ -8,7 +8,7 @@
   const ipfs: Ipfs = getContext("ipfs");
 
   const refresh = async () => {
-    await ipfs?.modsGet();
+    await ipfs?.moderatorsGet();
   };
   onMount(refresh);
 
@@ -27,7 +27,7 @@
     //   return;
     // }
     try {
-      await ipfs?.modAdd(newModeratorAddress);
+      await ipfs?.moderatorAdd(newModeratorAddress);
       newModeratorAddress = "";
       await refresh();
     } catch (error) {
@@ -37,7 +37,7 @@
   };
 
   const deleteModerator = async (moderator: string) => {
-    await ipfs?.modDelete(moderator);
+    await ipfs?.moderatorDelete(moderator);
     await refresh();
   };
 

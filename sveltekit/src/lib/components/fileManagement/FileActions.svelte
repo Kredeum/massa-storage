@@ -19,7 +19,6 @@
     onPin: (id: number) => void;
   } = $props();
 
-  
   function handleModerate(status: FileItem["status"]) {
     onModerate({ id: file.id, status });
   }

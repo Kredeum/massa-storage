@@ -37,7 +37,8 @@ class Ipfs extends Client {
     return has;
   };
   isModeratorFunc = (value: string): boolean => this.#mods.includes(value);
-  modHas = async (value: string): Promise<boolean | undefined> => await this.has(MODERATOR, value);
+  moderatorHas = async (value: string): Promise<boolean | undefined> =>
+    await this.has(MODERATOR, value);
   cidHas = async (value: string): Promise<boolean | undefined> => await this.has(CID, value);
 
   add = async (type: string, value: string) => {
@@ -59,14 +60,14 @@ class Ipfs extends Client {
         return toast.error(`Failed to ${type}Add`);
       }
 
-      await this.modsGet();
+      await this.moderatorsGet();
       toast.success(`${type}Add ok`);
     } catch (error) {
       toast.error(`Error ${type}Add`);
       console.error("Error:", error);
     }
   };
-  modAdd = async (value: string) => await this.add(MODERATOR, value);
+  moderatorAdd = async (value: string) => await this.add(MODERATOR, value);
   cidAdd = async (value: string) => await this.add(CID, value);
 
   del = async (type: string, value: string) => {
@@ -86,14 +87,14 @@ class Ipfs extends Client {
       const status = await op.waitSpeculativeExecution();
       if (status !== OperationStatus.SpeculativeSuccess) return toast.error(`Failed to ${type}Del`);
 
-      await this.modsGet();
+      await this.moderatorsGet();
       toast.success(`Moderator delete ok`);
     } catch (error) {
       toast.error(`Error ${type}Del`);
       console.error("Error:", error);
     }
   };
-  modDelete = async (value: string) => await this.del(MODERATOR, value);
+  moderatorDelete = async (value: string) => await this.del(MODERATOR, value);
   cidDelete = async (value: string) => await this.del(CID, value);
 
   get = async (type: string) => {
@@ -120,7 +121,7 @@ class Ipfs extends Client {
     if (type === MODERATOR) this.#mods = items;
     if (type === CID) this.#cids = items;
   };
-  modsGet = async () => await this.get(MODERATOR);
+  moderatorsGet = async () => await this.get(MODERATOR);
   cidsGet = async () => await this.get(CID);
 
   get mods() {

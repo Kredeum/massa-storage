@@ -5,7 +5,7 @@
 
 import { Storage } from '@massalabs/massa-as-sdk';
 import { stringToBytes, boolToByte, bytesToString } from '@massalabs/as-types';
-import { PREFIX_LENGTH, MODERATOR, CID } from '../../../common/src/constants';
+import { MODERATOR, CID } from '../../../common/src/constants';
 
 // Boolean Map : map values always true, real value inside key
 class BooleanMap {
@@ -13,17 +13,12 @@ class BooleanMap {
   private _size: usize;
 
   constructor(mapPrefix: string) {
-    assert(mapPrefix.length === PREFIX_LENGTH, 'Wrong map prefix length');
-
     this._mapPrefix = mapPrefix;
     this._size = 0;
   }
 
   key(key: string): StaticArray<u8> {
     return stringToBytes(this._mapPrefix + key);
-  }
-  value(key: string): string {
-    return key.slice(PREFIX_LENGTH);
   }
   size(): usize {
     return this._size;
@@ -35,12 +30,10 @@ class BooleanMap {
     return Storage.getKeys(this.key(prefix));
   }
   values(prefix: string): string[] {
-    const prefixLength = this.key(prefix).length;
-    const keys = this.keys(prefix);
     const values: string[] = [];
+    const keys = this.keys(prefix);
     for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      values.push(bytesToString(key).slice(prefixLength));
+      values.push(bytesToString(keys[i]).slice(this.key(prefix).length));
     }
     return values;
   }
@@ -58,7 +51,7 @@ class BooleanMap {
   }
 }
 
-const modMap = new BooleanMap(MODERATOR);
+const moderatorMap = new BooleanMap(MODERATOR);
 const cidMap = new BooleanMap(CID);
 
-export { modMap, cidMap };
+export { moderatorMap, cidMap };

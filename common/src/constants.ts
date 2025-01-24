@@ -1,8 +1,6 @@
 const GREETING_KEY = "GREETING";
 
-const PREFIX_LENGTH = 3;
-
-const MODERATOR = "mod";  
+const MODERATOR = "moderator";
 const CID = "cid";
 
-export { PREFIX_LENGTH, MODERATOR, CID, GREETING_KEY };
+export { MODERATOR, CID, GREETING_KEY };
