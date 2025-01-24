@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { createKuboClient } from "$lib/ts/kubo";
-  import FileUpload from "$lib/components/FileUpload.svelte";
+  import FileUpload from "$lib/components/fileManagement/FileUpload.svelte";
   import all from "it-all";
   import { CID } from "multiformats";
 

@@ -1,7 +1,10 @@
 <script lang="ts">
   import { Client } from "$lib/runes/client.svelte";
+  import { onMount } from "svelte";
 
   const { client }: { client: Client } = $props();
+
+  onMount(client.connect);
 </script>
 
 <div class="flex items-center gap-2 text-sm font-medium text-gray-700">

@@ -1,17 +1,15 @@
 <script lang="ts">
-  import type { FilterState, SortConfig, FileItem } from "$lib/types/file";
+  import type { FilterState, SortConfig, FileItem } from "$lib/ts/types";
 
   let {
     filters,
-    sortConfig,
     onTypeFilter,
     onSort,
     files = []
   }: {
     filters: FilterState;
-    sortConfig: SortConfig;
     onTypeFilter: (value: FilterState["type"]) => void;
-    onSort: (key: keyof FileItem) => void;
+    onSort: (config: SortConfig) => void;
     files: FileItem[];
   } = $props();
 

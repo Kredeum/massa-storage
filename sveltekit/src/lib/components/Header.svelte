@@ -1,7 +1,6 @@
 <!-- Header.svelte -->
 <script lang="ts">
   import { base } from "$app/paths";
-  import { Ipfs } from "$lib/runes/ipfs.svelte";
   import logoMassa from "$lib/assets/logoMassa.svg";
   import Connect from "$lib/components/Connect.svelte";
   import type { Client } from "$lib/runes/client.svelte";

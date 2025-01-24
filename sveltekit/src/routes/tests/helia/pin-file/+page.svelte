@@ -8,7 +8,7 @@
   import { createHelia, type Helia } from "helia";
   import { unixfs, type UnixFS } from "@helia/unixfs";
 
-  import FileUpload from "$lib/components/FileUpload.svelte";
+  import FileUpload from "$lib/components/fileManagement/FileUpload.svelte";
   import all from "it-all";
   import drain from "it-drain";
 

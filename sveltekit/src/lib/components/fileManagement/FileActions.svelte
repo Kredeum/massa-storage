@@ -1,6 +1,13 @@
 <script lang="ts">
-  import type { FileItem } from "$lib/types/file";
+  import { getContext } from "svelte";
+  import type { FileItem } from "$lib/ts/types";
   import { Check, X, Pin } from "lucide-svelte";
+  import type { Ipfs } from "$lib/runes/ipfs.svelte";
+  import toast from "svelte-hot-french-toast";
+
+  const ipfs: Ipfs = getContext("ipfs");
+
+  let isModerator = $derived.by(() => ipfs?.isModeratorFunc(ipfs?.address));
 
   let {
     file,
@@ -12,6 +19,7 @@
     onPin: (id: number) => void;
   } = $props();
 
+  
   function handleModerate(status: FileItem["status"]) {
     onModerate({ id: file.id, status });
   }
@@ -40,27 +48,30 @@
   }
 </script>
 
-<div class="flex items-center justify-end gap-3.5">
-  <button
-    onclick={(e) => {
-      e.stopPropagation();
-      handleModerate("Approved");
-    }}
-    class="cursor-pointer text-green-600 hover:text-green-900"
-    disabled={file.status === "Approved"}
-  >
-    <Check size={22} strokeWidth={3} />
-  </button>
-  <button
-    onclick={(e) => {
-      e.stopPropagation();
-      handleModerate("Rejected");
-    }}
-    class="cursor-pointer text-red-600 hover:text-red-900"
-    disabled={file.status === "Rejected"}
-  >
-    <X size={22} strokeWidth={3} />
-  </button>
+<div class="flex items-center justify-end gap-2">
+  {#if isModerator}
+    <button
+      onclick={(e) => {
+        e.stopPropagation();
+        handleModerate("Approved");
+      }}
+      class="cursor-pointer text-green-600 hover:text-green-900"
+      disabled={file.status === "Approved"}
+    >
+      <Check size={22} strokeWidth={3} />
+    </button>
+    <button
+      onclick={(e) => {
+        e.stopPropagation();
+        handleModerate("Rejected");
+      }}
+      class="cursor-pointer text-red-600 hover:text-red-900"
+      disabled={file.status === "Rejected"}
+    >
+      <X size={22} strokeWidth={3} />
+    </button>
+  {/if}
+
   <button
     onclick={(e) => {
       e.stopPropagation();

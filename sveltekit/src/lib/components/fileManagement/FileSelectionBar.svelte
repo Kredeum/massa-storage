@@ -1,5 +1,14 @@
 <script lang="ts">
+  import { getContext } from "svelte";
+  import type { FileItem } from "$lib/ts/types";
   import { Check, X, Pin } from "lucide-svelte";
+  import type { Ipfs } from "$lib/runes/ipfs.svelte";
+  import toast from "svelte-hot-french-toast";
+
+  const ipfs: Ipfs = getContext("ipfs");
+
+  let isModerator = $derived.by(() => ipfs?.isModeratorFunc(ipfs?.address));
+
   interface Props {
     selectedCount: number;
     onApprove: () => void;
@@ -14,12 +23,14 @@
   <div class="flex items-center gap-4 rounded-lg border border-gray-200 bg-white px-4 py-2 shadow-sm">
     <span class="text-sm font-medium text-gray-700">{selectedCount} file{selectedCount > 1 ? "s" : ""}</span>
     <div class="flex items-center gap-2">
-      <button class="cursor-pointer text-green-600 hover:text-green-900" onclick={onApprove}>
-        <Check size={22} strokeWidth={3} />
-      </button>
-      <button class="cursor-pointer text-red-600 hover:text-red-900" onclick={onReject}>
-        <X size={22} strokeWidth={3} />
-      </button>
+      {#if isModerator}
+        <button class="cursor-pointer text-green-600 hover:text-green-900" onclick={onApprove}>
+          <Check size={22} strokeWidth={3} />
+        </button>
+        <button class="cursor-pointer text-red-600 hover:text-red-900" onclick={onReject}>
+          <X size={22} strokeWidth={3} />
+        </button>
+      {/if}
       <button class="cursor-pointer text-gray-600 hover:text-blue-900" onclick={onPin}>
         <Pin size={22} strokeWidth={3} />
       </button>

@@ -73,10 +73,7 @@ class Client {
 
   // return connect status
   connect = async (): Promise<boolean> => {
-    if (!this.#wallet) {
-      toast.error("Wallet not found");
-      return false;
-    }
+    if (!this.#wallet) return false;
 
     const connected = this.#isMassaWallet() ? true : await this.#wallet?.connect();
     const info = `Connect ${this.provider.address} on ${(await this.provider.networkInfos())?.name}`;
@@ -119,7 +116,7 @@ class Client {
     let wallet: Wallet | undefined;
     let provider: Provider;
 
-    let info = "";
+    let info = "Client.#initProvider ~ ";
     let wallets: Wallet[] = [];
     let accounts: Provider[] = [];
 
@@ -150,13 +147,17 @@ class Client {
       throw new Error("Provider not found");
     }
 
-    if (provider.address)
+    if (provider.address) {
       info += `Account ${provider.address} on ${(await provider.networkInfos()).name}`;
-    else info += `no Account`;
+    } else {
+      info += `no Account`;
+    }
     console.info(info);
 
     this.provider = provider;
     this.#wallet = wallet;
+
+    await this.connect();
   };
 
   constructor(walletOrProvider?: Wallet | Provider, accountNum = 0, walletNum = 0) {

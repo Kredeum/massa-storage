@@ -36,6 +36,7 @@ class Ipfs extends Client {
 
     return has;
   };
+  isModeratorFunc = (value: string): boolean => this.#mods.includes(value);
   modHas = async (value: string): Promise<boolean | undefined> => await this.has(MODERATOR, value);
   cidHas = async (value: string): Promise<boolean | undefined> => await this.has(CID, value);
 
@@ -72,7 +73,7 @@ class Ipfs extends Client {
     try {
       const op = await this.provider.callSC({
         target: IPFS_ADDRESS,
-        func: `${type}Del`,
+        func: `${type}Delete`,
         parameter: new Args().addString(value).serialize()
       });
       // console.info(`del${type} ~ op: op`);
@@ -86,7 +87,7 @@ class Ipfs extends Client {
       if (status !== OperationStatus.SpeculativeSuccess) return toast.error(`Failed to ${type}Del`);
 
       await this.modsGet();
-      toast.success(`${type}Del ok`);
+      toast.success(`Moderator delete ok`);
     } catch (error) {
       toast.error(`Error ${type}Del`);
       console.error("Error:", error);
