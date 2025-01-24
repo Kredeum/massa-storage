@@ -8,17 +8,7 @@
   const ipfs: Ipfs = getContext("ipfs");
 
   let userAddress = $state<string>("");
-  let isModerator = $state<boolean>(false);
-
-  const checkModerator = async () => {
-    userAddress = ipfs?.address ?? "";
-    if (!userAddress) toast.error("User address not found");
-    isModerator = (await ipfs?.modHas(userAddress)) ?? false;
-  };
-
-  $effect(() => {
-    checkModerator();
-  });
+  let isModerator = $derived(() => ipfs?.isModeratorFunc(userAddress));
 
   interface Props {
     selectedCount: number;
