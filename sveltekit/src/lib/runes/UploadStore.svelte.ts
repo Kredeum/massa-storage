@@ -2,7 +2,7 @@ import { createKuboClient } from "$lib/ts/kubo";
 import type { FileItem } from "$lib/ts/types";
 import { toast } from "svelte-hot-french-toast";
 import { MAX_FILE_SIZE } from "$lib/constants/files";
-import { formatSize, getFileType } from "$lib/ts/utils";
+import { formatSize, getFileType, formatDate } from "$lib/ts/utils";
 import { getContext } from "svelte";
 
 export class UploadStore {
@@ -10,20 +10,12 @@ export class UploadStore {
   cid = $state<string>("");
   private kubo = createKuboClient();
 
-  private formatDate(): string {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const seconds = String(now.getSeconds()).padStart(2, "0");
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-  }
+  isUploading = $state<boolean>(false);
 
   async processUploadedFiles(): Promise<FileItem[]> {
     if (!this.uploadFiles) return [];
+
+    toast.loading("Uploading files...");
 
     const ipfs = getContext("ipfs");
 
@@ -64,7 +56,7 @@ export class UploadStore {
             tags: [],
             status: "Pending",
             isPinned: false,
-            uploadDate: this.formatDate(),
+            uploadDate: formatDate(),
             blob: file,
             mimeType,
             cid: this.cid,
