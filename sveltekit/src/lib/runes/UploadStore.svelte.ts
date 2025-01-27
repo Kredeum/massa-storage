@@ -5,17 +5,25 @@ import { MAX_FILE_SIZE } from "$lib/constants/files";
 import { formatSize, getFileType, formatDate } from "$lib/ts/utils";
 import { getContext } from "svelte";
 
+import { FileStore } from "./FileStore.svelte";
+
+const fileStore = new FileStore();
+
 export class UploadStore {
   uploadFiles = $state<FileList | undefined>();
   cid = $state<string>("");
   private kubo = createKuboClient();
+  // isUploading = $state<boolean>(false);
 
-  isUploading = $state<boolean>(false);
+  // toastLoading(): void {
+  //   toast.loading("Uploading files...");
+  // }
 
   async processUploadedFiles(): Promise<FileItem[]> {
     if (!this.uploadFiles) return [];
+    console.log("uploadFilesBefore", this.uploadFiles);
 
-    toast.loading("Uploading files...");
+    // this.isUploading = true;
 
     const ipfs = getContext("ipfs");
 
@@ -71,6 +79,7 @@ export class UploadStore {
   }
 
   setUploadFiles(files: FileList | undefined) {
+    // this.isUploading = false;
     this.uploadFiles = files;
   }
 }

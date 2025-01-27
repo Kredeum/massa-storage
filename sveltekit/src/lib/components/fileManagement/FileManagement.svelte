@@ -15,6 +15,17 @@
   import type { FileItem, FileStatus } from "$lib/ts/types";
   import { Ipfs } from "$lib/runes/ipfs.svelte";
 
+  // TEST
+  import { formatDate } from "$lib/ts/utils";
+  import { createKuboClient } from "$lib/ts/kubo";
+  import all from "it-all";
+  import { CID } from "multiformats";
+
+  let kubo: ReturnType<typeof createKuboClient>;
+  let cids = $state<any>(null);
+  let files = $state<FileList>();
+  // TEST ENDS
+
   const fileStore = new FileStore();
   const filterStore = new FilterStore();
   const uploadStore = new UploadStore();
@@ -29,13 +40,64 @@
     }
   });
 
+  // const getCids = async () => {
+  //   try {
+  //     let filesArray = [];
+  //     for await (const file of files) {
+  //       filesArray.push({
+  //         path: file.name,
+  //         content: new Uint8Array(await file.arrayBuffer())
+  //       });
+  //     }
+
+  //     cids = await all(kubo.addAll(filesArray, { wrapWithDirectory: true }));
+  //     console.log("filesHandle ~ cids:", cids);
+  //     cids.forEach((cid: string) => {
+  //       const file: FileItem = {
+  //         cid: cid,
+  //         name: cid,
+  //         id: Date.now() + Math.random(),
+  //         size: "unknown",
+  //         sizeInBytes: -1,
+  //         status: "Pending",
+  //         isPinned: true,
+  //         uploadDate: formatDate(),
+  //         blob: undefined,
+  //         mimeType: undefined,
+  //         arrayBuffer: undefined
+  //       };
+  //       fileStore.files.push(file);
+  //     });
+  //   } catch (error) {
+  //     console.error("Error uploading file:", error);
+  //   }
+  // };
+
+  // $effect(() => {
+  //   getCids();
+  // });
+
+  // onMount(async () => {
+  //   kubo = await createKuboClient();
+  // });
+
   const getCids = async () => {
     await ipfs?.cidsGet();
     const cids = ipfs.cids;
     cids.forEach((cid) => {
+      console.log("cid:", cid);
       const file: FileItem = {
         cid: cid,
-        name: cid
+        name: cid,
+        id: Date.now() + Math.random(),
+        size: undefined,
+        sizeInBytes: -1,
+        status: "Pending",
+        isPinned: true,
+        uploadDate: formatDate(),
+        blob: undefined,
+        mimeType: undefined,
+        arrayBuffer: undefined
       };
       fileStore.files.push(file);
     });

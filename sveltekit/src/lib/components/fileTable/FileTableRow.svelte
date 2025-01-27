@@ -46,10 +46,6 @@
   function handleMouseLeave() {
     hoveredPreview = false;
   }
-
-  function handleTagRemove(tag: string, fileIds: number[]) {
-    fileStore.removeTag(tag, fileIds);
-  }
 </script>
 
 <tr
@@ -101,7 +97,7 @@
               <span class="flex items-center justify-center">
                 {tag}
               </span>
-              <button
+              <!-- <button
                 class="cursor-pointer text-gray-500 transition-colors hover:text-blue-900"
                 onclick={(e) => {
                   e.stopPropagation();
@@ -109,7 +105,7 @@
                 }}
               >
                 <X size={10} strokeWidth={2} />
-              </button>
+              </button> -->
             </div>
           {/each}
         </div>

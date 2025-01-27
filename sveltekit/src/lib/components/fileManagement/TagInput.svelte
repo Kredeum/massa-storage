@@ -1,12 +1,15 @@
-<!-- TagInput.svelte -->
 <script lang="ts">
+  // import { X } from "lucide-svelte";
   interface Props {
     selectedFiles: number[];
     files: import("$lib/ts/types").FileItem[];
     onAddTag: (tag: string, fileIds: number[]) => void;
+    onRemoveTag: (tag: string, fileIds: number[]) => void;
   }
 
-  let { selectedFiles = [], files = [], onAddTag }: Props = $props();
+  let { selectedFiles = [], files = [], onAddTag, onRemoveTag }: Props = $props();
+  // let tagText = $state("");
+  // let removeBtn = $state("<button class='material-symbols-outlined'>X</button>");
   let newTag = $state("");
 
   function handleAddTag() {
@@ -14,6 +17,10 @@
       onAddTag(newTag.trim(), selectedFiles);
       newTag = "";
     }
+  }
+
+  function handleRemoveTag(tag: string, fileIds: number[]) {
+    onRemoveTag(tag, fileIds);
   }
 
   function handleKeyPress(e: KeyboardEvent) {
