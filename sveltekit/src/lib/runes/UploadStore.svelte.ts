@@ -55,21 +55,27 @@ export class UploadStore {
             toast.error("Failed to add and pin file. Check your IPFS server connection.");
           }
 
+
+          
+
+
+
           return {
-            id: Date.now() + Math.random(),
-            name: file.name,
-            size: formatSize(file.size),
-            sizeInBytes: file.size,
-            type: getFileType(mimeType),
-            tags: [],
-            status: "Pending",
-            isPinned: false,
-            uploadDate: formatDate(),
-            blob: file,
-            mimeType,
+            // id: Date.now() + Math.random(),
+            name: file.name, // récuperer en récupérant unixfs
+            // size: formatSize(file.size),
+            sizeInBytes: file.size, //unixfs
+            // type: getFileType(mimeType),
+            tags: [], // on abandonne l'idée de tag générique? Enlever Tags complet
+            status: "Pending", // pending, approved, rejected
+            isPinned: false, //à chercher sur kubo
+            uploadDate: formatDate(), // à garder dans la blockchain?
+            metadata: {}, //quoi rajoutter d'autres?
+            blob: file, // à virer
+            mimeType, // a garder// //soit unixfs soit on va le calculer en fonction de l'extension de name
             cid: this.cid,
-            arrayBuffer: arrayBuffer,
-            file
+            arrayBuffer: arrayBuffer, // à virer remplacer directement par content, à ne pas mettre dans la blockchain, soit récupérer à l'upload soit récup avec kubo
+            file // pas besoin
           };
         })
     );
