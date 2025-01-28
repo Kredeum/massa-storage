@@ -20,9 +20,11 @@
   import { createKuboClient } from "$lib/ts/kubo";
   import all from "it-all";
   import { CID } from "multiformats";
+  import FilePreview from "../fileTable/FilePreview.svelte";
+  import toast from "svelte-hot-french-toast";
 
   let kubo: ReturnType<typeof createKuboClient>;
-  let cids = $state<any>(null);
+  let cids = $state<any | undefined>();
   let files = $state<FileList>();
   // TEST ENDS
 
@@ -34,66 +36,54 @@
   $effect(() => {
     if (uploadStore.uploadFiles) {
       (async () => {
-        const newFiles = await uploadStore.processUploadedFiles();
-        fileStore.addFiles(newFiles);
+        cids = await uploadStore.processUploadedFiles();
+        const dirCid = getDirCid();
+        try {
+          await ipfs?.cidAdd(dirCid);
+        } catch (error) {
+          console.error("Failed to add directory:", error);
+        }
       })();
     }
   });
 
-  // const getCids = async () => {
-  //   try {
-  //     let filesArray = [];
-  //     for await (const file of files) {
-  //       filesArray.push({
-  //         path: file.name,
-  //         content: new Uint8Array(await file.arrayBuffer())
-  //       });
-  //     }
+  // -------------------------------------------------------------------------
 
-  //     cids = await all(kubo.addAll(filesArray, { wrapWithDirectory: true }));
-  //     console.log("filesHandle ~ cids:", cids);
-  //     cids.forEach((cid: string) => {
-  //       const file: FileItem = {
-  //         cid: cid,
-  //         name: cid,
-  //         id: Date.now() + Math.random(),
-  //         size: "unknown",
-  //         sizeInBytes: -1,
-  //         status: "Pending",
-  //         isPinned: true,
-  //         uploadDate: formatDate(),
-  //         blob: undefined,
-  //         mimeType: undefined,
-  //         arrayBuffer: undefined
-  //       };
-  //       fileStore.files.push(file);
-  //     });
-  //   } catch (error) {
-  //     console.error("Error uploading file:", error);
-  //   }
-  // };
+  interface FileInfo {
+    path: string;
+    cid: string; // ou CID selon ton usage
+    size: number;
+  }
 
-  // $effect(() => {
-  //   getCids();
-  // });
+  // To display files information
+  const getDirCid = () => {
+    const cidsArray = Array.from(cids) as FileInfo[]; // Convert Proxy to Array
+    console.log("cidsArray", cidsArray[0]);
+    const files = cidsArray.map(({ path, cid, size }) => {
+      return { path, cid, size };
+    });
+    console.log("files", files);
+    const dirCid = files[files.length - 1].cid.toString();
+    console.log("dirCid", dirCid);
+    return dirCid;
+  };
 
-  // onMount(async () => {
-  //   kubo = await createKuboClient();
-  // });
+  // -------------------------------------------------------------------------
 
   const getCids = async () => {
     await ipfs?.cidsGet();
     const cids = ipfs.cids;
     cids.forEach((cid) => {
       console.log("cid:", cid);
+
       const file: FileItem = {
         cid: cid,
-        name: cid,
+        name: "N/A",
         id: Date.now() + Math.random(),
         size: undefined,
         sizeInBytes: -1,
         status: "Pending",
-        isPinned: true,
+        isPinned: false,
         uploadDate: formatDate(),
         blob: undefined,
         mimeType: undefined,

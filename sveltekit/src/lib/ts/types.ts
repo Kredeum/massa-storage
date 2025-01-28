@@ -8,19 +8,19 @@ export type FileStatus = "Pending" | "Approved" | "Rejected";
 
 export interface FileItem {
   arrayBuffer?: ArrayBuffer;
-  id?: number;
-  name?: string;
-  size?: string;
-  sizeInBytes?: number;
-  type?: FileType;
-  tags?: string[];
-  status?: FileStatus;
-  isPinned?: boolean;
-  uploadDate?: string;
-  blob?: Blob;
-  file?: File | undefined;
-  cid?: string | undefined;
-  mimeType?: string;
+  id?: number; // pas besoin
+  name?: string; // récuperer en récupérant unixfs
+  size?: string; // pas besoin
+  sizeInBytes?: number; //unixfs
+  type?: FileType; // getFileType(mimeType) à voir
+  tags?: string[]; // on abandonne l'idée de tag générique? Enlever Tags complet
+  status?: FileStatus; // pending, approved, rejected à chercher sur contrat?
+  isPinned?: boolean; //à chercher sur kubo
+  uploadDate?: string; // à garder dans la blockchain?
+  blob?: Blob; // pas besoin
+  file?: File | undefined; // pas besoin
+  cid?: string | undefined; // à virer
+  mimeType?: string; // a garder// //soit unixfs soit on va le calculer en fonction de l'extension de name
 }
 
 export interface FilterState {

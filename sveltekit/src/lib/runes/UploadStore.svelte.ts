@@ -1,84 +1,60 @@
+import { create, type AddResult } from "kubo-rpc-client";
 import { createKuboClient } from "$lib/ts/kubo";
-import type { FileItem } from "$lib/ts/types";
 import { toast } from "svelte-hot-french-toast";
-import { MAX_FILE_SIZE } from "$lib/constants/files";
-import { formatSize, getFileType, formatDate } from "$lib/ts/utils";
-import { getContext } from "svelte";
+import all from "it-all";
+import { CID } from "multiformats";
 
 import { FileStore } from "./FileStore.svelte";
+import { formatSize, getFileType, formatDate } from "$lib/ts/utils";
+import { MAX_FILE_SIZE } from "$lib/constants/files";
 
 const fileStore = new FileStore();
 
 export class UploadStore {
   uploadFiles = $state<FileList | undefined>();
-  cid = $state<string>("");
-  private kubo = createKuboClient();
+  cids = $state<Array<string | AddResult>>([]);
 
-  async processUploadedFiles(): Promise<FileItem[]> {
-    if (!this.uploadFiles) return [];
-    console.log("uploadFilesBefore", this.uploadFiles);
+  #kubo: ReturnType<typeof createKuboClient>;
 
-    const ipfs = getContext("ipfs");
+  constructor() {
+    this.#kubo = createKuboClient();
+  }
 
-    const newFiles: FileItem[] = await Promise.all(
-      Array.from(this.uploadFiles)
-        .filter((file) => {
-          if (file.size > MAX_FILE_SIZE) {
-            toast.error(`File ${file.name} exceeds maximum size of ${formatSize(MAX_FILE_SIZE)}`);
-            return false;
-          }
-          return true;
-        })
-        .map(async (file) => {
+  async processUploadedFiles(): Promise<any[] | undefined> {
+    if (!this.uploadFiles) return;
+
+    const valideFiles = Array.from(this.uploadFiles).filter((file) => {
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`File ${file.name} exceeds maximum size of ${formatSize(MAX_FILE_SIZE)}`);
+        return false;
+      }
+      return true;
+    });
+
+    // const loadingToast = toast.loading("Uploading files...");
+
+    try {
+      await Promise.all(
+        valideFiles.map(async (file) => {
           const arrayBuffer = await file.arrayBuffer();
           const mimeType = file.type;
           const content = new Uint8Array(arrayBuffer);
+          let filesArray: { path: string; content: Uint8Array }[] = [];
 
-          const loadingToast = toast.loading("Uploading files...");
-
-          try {
-            const result = await this.kubo.addAndPin(content);
-            if (result) {
-              console.log("result", result);
-              this.cid = result.toString();
-              await ipfs?.cidAdd(this.cid, file.name, file.size);
-            } else {
-              console.error("Result from addAndPin is undefined");
-              toast.error("Failed to add and pin file. Unexpected result from IPFS.");
-            }
-          } catch (error) {
-            console.error("Error in addAndPin:", error);
-            toast.error("Failed to add and pin file. Check your IPFS server connection.");
-          }
-          toast.dismiss(loadingToast);
-
-          return {
-            // id: Date.now() + Math.random(),
-            name: file.name, // récuperer en récupérant unixfs
-            // size: formatSize(file.size),
-            sizeInBytes: file.size, //unixfs
-            // type: getFileType(mimeType),
-            tags: [], // on abandonne l'idée de tag générique? Enlever Tags complet
-            status: "Pending", // pending, approved, rejected
-            isPinned: false, //à chercher sur kubo
-            uploadDate: formatDate(), // à garder dans la blockchain?
-            metadata: {}, //quoi rajoutter d'autres?
-            blob: file, // à virer
-            mimeType, // a garder// //soit unixfs soit on va le calculer en fonction de l'extension de name
-            cid: this.cid,
-            arrayBuffer: arrayBuffer, // à virer remplacer directement par content, à ne pas mettre dans la blockchain, soit récupérer à l'upload soit récup avec kubo
-            file // pas besoin
-          };
+          filesArray.push({
+            path: file.name,
+            content: content
+          });
+          this.cids = await all(this.#kubo.addAll(filesArray, { wrapWithDirectory: true }));
         })
-    );
-
+      );
+      // toast.dismiss(loadingToast);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      toast.error("Failed to upload file");
+    }
     this.uploadFiles = undefined;
-    // toast.dismiss(loadingToast);
-
-    return newFiles;
-  }
-
-  setUploadFiles(files: FileList | undefined) {
-    this.uploadFiles = files;
+    console.log(" dir-cids:", this.cids);
+    return this.cids;
   }
 }
