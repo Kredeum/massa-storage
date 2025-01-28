@@ -70,11 +70,33 @@
 
   // -------------------------------------------------------------------------
 
-  const getCids = async () => {
+  onMount(async () => {
+    kubo = await createKuboClient();
+    await getFiles();
+  });
+
+  const getFiles = async () => {
     await ipfs?.cidsGet();
     const cids = ipfs.cids;
-    cids.forEach((cid) => {
-      console.log("cid:", cid);
+    cids.forEach(async (cid) => {
+      let retreivedFile = $state<string>("");
+      console.log("fileRetreive:", cid);
+      if (!cid) return "";
+
+      // try {
+      //   const chunks = await all(kubo.cat(CID.parse(cid)));
+      //   const blob = new Blob(chunks);
+      //   const reader = new FileReader();
+
+      //   reader.onloadend = () => {
+      //     retreivedFile = reader.result as string;
+      //     console.log("retreivedFile", retreivedFile);
+      //   };
+
+      //   reader.readAsDataURL(blob);
+      // } catch (error) {
+      //   console.error("Error retrieving file:", error);
+      // }
 
       const file: FileItem = {
         cid: cid,
@@ -92,10 +114,6 @@
       fileStore.files.push(file);
     });
   };
-
-  onMount(() => {
-    getCids();
-  });
 
   const filteredFiles = $derived(filterStore.filterFiles(fileStore.files));
   const paginatedFiles = $derived(filterStore.getPaginatedFiles(fileStore.files));
