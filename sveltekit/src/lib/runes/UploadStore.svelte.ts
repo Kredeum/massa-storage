@@ -13,17 +13,10 @@ export class UploadStore {
   uploadFiles = $state<FileList | undefined>();
   cid = $state<string>("");
   private kubo = createKuboClient();
-  // isUploading = $state<boolean>(false);
-
-  // toastLoading(): void {
-  //   toast.loading("Uploading files...");
-  // }
 
   async processUploadedFiles(): Promise<FileItem[]> {
     if (!this.uploadFiles) return [];
     console.log("uploadFilesBefore", this.uploadFiles);
-
-    // this.isUploading = true;
 
     const ipfs = getContext("ipfs");
 
@@ -41,11 +34,14 @@ export class UploadStore {
           const mimeType = file.type;
           const content = new Uint8Array(arrayBuffer);
 
+          const loadingToast = toast.loading("Uploading files...");
+
           try {
             const result = await this.kubo.addAndPin(content);
             if (result) {
+              console.log("result", result);
               this.cid = result.toString();
-              await ipfs?.cidAdd(this.cid);
+              await ipfs?.cidAdd(this.cid, file.name, file.size);
             } else {
               console.error("Result from addAndPin is undefined");
               toast.error("Failed to add and pin file. Unexpected result from IPFS.");
@@ -54,11 +50,7 @@ export class UploadStore {
             console.error("Error in addAndPin:", error);
             toast.error("Failed to add and pin file. Check your IPFS server connection.");
           }
-
-
-          
-
-
+          toast.dismiss(loadingToast);
 
           return {
             // id: Date.now() + Math.random(),
@@ -81,11 +73,12 @@ export class UploadStore {
     );
 
     this.uploadFiles = undefined;
+    // toast.dismiss(loadingToast);
+
     return newFiles;
   }
 
   setUploadFiles(files: FileList | undefined) {
-    // this.isUploading = false;
     this.uploadFiles = files;
   }
 }

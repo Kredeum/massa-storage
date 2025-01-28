@@ -16,7 +16,7 @@
 
   const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault();
-    toast.loading("Adding moderator...");
+    const loadingToast = toast.loading("Adding moderator...");
     try {
       await ipfs?.moderatorAdd(newModeratorAddress);
       newModeratorAddress = "";
@@ -24,12 +24,16 @@
     } catch (error) {
       console.error("Failed to add moderator:", error);
       toast.error("Failed to add moderator");
+    } finally {
+      toast.dismiss(loadingToast);
     }
   };
 
   const deleteModerator = async (moderator: string) => {
+    const loadingToast = toast.loading("Deleting moderator...");
     await ipfs?.moderatorDelete(moderator);
     await refresh();
+    toast.dismiss(loadingToast);
   };
 
   const handleCopyAddress = async (address: string) => {
