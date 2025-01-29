@@ -30,6 +30,7 @@ const createKuboClient = () => {
   };
 
   return {
+    ls: ipfs.ls,
     addAll: ipfs.addAll,
     add: ipfs.add,
     pin: ipfs.pin.add,

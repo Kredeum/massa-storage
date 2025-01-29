@@ -113,8 +113,8 @@
 
       try {
         // const files = await kubo.pins(cid);
-        const files = ipfs.ls(cid);
-        for (const file of files) {
+        const files = await kubo.ls(cid);
+        for await (const file of files) {
           console.log("file", file);
         }
       } catch (error) {
