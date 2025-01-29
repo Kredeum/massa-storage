@@ -63,7 +63,7 @@ export class UploadStore {
             type: getFileType(mimeType),
             tags: [],
             status: "Pending",
-            isPinned: false,
+            isPinned: true,
             uploadDate: this.formatDate(),
             blob: file,
             mimeType,

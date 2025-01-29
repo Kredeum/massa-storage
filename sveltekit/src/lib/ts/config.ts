@@ -13,7 +13,7 @@ const COUNTER_ADDRESS = (networkName: NetworkName = "buildnet" as NetworkName) =
 
 const GREETING_ADDRESS = "AS15R8LW3sbDpGqqbJyee7zJCXbFTjVDWg56JWz59muHxLdtSZQP";
 
-const IPFS_ADDRESS = "AS16YkdtAtYmmiRGpood1zxWWB15M1qme8u2XJExDz3ecLN676cy";
+const IPFS_ADDRESS = "AS1JXyfobBZKCayN8N7DSBiVNnJUMm5W7616CPNofvK5PAieheAS";
 
 const BURNER_WALLET_KEY = String(env.PUBLIC_BURNER_WALLET_KEY || "");
 
