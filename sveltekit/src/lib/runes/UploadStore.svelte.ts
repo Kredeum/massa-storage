@@ -2,13 +2,9 @@ import { create, type AddResult } from "kubo-rpc-client";
 import { createKuboClient } from "$lib/ts/kubo";
 import { toast } from "svelte-hot-french-toast";
 import all from "it-all";
-import { CID } from "multiformats";
 
-import { FileStore } from "./FileStore.svelte";
 import { formatSize, getFileType, formatDate } from "$lib/ts/utils";
 import { MAX_FILE_SIZE } from "$lib/constants/files";
-
-const fileStore = new FileStore();
 
 export class UploadStore {
   uploadFiles = $state<FileList | undefined>();
@@ -22,6 +18,7 @@ export class UploadStore {
 
   async processUploadedFiles(): Promise<any[] | undefined> {
     if (!this.uploadFiles) return;
+    // const loadingToast = toast.loading("Uploading files...");
 
     const valideFiles = Array.from(this.uploadFiles).filter((file) => {
       if (file.size > MAX_FILE_SIZE) {
@@ -30,8 +27,6 @@ export class UploadStore {
       }
       return true;
     });
-
-    // const loadingToast = toast.loading("Uploading files...");
 
     try {
       await Promise.all(
@@ -48,13 +43,13 @@ export class UploadStore {
           this.cids = await all(this.#kubo.addAll(filesArray, { wrapWithDirectory: true }));
         })
       );
-      // toast.dismiss(loadingToast);
     } catch (error) {
       console.error("Error uploading file:", error);
       toast.error("Failed to upload file");
     }
     this.uploadFiles = undefined;
     console.log(" dir-cids:", this.cids);
+    // toast.dismiss(loadingToast);
     return this.cids;
   }
 }

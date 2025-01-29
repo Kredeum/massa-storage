@@ -15,7 +15,7 @@
   import type { FileItem, FileStatus } from "$lib/ts/types";
   import { Ipfs } from "$lib/runes/ipfs.svelte";
 
-  // TEST
+  // TEST---------------------------------------------------
   import { formatDate } from "$lib/ts/utils";
   import { createKuboClient } from "$lib/ts/kubo";
   import all from "it-all";
@@ -26,7 +26,7 @@
   let kubo: ReturnType<typeof createKuboClient>;
   let cids = $state<any | undefined>();
   let files = $state<FileList>();
-  // TEST ENDS
+  // TEST ENDS------------------------------------------------
 
   const fileStore = new FileStore();
   const filterStore = new FilterStore();
@@ -79,41 +79,46 @@
     await ipfs?.cidsGet();
     const cids = ipfs.cids;
     cids.forEach(async (cid) => {
-      let retreivedFile = $state<string>("");
       console.log("fileRetreive:", cid);
       if (!cid) return "";
+      // ---TEST WITH CAT------------------------------------
+      let retreivedFile = $state<string>("");
+      try {
+        const chunks = await all(kubo.cat(CID.parse(cid)));
+        const blob = new Blob(chunks);
+        const reader = new FileReader();
 
-      // try {
-      //   const chunks = await all(kubo.cat(CID.parse(cid)));
-      //   const blob = new Blob(chunks);
-      //   const reader = new FileReader();
+        reader.onloadend = () => {
+          retreivedFile = reader.result as string;
+        };
 
-      //   reader.onloadend = () => {
-      //     retreivedFile = reader.result as string;
-      //     console.log("retreivedFile", retreivedFile);
-      //   };
-
-      //   reader.readAsDataURL(blob);
-      // } catch (error) {
-      //   console.error("Error retrieving file:", error);
-      // }
+        reader.readAsDataURL(blob);
+      } catch (error) {
+        console.error("Error retrieving file:", error);
+      }
+      // ---TEST WITH IPFS GET--------------------------------------
+      // let retreivedFile = $state<string>("");
+      try {
+        retreivedFile = await ipfs.get(cid);
+      } catch (error) {
+        console.error("Error retrieving file:", error);
+      }
 
       const file: FileItem = {
         cid: cid,
         name: "N/A",
-        id: Date.now() + Math.random(),
-        size: undefined,
         sizeInBytes: -1,
         status: "Pending",
         isPinned: false,
         uploadDate: formatDate(),
-        blob: undefined,
         mimeType: undefined,
         arrayBuffer: undefined
       };
       fileStore.files.push(file);
     });
   };
+
+  //-------TEST---------------------------------------------------
 
   const filteredFiles = $derived(filterStore.filterFiles(fileStore.files));
   const paginatedFiles = $derived(filterStore.getPaginatedFiles(fileStore.files));
@@ -128,7 +133,7 @@
     <div class="flex items-center justify-between gap-4">
       <div class="flex flex-1 items-center gap-4">
         <SearchBar bind:searchTerm={filterStore.searchQuery} />
-        <TagInput selectedFiles={fileStore.selectedFiles} files={fileStore.files} onAddTag={fileStore.addTag.bind(fileStore)} />
+        <TagInput selectedFiles={fileStore.selectedFiles} files={fileStore.files} onAddTag={fileStore.addTag.bind(fileStore)} onRemoveTag={fileStore.removeTag.bind(fileStore)} />
         {#if fileStore.selectedFiles.length > 0}
           <FileSelectionBar
             selectedCount={fileStore.selectedFiles.length}
