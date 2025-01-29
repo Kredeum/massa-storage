@@ -82,32 +82,49 @@
       console.log("fileRetreive:", cid);
       if (!cid) return "";
       // ---TEST WITH CAT------------------------------------
-      let retreivedFile = $state<string>("");
-      try {
-        const chunks = await all(kubo.cat(CID.parse(cid)));
-        const blob = new Blob(chunks);
-        const reader = new FileReader();
-
-        reader.onloadend = () => {
-          retreivedFile = reader.result as string;
-        };
-
-        reader.readAsDataURL(blob);
-      } catch (error) {
-        console.error("Error retrieving file:", error);
-      }
-      // ---TEST WITH IPFS GET--------------------------------------
       // let retreivedFile = $state<string>("");
+      // try {
+      //   const chunks = await all(kubo.cat(CID.parse(cid)));
+      //   const blob = new Blob(chunks);
+      //   const reader = new FileReader();
+
+      //   reader.onloadend = () => {
+      //     retreivedFile = reader.result as string;
+      //   };
+
+      //   reader.readAsDataURL(blob);
+      // } catch (error) {
+      //   console.error("Error retrieving file:", error);
+      // }
+      // ---TEST WITH IPFS GET--------------------------------------
+      let fileName = "";
+      let fileCid = "";
+      let fileSizeInBytes = 0;
+      // try {
+      //   for await (const file of kubo.pins(cid)) {
+      //     console.log(file.path);
+      //     fileName = file.path;
+      //     fileCid = cid.toString();
+      //     fileSizeInBytes = file.size;
+      //   }
+      // } catch (error) {
+      //   console.error("Error retrieving file:", error);
+      // }
+
       try {
-        retreivedFile = await ipfs.get(cid);
+        // const files = await kubo.pins(cid);
+        const files = ipfs.ls(cid);
+        for (const file of files) {
+          console.log("file", file);
+        }
       } catch (error) {
-        console.error("Error retrieving file:", error);
+        console.error("Error retrieving pinned files:", error);
       }
 
       const file: FileItem = {
-        cid: cid,
-        name: "N/A",
-        sizeInBytes: -1,
+        cid: fileCid,
+        name: fileName,
+        sizeInBytes: fileSizeInBytes,
         status: "Pending",
         isPinned: false,
         uploadDate: formatDate(),
