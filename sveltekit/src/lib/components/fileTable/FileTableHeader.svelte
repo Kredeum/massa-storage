@@ -12,10 +12,10 @@
     showSelectionMenu = $bindable(false),
     buttonRef = $bindable<HTMLButtonElement | null>(null)
   } = $props<{
-    selectedFiles: number[];
+    selectedFiles: string[];
     sortConfig: SortConfig;
     handleSort: (key: keyof FileItem) => void;
-    onSelectionChange: (selected: number[]) => void;
+    onSelectionChange: (selected: string[]) => void;
     filteredFiles: FileItem[];
     showSelectionMenu?: boolean;
     buttonRef?: HTMLButtonElement | null;
@@ -33,7 +33,7 @@
           indeterminate={selectedFiles.length > 0 && selectedFiles.length < filteredFiles.length}
           onchange={(e) => {
             const checked = e.currentTarget.checked;
-            onSelectionChange(checked ? filteredFiles.map((f: FileItem) => Number(f.cid)) : []);
+            onSelectionChange(checked ? filteredFiles.map((f: FileItem) => f.cid) : []);
           }}
         />
         <button

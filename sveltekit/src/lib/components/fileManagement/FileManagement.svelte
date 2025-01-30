@@ -1,5 +1,8 @@
 <script lang="ts">
   import { getContext, onMount } from "svelte";
+  import { createKuboClient } from "$lib/ts/kubo";
+  import type { AddResult } from "kubo-rpc-client";
+
   import SearchBar from "./SearchBar.svelte";
   import FileFilters from "./FileFilters.svelte";
   import FileTable from "../fileTable/FileTable.svelte";
@@ -12,21 +15,14 @@
   import { FileStore } from "$lib/runes/FileStore.svelte";
   import { FilterStore } from "$lib/runes/FilterStore.svelte";
   import { UploadStore } from "$lib/runes/UploadStore.svelte";
-  import type { FileItem, FileStatus } from "$lib/ts/types";
+  import type { FileItem, FileStatus, FileInfo } from "$lib/ts/types";
+  import { formatDate } from "$lib/ts/utils";
+
   import { Ipfs } from "$lib/runes/ipfs.svelte";
 
-  // TEST---------------------------------------------------
-  import { formatDate } from "$lib/ts/utils";
-  import { createKuboClient } from "$lib/ts/kubo";
-  import all from "it-all";
-  import { CID } from "multiformats";
-  import FilePreview from "../fileTable/FilePreview.svelte";
-  import toast from "svelte-hot-french-toast";
-
   let kubo: ReturnType<typeof createKuboClient>;
-  let cids = $state<any | undefined>();
+  let cids = $state<AddResult[]>([]);
   let files = $state<FileList>();
-  // TEST ENDS------------------------------------------------
 
   const fileStore = new FileStore();
   const filterStore = new FilterStore();
@@ -36,7 +32,9 @@
   $effect(() => {
     if (uploadStore.uploadFiles) {
       (async () => {
-        cids = await uploadStore.processUploadedFiles();
+        cids = (await uploadStore.processUploadedFiles()).filter((item): item is AddResult => {
+          return typeof item !== "string";
+        });
         const dirCid = getDirCid();
         try {
           await ipfs?.cidAdd(dirCid);
@@ -47,17 +45,8 @@
     }
   });
 
-  // -------------------------------------------------------------------------
-
-  interface FileInfo {
-    path: string;
-    cid: string; // ou CID selon ton usage
-    size: number;
-  }
-
-  // To display files information
   const getDirCid = () => {
-    const cidsArray = Array.from(cids) as FileInfo[]; // Convert Proxy to Array
+    const cidsArray = Array.from(cids); // Convert Proxy to Array
     console.log("cidsArray", cidsArray[0]);
     const files = cidsArray.map(({ path, cid, size }) => {
       return { path, cid, size };
@@ -67,8 +56,6 @@
     console.log("dirCid", dirCid);
     return dirCid;
   };
-
-  // -------------------------------------------------------------------------
 
   onMount(async () => {
     kubo = await createKuboClient();
@@ -106,13 +93,12 @@
         isPinned: false,
         uploadDate: formatDate(),
         mimeType: undefined,
-        arrayBuffer: undefined
+        arrayBuffer: undefined,
+        tags: []
       };
       fileStore.files.push(file);
     });
   };
-
-  //-------TEST---------------------------------------------------
 
   const filteredFiles = $derived(filterStore.filterFiles(fileStore.files));
   const paginatedFiles = $derived(filterStore.getPaginatedFiles(fileStore.files));

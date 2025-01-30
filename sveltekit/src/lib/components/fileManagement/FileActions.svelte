@@ -3,7 +3,6 @@
   import type { FileItem } from "$lib/ts/types";
   import { Check, X, Pin } from "lucide-svelte";
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
-  import toast from "svelte-hot-french-toast";
 
   const ipfs: Ipfs = getContext("ipfs");
 
@@ -15,26 +14,16 @@
     onPin
   }: {
     file: FileItem;
-    onModerate: (data: { id: number; status: FileItem["status"] }) => void;
-    onPin: (id: number) => void;
+    onModerate: (data: { id: string; status: FileItem["status"] }) => void;
+    onPin: (id: string) => void;
   } = $props();
 
   function handleModerate(status: FileItem["status"]) {
-    const id = Number(file.cid);
-    if (!isNaN(id)) {
-      onModerate({ id, status });
-    } else {
-      console.error("File CID is not a valid number");
-    }
+    onModerate({ id: file.cid, status });
   }
 
   function handlePin() {
-    const id = Number(file.cid);
-    if (!isNaN(id)) {
-      onPin(id);
-    } else {
-      console.error("File CID is not a valid number");
-    }
+    onPin(file.cid);
   }
 
   async function handleDownload() {

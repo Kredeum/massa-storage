@@ -1,9 +1,9 @@
-import { create, type AddResult } from "kubo-rpc-client";
+import { type AddResult } from "kubo-rpc-client";
 import { createKuboClient } from "$lib/ts/kubo";
 import { toast } from "svelte-hot-french-toast";
 import all from "it-all";
 
-import { formatSize, getFileType, formatDate } from "$lib/ts/utils";
+import { formatSize } from "$lib/ts/utils";
 import { MAX_FILE_SIZE } from "$lib/constants/files";
 
 export class UploadStore {
@@ -16,8 +16,8 @@ export class UploadStore {
     this.#kubo = createKuboClient();
   }
 
-  async processUploadedFiles(): Promise<any[] | undefined> {
-    if (!this.uploadFiles) return;
+  async processUploadedFiles(): Promise<(string | AddResult)[]> {
+    if (!this.uploadFiles) return [];
     // const loadingToast = toast.loading("Uploading files...");
 
     const valideFiles = Array.from(this.uploadFiles).filter((file) => {
@@ -34,7 +34,7 @@ export class UploadStore {
           const arrayBuffer = await file.arrayBuffer();
           const mimeType = file.type;
           const content = new Uint8Array(arrayBuffer);
-          let filesArray: { path: string; content: Uint8Array }[] = [];
+          const filesArray: { path: string; content: Uint8Array }[] = [];
 
           filesArray.push({
             path: file.name,

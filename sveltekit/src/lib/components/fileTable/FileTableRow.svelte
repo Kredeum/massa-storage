@@ -20,8 +20,8 @@
     onTooltipHide
   } = $props<{
     file: FileItem;
-    selectedFiles: number[];
-    onSelect: (id: number) => void;
+    selectedFiles: string[];
+    onSelect: (id: string) => void;
     actions?: import("svelte").Snippet<[FileItem]>;
     onTooltipShow: (content: string, event: MouseEvent) => void;
     onTooltipHide: () => void;
@@ -30,12 +30,12 @@
   let hoveredPreview = $state(false);
 
   function handleRowClick() {
-    onSelect(Number(file.cid));
+    onSelect(file.cid);
   }
 
   function handleCheckboxClick(e: Event) {
     e.stopPropagation();
-    onSelect(Number(file.cid));
+    onSelect(file.cid);
   }
 
   function handleMouseEnter(e: MouseEvent) {
@@ -65,7 +65,7 @@
     <input
       type="checkbox"
       class="cursor-pointer rounded text-blue-600"
-      checked={selectedFiles.includes(Number(file.cid))}
+      checked={selectedFiles.includes(file.cid)}
       onclick={handleCheckboxClick}
       onkeydown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -102,7 +102,7 @@
                 class="cursor-pointer text-gray-500 transition-colors hover:text-blue-900"
                 onclick={(e) => {
                   e.stopPropagation();
-                  handleTagRemove(tag, [Number(file.cid)]);
+                  handleTagRemove(tag, [file.cid]);
                 }}
               >
                 <X size={10} strokeWidth={2} />

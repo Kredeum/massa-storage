@@ -12,8 +12,10 @@
   let tooltipContent = $state("");
   let tooltip: FileTooltip;
 
-  function handleSelect(id: number) {
-    const newSelected = selectedFiles.includes(id) ? selectedFiles.filter((selectedId) => selectedId !== id) : [...selectedFiles, id];
+  function handleSelect(fileCid: string) {
+    console.log("CIDCID", fileCid);
+    const newSelected = selectedFiles.includes(fileCid) ? selectedFiles.filter((selectedId) => selectedId !== fileCid) : [...selectedFiles, fileCid];
+    console.log("newSelected", newSelected); // newSelected
     selectedFiles = newSelected;
     onSelectionChange(newSelected);
   }

@@ -1,10 +1,10 @@
 <script lang="ts">
   // import { X } from "lucide-svelte";
   interface Props {
-    selectedFiles: number[];
+    selectedFiles: string[];
     files: import("$lib/ts/types").FileItem[];
-    onAddTag: (tag: string, fileIds: number[]) => void;
-    onRemoveTag: (tag: string, fileIds: number[]) => void;
+    onAddTag: (tag: string, fileIds: string[]) => void;
+    onRemoveTag: (tag: string, fileIds: string[]) => void;
   }
 
   let { selectedFiles = [], files = [], onAddTag, onRemoveTag }: Props = $props();
@@ -19,7 +19,7 @@
     }
   }
 
-  function handleRemoveTag(tag: string, fileIds: number[]) {
+  function handleRemoveTag(tag: string, fileIds: string[]) {
     onRemoveTag(tag, fileIds);
   }
 
