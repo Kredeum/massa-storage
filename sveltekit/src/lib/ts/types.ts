@@ -1,6 +1,6 @@
 type EmptyObject = Record<string, never>;
 
-export type { EmptyObject, FileInfo };
+export type { EmptyObject };
 
 export type FileType = "image" | "video" | "audio" | "document";
 
@@ -50,8 +50,10 @@ export interface PropsFileTable {
   filteredFiles: FileItem[];
 }
 
-interface FileInfo {
-  path: string;
-  cid: string;
-  size: number;
+export interface PropsFilePagination {
+  currentPage: number;
+  totalPages: number;
+  itemsPerPage: number;
+  totalItems: number;
+  setPage: (page: number) => void;
 }

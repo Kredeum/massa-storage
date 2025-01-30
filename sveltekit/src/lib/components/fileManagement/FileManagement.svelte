@@ -15,14 +15,13 @@
   import { FileStore } from "$lib/runes/FileStore.svelte";
   import { FilterStore } from "$lib/runes/FilterStore.svelte";
   import { UploadStore } from "$lib/runes/UploadStore.svelte";
-  import type { FileItem, FileStatus, FileInfo } from "$lib/ts/types";
+  import type { FileItem, FileStatus } from "$lib/ts/types";
   import { formatDate } from "$lib/ts/utils";
 
   import { Ipfs } from "$lib/runes/ipfs.svelte";
 
   let kubo: ReturnType<typeof createKuboClient>;
   let cids = $state<AddResult[]>([]);
-  let files = $state<FileList>();
 
   const fileStore = new FileStore();
   const filterStore = new FilterStore();
@@ -113,7 +112,7 @@
     <div class="flex items-center justify-between gap-4">
       <div class="flex flex-1 items-center gap-4">
         <SearchBar bind:searchTerm={filterStore.searchQuery} />
-        <TagInput selectedFiles={fileStore.selectedFiles} files={fileStore.files} onAddTag={fileStore.addTag.bind(fileStore)} onRemoveTag={fileStore.removeTag.bind(fileStore)} />
+        <TagInput selectedFiles={fileStore.selectedFiles} files={fileStore.files} onAddTag={fileStore.addTag.bind(fileStore)} />
         {#if fileStore.selectedFiles.length > 0}
           <FileSelectionBar
             selectedCount={fileStore.selectedFiles.length}

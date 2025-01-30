@@ -1,13 +1,6 @@
 <script lang="ts">
-  interface Props {
-    currentPage: number;
-    totalPages: number;
-    itemsPerPage: number;
-    totalItems: number;
-    setPage: (page: number) => void;
-  }
-
-  let { currentPage, totalPages, itemsPerPage, totalItems, setPage }: Props = $props();
+  import type { PropsFilePagination } from "$lib/ts/types";
+  let { currentPage, totalPages, itemsPerPage, totalItems, setPage }: PropsFilePagination = $props();
 
   function handlePrevious() {
     if (currentPage > 0) {

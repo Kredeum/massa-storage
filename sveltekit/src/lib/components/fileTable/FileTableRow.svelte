@@ -5,11 +5,7 @@
   import FileCidCell from "./FileCidCell.svelte";
   import FilePreview from "$lib/components/fileTable/FilePreview.svelte";
   import TimeTooltip from "./TimeTooltip.svelte";
-  import { X } from "lucide-svelte";
-  import { FileStore } from "$lib/runes/FileStore.svelte";
   import { formatSize } from "$lib/ts/utils";
-
-  const fileStore = new FileStore();
 
   let {
     file,

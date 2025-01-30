@@ -32,7 +32,6 @@ export class UploadStore {
       await Promise.all(
         valideFiles.map(async (file) => {
           const arrayBuffer = await file.arrayBuffer();
-          const mimeType = file.type;
           const content = new Uint8Array(arrayBuffer);
           const filesArray: { path: string; content: Uint8Array }[] = [];
 

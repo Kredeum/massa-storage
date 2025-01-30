@@ -4,10 +4,9 @@
     selectedFiles: string[];
     files: import("$lib/ts/types").FileItem[];
     onAddTag: (tag: string, fileIds: string[]) => void;
-    onRemoveTag: (tag: string, fileIds: string[]) => void;
   }
 
-  let { selectedFiles = [], files = [], onAddTag, onRemoveTag }: Props = $props();
+  let { selectedFiles = [], files = [], onAddTag }: Props = $props();
   // let tagText = $state("");
   // let removeBtn = $state("<button class='material-symbols-outlined'>X</button>");
   let newTag = $state("");
@@ -17,10 +16,6 @@
       onAddTag(newTag.trim(), selectedFiles);
       newTag = "";
     }
-  }
-
-  function handleRemoveTag(tag: string, fileIds: string[]) {
-    onRemoveTag(tag, fileIds);
   }
 
   function handleKeyPress(e: KeyboardEvent) {
