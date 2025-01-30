@@ -4,49 +4,61 @@
 //
 
 import { Storage } from '@massalabs/massa-as-sdk';
-import { stringToBytes, boolToByte, bytesToString } from '@massalabs/as-types';
+import { stringToBytes, boolToByte, bytesToString, byteToBool } from '@massalabs/as-types';
 import { MODERATOR, CID } from '../../../common/src/constants';
 
-// Boolean Map : map values always true, real value inside key
+// Boolean Map, 3 map values : true, false or undefined, real value inside key
 class BooleanMap {
   private _mapPrefix: string;
-  private _size: usize;
 
   constructor(mapPrefix: string) {
     this._mapPrefix = mapPrefix;
-    this._size = 0;
   }
 
-  key(key: string): StaticArray<u8> {
+  private _key(key: string): StaticArray<u8> {
     return stringToBytes(this._mapPrefix + key);
   }
-  size(): usize {
-    return this._size;
+  private _keys(prefix: string): StaticArray<u8>[] {
+    return Storage.getKeys(this._key(prefix));
+  }
+  private _set(key: string, value: bool): bool {
+    const _key = this._key(key);
+    const _has = Storage.has(_key);
+
+    Storage.set(_key, boolToByte(value));
+
+    return _has;
+  }
+
+  size(prefix: string): usize {
+    return this._keys(prefix).length;
   }
   has(key: string): bool {
-    return Storage.has(this.key(key));
+    return Storage.has(this._key(key));
   }
-  keys(prefix: string): StaticArray<u8>[] {
-    return Storage.getKeys(this.key(prefix));
+  get(key: string):  StaticArray<u8> {
+    const _key = this._key(key);
+    return Storage.has(_key) ? Storage.get(_key) : [];
   }
-  values(prefix: string): string[] {
+  kvalues(prefix: string): string[] {
     const values: string[] = [];
-    const keys = this.keys(prefix);
+    const keys = this._keys(prefix);
     for (let i = 0; i < keys.length; i++) {
-      values.push(bytesToString(keys[i]).slice(this.key(prefix).length));
+      values.push(bytesToString(keys[i]).slice(this._key(prefix).length));
     }
     return values;
   }
   add(key: string): bool {
-    if (this.has(key)) return false;
-    Storage.set(this.key(key), boolToByte(true));
-    this._size += 1;
-    return true;
+    return this._set(key, true);
+  }
+  set(key: string, value: bool): void {
+    this._set(key, value);
   }
   delete(key: string): bool {
     if (!this.has(key)) return false;
-    Storage.del(this.key(key));
-    this._size -= 1;
+
+    Storage.del(this._key(key));
+
     return true;
   }
 }

@@ -11,6 +11,7 @@ class Client {
 
   // PROVIDER
   provider = $state<Provider | EmptyObject>({});
+  chainId: string = "";
 
   // WALLET
   #wallet = $state<Wallet | undefined>();
@@ -76,7 +77,10 @@ class Client {
     if (!this.#wallet) return false;
 
     const connected = this.#isMassaWallet() ? true : await this.#wallet?.connect();
-    const info = `Connect ${this.provider.address} on ${(await this.provider.networkInfos())?.name}`;
+    const network = await this.provider.networkInfos();
+    this.chainId = network.chainId.toString();
+
+    const info = `Connect ${this.provider.address} on ${network.name} (${network.chainId})`;
     console.info(info, connected);
 
     if (!connected) {

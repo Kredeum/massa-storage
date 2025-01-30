@@ -7,6 +7,7 @@
   import TimeTooltip from "./TimeTooltip.svelte";
   import { X } from "lucide-svelte";
   import { FileStore } from "$lib/runes/FileStore.svelte";
+    import { shortenString } from "$lib/ts/utils";
 
   const fileStore = new FileStore();
 
@@ -86,7 +87,7 @@
         <div class="flex items-center">
           <FileIcon type={file.type} />
           <span class="ml-2 cursor-pointer truncate hover:text-blue-600" onmouseenter={handleMouseEnter} onmouseleave={handleMouseLeave} role="button" tabindex="0">
-            {file.name}
+            {shortenString(file.name)}
           </span>
           {#if hoveredPreview}
             <FilePreview {file} />

@@ -1,7 +1,11 @@
 import toast from "svelte-hot-french-toast";
 import type { FileType } from "$lib/ts/types";
 
-const shortenString = (addr: string) => addr?.slice(0, 9) + "..." + addr?.slice(-5);
+const shortenString = (addr: string) => {
+  if (!addr) return "";
+  if (addr.length < 16) return addr;
+  return addr?.slice(0, 10) + "..." + addr?.slice(-4);
+}
 
 export { shortenString };
 

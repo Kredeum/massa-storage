@@ -25,7 +25,7 @@ export function cidDelete(cidArg: StaticArray<u8>): void {
 export function cidsGet(prefixArg: StaticArray<u8>): StaticArray<u8> {
   const prefix = _stringArgToString(prefixArg);
 
-  return new Args().add(cidMap.values(prefix)).serialize();
+  return new Args().add(cidMap.kvalues(prefix)).serialize();
 }
 
 export function cidHas(cidArg: StaticArray<u8>): StaticArray<u8> {

@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { shortenString } from "$lib/ts/utils";
+
   let { cid, fileName, onTooltipShow, onTooltipHide } = $props<{
     cid: string;
     fileName: string;
@@ -7,7 +9,7 @@
   }>();
 
   function getDisplayCid() {
-    return cid ? `${cid.slice(0, 4)}...${cid.slice(-4)}` : "";
+    return shortenString(cid);
   }
 
   function handleCopyCid(e: MouseEvent) {

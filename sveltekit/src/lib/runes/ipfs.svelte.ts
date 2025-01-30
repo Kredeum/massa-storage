@@ -7,7 +7,7 @@ import {
   OperationStatus
 } from "@massalabs/massa-web3";
 
-import { IPFS_ADDRESS } from "$lib/ts/config";
+import { ipfsAddress } from "$lib/ts/config";
 
 import type { Wallet } from "@massalabs/wallet-provider";
 import toast from "svelte-hot-french-toast";
@@ -22,7 +22,7 @@ class Ipfs extends Client {
     if (!this.provider.readSC) return;
 
     const result: ReadSCData = await this.provider.readSC({
-      target: IPFS_ADDRESS,
+      target: ipfsAddress(this.chainId),
       func: `${type}Has`,
       parameter: new Args().addString(value).serialize()
     });
@@ -44,7 +44,7 @@ class Ipfs extends Client {
   add = async (type: string, value: string) => {
     try {
       const op = await this.provider.callSC({
-        target: IPFS_ADDRESS,
+        target: ipfsAddress(this.chainId),
         func: `${type}Add`,
         parameter: new Args().addString(value).serialize()
       });
@@ -73,7 +73,7 @@ class Ipfs extends Client {
   del = async (type: string, value: string) => {
     try {
       const op = await this.provider.callSC({
-        target: IPFS_ADDRESS,
+        target: ipfsAddress(this.chainId),
         func: `${type}Delete`,
         parameter: new Args().addString(value).serialize()
       });
@@ -102,10 +102,10 @@ class Ipfs extends Client {
 
     const func = `${type}sGet`;
     console.log(func, $state.snapshot(this.#mods), $state.snapshot(this.#cids));
-    console.log(func, "~ IPFS_ADDRESS:", IPFS_ADDRESS);
+    console.log(func, "~ ipfsAddress:", ipfsAddress);
 
     const result: ReadSCData = await this.provider.readSC({
-      target: IPFS_ADDRESS,
+      target: ipfsAddress(this.chainId),
       func,
       parameter: new Args().addString("").serialize()
     });

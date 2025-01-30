@@ -7,7 +7,7 @@
   import { create } from "kubo-rpc-client";
 
   let files = $state<FileList>();
-  let cids = $state<any>(null);
+  let cids = $state<unknown>(null);
 
   let kubo: ReturnType<typeof createKuboClient>;
 
