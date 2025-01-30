@@ -7,6 +7,7 @@
   import TimeTooltip from "./TimeTooltip.svelte";
   import { X } from "lucide-svelte";
   import { FileStore } from "$lib/runes/FileStore.svelte";
+  import { formatSize } from "$lib/ts/utils";
 
   const fileStore = new FileStore();
 
@@ -116,7 +117,7 @@
       </td>
     {:else if column.key === "size"}
       <td class="w-[8%] cursor-default px-4 py-4 text-center text-sm text-gray-500">
-        {file.size}
+        {formatSize(file.sizeInBytes)}
       </td>
     {:else if column.key === "type"}
       <td class="w-[8%] cursor-default px-4 py-4 text-center text-sm text-gray-500">

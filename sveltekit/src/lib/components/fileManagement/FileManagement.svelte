@@ -81,41 +81,18 @@
     cids.forEach(async (cid) => {
       console.log("fileRetreive:", cid);
       if (!cid) return "";
-      // ---TEST WITH CAT------------------------------------
-      // let retreivedFile = $state<string>("");
-      // try {
-      //   const chunks = await all(kubo.cat(CID.parse(cid)));
-      //   const blob = new Blob(chunks);
-      //   const reader = new FileReader();
 
-      //   reader.onloadend = () => {
-      //     retreivedFile = reader.result as string;
-      //   };
-
-      //   reader.readAsDataURL(blob);
-      // } catch (error) {
-      //   console.error("Error retrieving file:", error);
-      // }
-      // ---TEST WITH IPFS GET--------------------------------------
       let fileName = "";
       let fileCid = "";
       let fileSizeInBytes = 0;
-      // try {
-      //   for await (const file of kubo.pins(cid)) {
-      //     console.log(file.path);
-      //     fileName = file.path;
-      //     fileCid = cid.toString();
-      //     fileSizeInBytes = file.size;
-      //   }
-      // } catch (error) {
-      //   console.error("Error retrieving file:", error);
-      // }
 
       try {
-        // const files = await kubo.pins(cid);
         const files = await kubo.ls(cid);
         for await (const file of files) {
           console.log("file", file);
+          fileName = file.name;
+          fileCid = cid.toString();
+          fileSizeInBytes = file.size;
         }
       } catch (error) {
         console.error("Error retrieving pinned files:", error);

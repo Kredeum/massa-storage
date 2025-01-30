@@ -10,8 +10,7 @@ export interface FileItem {
   arrayBuffer?: ArrayBuffer;
   id?: number; // pas besoin
   name?: string; // récuperer en récupérant unixfs
-  size?: string; // pas besoin
-  sizeInBytes?: number; //unixfs
+  sizeInBytes: number; //unixfs
   type?: FileType; // getFileType(mimeType) à voir
   tags?: string[]; // on abandonne l'idée de tag générique? Enlever Tags complet
   status?: FileStatus; // pending, approved, rejected à chercher sur contrat?

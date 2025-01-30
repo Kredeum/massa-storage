@@ -28,7 +28,7 @@ export function formatSize(bytes: number): string {
     unitIndex++;
   }
 
-  return `${size.toFixed(2)} ${units[unitIndex]}`;
+  return `${Math.floor(size)} ${units[unitIndex]}`;
 }
 
 export function validateFiles(
