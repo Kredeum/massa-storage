@@ -24,8 +24,13 @@ export function cidDelete(cidArg: StaticArray<u8>): void {
 
 export function cidsGet(prefixArg: StaticArray<u8>): StaticArray<u8> {
   const prefix = _stringArgToString(prefixArg);
-
-  return new Args().add(cidMap.values(prefix)).serialize();
+  const keys = cidMap.keys(prefix);
+  const values = cidMap.values(prefix);
+  
+  return new Args()
+    .add(keys)
+    .add(values)
+    .serialize();
 }
 
 export function cidHas(cidArg: StaticArray<u8>): StaticArray<u8> {
@@ -33,5 +38,7 @@ export function cidHas(cidArg: StaticArray<u8>): StaticArray<u8> {
 
   const hasValue = cidMap.has(cid);
 
-  return new Args().add(hasValue).serialize();
-}
+  return new Args()
+  .add(hasValue)
+  .serialize();
+} 

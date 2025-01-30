@@ -6,6 +6,7 @@ import {
   Web3Provider,
 } from '@massalabs/massa-web3';
 import { getScByteCode } from './utils';
+import { updateAddresses } from './addresses';
 
 const account = await Account.fromEnv();
 
@@ -13,10 +14,11 @@ const account = await Account.fromEnv();
 // const provider = Web3Provider.mainnet(account);
 const provider = Web3Provider.buildnet(account);
 
-console.log('Deploying contract...');
+const chainId = (await provider.networkInfos()).chainId.toString();
+console.log(`Deploying contract on ${chainId}...`);
 
 const byteCode = getScByteCode('build', 'ipfs.wasm');
-const deployer = process.env.DEPLOYER_ADDRESS;
+const deployer = account.publicKey.toString();
 console.log('deployer:', deployer);
 
 if (!deployer) {
@@ -28,12 +30,14 @@ const contract = await SmartContract.deploy(provider, byteCode, undefined, {
   coins: Mas.fromString('1'),
 });
 
-console.log('Contract deployed at:', contract.address);
 
 const events = await provider.getEvents({
   smartContractAddress: contract.address,
 });
 
+console.log('Contract deployed at:', contract.address);
 for (const event of events) {
   console.log('Event message:', event.data);
 }
+
+await updateAddresses(chainId, contract.address);

@@ -1,12 +1,14 @@
-<!-- TagInput.svelte -->
 <script lang="ts">
+  // import { X } from "lucide-svelte";
   interface Props {
-    selectedFiles: number[];
+    selectedFiles: string[];
     files: import("$lib/ts/types").FileItem[];
-    onAddTag: (tag: string, fileIds: number[]) => void;
+    onAddTag: (tag: string, fileIds: string[]) => void;
   }
 
   let { selectedFiles = [], files = [], onAddTag }: Props = $props();
+  // let tagText = $state("");
+  // let removeBtn = $state("<button class='material-symbols-outlined'>X</button>");
   let newTag = $state("");
 
   function handleAddTag() {

@@ -16,9 +16,9 @@
         Massa Storage
       </a>
       <a href="{base}/app" class="text-sm text-gray-600 hover:text-gray-900">Files</a>
-      <a href="{base}/app/profiles" class="text-sm text-gray-600 hover:text-gray-900">Moderators</a>
+      <a href="{base}/app/moderators" class="text-sm text-gray-600 hover:text-gray-900">Moderators</a>
       <a href="{base}/tests" class="text-sm text-gray-600 hover:text-gray-900">Tests</a>
-      <a href="https://github.com/kredeum/massa-storage" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-600 hover:text-gray-900"> GitHub </a>
+      <a href="https://github.com/kredeum/massa-storage" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-600 hover:text-gray-900">GitHub</a>
     </div>
     <div class="flex items-center">
       <Connect {client} />

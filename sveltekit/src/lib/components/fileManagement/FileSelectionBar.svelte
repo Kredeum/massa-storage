@@ -1,9 +1,7 @@
 <script lang="ts">
   import { getContext } from "svelte";
-  import type { FileItem } from "$lib/ts/types";
   import { Check, X, Pin } from "lucide-svelte";
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
-  import toast from "svelte-hot-french-toast";
 
   const ipfs: Ipfs = getContext("ipfs");
 

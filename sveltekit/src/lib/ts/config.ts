@@ -1,5 +1,6 @@
 import * as envir from "$env/static/public";
 import type { NetworkName } from "@massalabs/massa-web3";
+import addresses from "../../../../common/addresses.json";
 
 const env = envir as Record<string, string>;
 
@@ -13,8 +14,13 @@ const COUNTER_ADDRESS = (networkName: NetworkName = "buildnet" as NetworkName) =
 
 const GREETING_ADDRESS = "AS15R8LW3sbDpGqqbJyee7zJCXbFTjVDWg56JWz59muHxLdtSZQP";
 
-const IPFS_ADDRESS = "AS12UyWLqFt3EdVGKXsPXf4sxKv6br6b62adLRo3BKf3C9aKdEUAw";
+const ipfsAddress = (chainId: string): string => {
+  if (chainId in addresses) {
+    return addresses[chainId as keyof typeof addresses];
+  }
+  throw new Error(`Invalid chain ID: ${chainId}`);
+};
 
 const BURNER_WALLET_KEY = String(env.PUBLIC_BURNER_WALLET_KEY || "");
 
-export { IPFS_ADDRESS, COUNTER_ADDRESS, GREETING_ADDRESS, BURNER_WALLET_KEY };
+export { ipfsAddress, COUNTER_ADDRESS, GREETING_ADDRESS, BURNER_WALLET_KEY };

@@ -6,7 +6,7 @@ export const columns: Column[] = [
   { key: "name", label: "Name", sortable: true },
   { key: "tags", label: "Tags", sortable: false },
   { key: "uploadDate", label: "Date", sortable: true },
-  { key: "size", label: "Size", sortable: true },
+  { key: "sizeInBytes", label: "Size", sortable: true },
   { key: "type", label: "Type", sortable: true },
   { key: "status", label: "Status", sortable: true },
   { key: "cid", label: "CID", sortable: false },

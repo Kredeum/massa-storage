@@ -1,7 +1,11 @@
 import toast from "svelte-hot-french-toast";
 import type { FileType } from "$lib/ts/types";
 
-const shortenString = (addr: string) => addr?.slice(0, 9) + "..." + addr?.slice(-5);
+const shortenString = (addr: string) => {
+  if (!addr) return "";
+  if (addr.length < 16) return addr;
+  return addr?.slice(0, 10) + "..." + addr?.slice(-4);
+};
 
 export { shortenString };
 
@@ -28,7 +32,7 @@ export function formatSize(bytes: number): string {
     unitIndex++;
   }
 
-  return `${size.toFixed(2)} ${units[unitIndex]}`;
+  return `${Math.floor(size)} ${units[unitIndex]}`;
 }
 
 export function validateFiles(
@@ -54,4 +58,16 @@ export function getFileType(mimeType: string): FileType {
   if (mimeType.startsWith("video/")) return "video";
   if (mimeType.startsWith("audio/")) return "audio";
   return "document";
+}
+
+export function formatDate(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }

@@ -67,11 +67,11 @@ export class FilterStore {
 
       if (this.sortConfig.key === "name") {
         return this.sortConfig.direction === "asc"
-          ? b.name.toLowerCase().localeCompare(a.name.toLowerCase())
-          : a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+          ? (b.name ? b.name.toLowerCase() : "").localeCompare(a.name ? a.name.toLowerCase() : "")
+          : (a.name ? a.name.toLowerCase() : "").localeCompare(b.name ? b.name.toLowerCase() : "");
       }
 
-      if (this.sortConfig.key === "size") {
+      if (this.sortConfig.key === "sizeInBytes") {
         return this.sortConfig.direction === "asc"
           ? b.sizeInBytes - a.sizeInBytes
           : a.sizeInBytes - b.sizeInBytes;

@@ -1,5 +1,8 @@
 <script lang="ts">
   import { getContext, onMount } from "svelte";
+  import { createKuboClient } from "$lib/ts/kubo";
+  import type { AddResult } from "kubo-rpc-client";
+
   import SearchBar from "./SearchBar.svelte";
   import FileFilters from "./FileFilters.svelte";
   import FileTable from "../fileTable/FileTable.svelte";
@@ -13,7 +16,12 @@
   import { FilterStore } from "$lib/runes/FilterStore.svelte";
   import { UploadStore } from "$lib/runes/UploadStore.svelte";
   import type { FileItem, FileStatus } from "$lib/ts/types";
+  import { formatDate } from "$lib/ts/utils";
+
   import { Ipfs } from "$lib/runes/ipfs.svelte";
+
+  let kubo: ReturnType<typeof createKuboClient>;
+  let cids = $state<AddResult[]>([]);
 
   const fileStore = new FileStore();
   const filterStore = new FilterStore();
@@ -23,27 +31,73 @@
   $effect(() => {
     if (uploadStore.uploadFiles) {
       (async () => {
-        const newFiles = await uploadStore.processUploadedFiles();
-        fileStore.addFiles(newFiles);
+        cids = (await uploadStore.processUploadedFiles()).filter((item): item is AddResult => {
+          return typeof item !== "string";
+        });
+        const dirCid = getDirCid();
+        try {
+          await ipfs?.cidAdd(dirCid);
+        } catch (error) {
+          console.error("Failed to add directory:", error);
+        }
       })();
     }
   });
 
-  const getCids = async () => {
+  const getDirCid = () => {
+    const cidsArray = Array.from(cids); // Convert Proxy to Array
+    console.log("cidsArray", cidsArray[0]);
+    const files = cidsArray.map(({ path, cid, size }) => {
+      return { path, cid, size };
+    });
+    console.log("files", files);
+    const dirCid = files[files.length - 1].cid.toString();
+    console.log("dirCid", dirCid);
+    return dirCid;
+  };
+
+  onMount(async () => {
+    kubo = await createKuboClient();
+    await getFiles();
+  });
+
+  const getFiles = async () => {
     await ipfs?.cidsGet();
     const cids = ipfs.cids;
-    cids.forEach((cid) => {
+    cids.forEach(async (cid) => {
+      console.log("fileRetreive:", cid);
+      if (!cid) return "";
+
+      let fileName = "";
+      let fileCid = "";
+      let fileSizeInBytes = 0;
+
+      try {
+        const files = await kubo.ls(cid);
+        for await (const file of files) {
+          console.log("file", file);
+          fileName = file.name;
+          fileCid = cid.toString();
+          fileSizeInBytes = file.size;
+        }
+      } catch (error) {
+        console.error("Error retrieving pinned files:", error);
+      }
+
       const file: FileItem = {
-        cid: cid,
-        name: cid
+        cid: fileCid,
+        name: fileName,
+        sizeInBytes: fileSizeInBytes,
+        status: "Pending",
+        isPinned: false,
+        uploadDate: formatDate(),
+        mimeType: undefined,
+        arrayBuffer: undefined,
+        tags: []
       };
       fileStore.files.push(file);
     });
   };
-
-  onMount(() => {
-    getCids();
-  });
 
   const filteredFiles = $derived(filterStore.filterFiles(fileStore.files));
   const paginatedFiles = $derived(filterStore.getPaginatedFiles(fileStore.files));

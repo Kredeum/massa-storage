@@ -3,7 +3,6 @@
   import type { FileItem } from "$lib/ts/types";
   import { Check, X, Pin } from "lucide-svelte";
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
-  import toast from "svelte-hot-french-toast";
 
   const ipfs: Ipfs = getContext("ipfs");
 
@@ -15,16 +14,16 @@
     onPin
   }: {
     file: FileItem;
-    onModerate: (data: { id: number; status: FileItem["status"] }) => void;
-    onPin: (id: number) => void;
+    onModerate: (data: { id: string; status: FileItem["status"] }) => void;
+    onPin: (id: string) => void;
   } = $props();
 
   function handleModerate(status: FileItem["status"]) {
-    onModerate({ id: file.id, status });
+    onModerate({ id: file.cid, status });
   }
 
   function handlePin() {
-    onPin(file.id);
+    onPin(file.cid);
   }
 
   async function handleDownload() {
