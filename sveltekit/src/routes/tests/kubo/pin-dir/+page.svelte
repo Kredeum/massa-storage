@@ -3,11 +3,10 @@
   import { createKuboClient } from "$lib/ts/kubo";
   import FileUpload from "$lib/components/fileManagement/FileUpload.svelte";
   import all from "it-all";
-  import { CID } from "multiformats";
-  import { create } from "kubo-rpc-client";
+  import { type AddResult } from "kubo-rpc-client";
 
   let files = $state<FileList>();
-  let cids = $state<unknown>(null);
+  let cids = $state<AddResult[]>([]);
 
   let kubo: ReturnType<typeof createKuboClient>;
 

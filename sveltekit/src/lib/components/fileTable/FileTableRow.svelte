@@ -5,11 +5,10 @@
   import FileCidCell from "./FileCidCell.svelte";
   import FilePreview from "$lib/components/fileTable/FilePreview.svelte";
   import TimeTooltip from "./TimeTooltip.svelte";
-  import { X } from "lucide-svelte";
-  import { FileStore } from "$lib/runes/FileStore.svelte";
-    import { shortenString } from "$lib/ts/utils";
 
-  const fileStore = new FileStore();
+  import { shortenString } from "$lib/ts/utils";
+  import { formatSize } from "$lib/ts/utils";
+
 
   let {
     file,
@@ -20,8 +19,8 @@
     onTooltipHide
   } = $props<{
     file: FileItem;
-    selectedFiles: number[];
-    onSelect: (id: number) => void;
+    selectedFiles: string[];
+    onSelect: (id: string) => void;
     actions?: import("svelte").Snippet<[FileItem]>;
     onTooltipShow: (content: string, event: MouseEvent) => void;
     onTooltipHide: () => void;
@@ -30,12 +29,12 @@
   let hoveredPreview = $state(false);
 
   function handleRowClick() {
-    onSelect(file.id);
+    onSelect(file.cid);
   }
 
   function handleCheckboxClick(e: Event) {
     e.stopPropagation();
-    onSelect(file.id);
+    onSelect(file.cid);
   }
 
   function handleMouseEnter(e: MouseEvent) {
@@ -46,10 +45,6 @@
 
   function handleMouseLeave() {
     hoveredPreview = false;
-  }
-
-  function handleTagRemove(tag: string, fileIds: number[]) {
-    fileStore.removeTag(tag, fileIds);
   }
 </script>
 
@@ -69,7 +64,7 @@
     <input
       type="checkbox"
       class="cursor-pointer rounded text-blue-600"
-      checked={selectedFiles.includes(file.id)}
+      checked={selectedFiles.includes(file.cid)}
       onclick={handleCheckboxClick}
       onkeydown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -102,26 +97,26 @@
               <span class="flex items-center justify-center">
                 {tag}
               </span>
-              <button
+              <!-- <button
                 class="cursor-pointer text-gray-500 transition-colors hover:text-blue-900"
                 onclick={(e) => {
                   e.stopPropagation();
-                  handleTagRemove(tag, [file.id]);
+                  handleTagRemove(tag, [file.cid]);
                 }}
               >
                 <X size={10} strokeWidth={2} />
-              </button>
+              </button> -->
             </div>
           {/each}
         </div>
       </td>
     {:else if column.key === "uploadDate"}
       <td class="w-[15%] px-4 py-4 text-center text-sm text-gray-500">
-        <!-- <TimeTooltip text={file.uploadDate.split(" ")[0].split("-").reverse().join("/")} tooltip={file.uploadDate.split(" ")[1]} /> -->
+        <TimeTooltip text={file.uploadDate.split(" ")[0].split("-").reverse().join("/")} tooltip={file.uploadDate.split(" ")[1]} />
       </td>
-    {:else if column.key === "size"}
+    {:else if column.key === "sizeInBytes"}
       <td class="w-[8%] cursor-default px-4 py-4 text-center text-sm text-gray-500">
-        {file.size}
+        {formatSize(file.sizeInBytes)}
       </td>
     {:else if column.key === "type"}
       <td class="w-[8%] cursor-default px-4 py-4 text-center text-sm text-gray-500">

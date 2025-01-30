@@ -34,10 +34,6 @@
       filters.tags = [];
     }
   }
-
-  function removeTag(tag: string) {
-    filters.tags = filters.tags.filter((t) => t !== tag);
-  }
 </script>
 
 <div class="flex flex-col space-y-4">

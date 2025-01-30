@@ -14,18 +14,9 @@
 
   let newModeratorAddress: string = $state("");
 
-  // function validateAddress(address: string): boolean {
-  //   // Accept addresses starting with AU and having the correct length (53 characters total)
-  //   const regex = /^AU[\dA-Za-z]{51}$/;
-  //   return regex.test(address);
-  // }
-
   const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault();
-    // if (!validateAddress(newModeratorAddress)) {
-    //   toast.error("Invalid address");
-    //   return;
-    // }
+    const loadingToast = toast.loading("Adding moderator...");
     try {
       await ipfs?.moderatorAdd(newModeratorAddress);
       newModeratorAddress = "";
@@ -33,12 +24,16 @@
     } catch (error) {
       console.error("Failed to add moderator:", error);
       toast.error("Failed to add moderator");
+    } finally {
+      toast.dismiss(loadingToast);
     }
   };
 
   const deleteModerator = async (moderator: string) => {
+    const loadingToast = toast.loading("Deleting moderator...");
     await ipfs?.moderatorDelete(moderator);
     await refresh();
+    toast.dismiss(loadingToast);
   };
 
   const handleCopyAddress = async (address: string) => {
