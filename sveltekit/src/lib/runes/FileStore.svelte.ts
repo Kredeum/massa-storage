@@ -12,20 +12,20 @@ export class FileStore {
     }
   }
 
-  updateFileStatus(id: number, status: FileStatus) {
-    this.files = this.files.map((file) => (file.id === id ? { ...file, status } : file));
+  updateFileStatus(cid: number, status: FileStatus) {
+    this.files = this.files.map((file) => (Number(file.cid) === cid ? { ...file, status } : file));
   }
 
-  togglePin(id: number) {
+  togglePin(cid: number) {
     this.files = this.files.map((file) =>
-      file.id === id ? { ...file, isPinned: !file.isPinned } : file
+      Number(file.cid) === cid ? { ...file, isPinned: !file.isPinned } : file
     );
   }
 
   addTag(tag: string, fileIds: number[]) {
     if (fileIds.length === 0) return;
     this.files = this.files.map((file) =>
-      fileIds.includes(file.id) ? { ...file, tags: [...file.tags, tag] } : file
+      fileIds.includes(Number(file.cid)) ? { ...file, tags: [...file.tags, tag] } : file
     );
     this.selectedFiles = [];
   }
@@ -33,28 +33,28 @@ export class FileStore {
   removeTag(tag: string, fileIds: number[]) {
     if (fileIds.length === 0) return;
     this.files = this.files.map((file) =>
-      fileIds.includes(file.id) ? { ...file, tags: file.tags.filter((t) => t !== tag) } : file
+      fileIds.includes(Number(file.cid)) ? { ...file, tags: file.tags.filter((t) => t !== tag) } : file
     );
     this.selectedFiles = [];
   }
 
   bulkApprove() {
     this.files = this.files.map((file) =>
-      this.selectedFiles.includes(file.id) ? { ...file, status: "Approved" } : file
+      this.selectedFiles.includes(Number(file.cid)) ? { ...file, status: "Approved" } : file
     );
     this.selectedFiles = [];
   }
 
   bulkReject() {
     this.files = this.files.map((file) =>
-      this.selectedFiles.includes(file.id) ? { ...file, status: "Rejected" } : file
+      this.selectedFiles.includes(Number(file.cid)) ? { ...file, status: "Rejected" } : file
     );
     this.selectedFiles = [];
   }
 
   bulkPin() {
     this.files = this.files.map((file) =>
-      this.selectedFiles.includes(file.id) ? { ...file, isPinned: true } : file
+      this.selectedFiles.includes(Number(file.cid)) ? { ...file, isPinned: true } : file
     );
     this.selectedFiles = [];
   }

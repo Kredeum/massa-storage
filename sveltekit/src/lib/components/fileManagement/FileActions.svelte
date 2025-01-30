@@ -20,11 +20,21 @@
   } = $props();
 
   function handleModerate(status: FileItem["status"]) {
-    onModerate({ id: file.id, status });
+    const id = Number(file.cid);
+    if (!isNaN(id)) {
+      onModerate({ id, status });
+    } else {
+      console.error("File CID is not a valid number");
+    }
   }
 
   function handlePin() {
-    onPin(file.id);
+    const id = Number(file.cid);
+    if (!isNaN(id)) {
+      onPin(id);
+    } else {
+      console.error("File CID is not a valid number");
+    }
   }
 
   async function handleDownload() {

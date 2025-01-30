@@ -30,12 +30,12 @@
   let hoveredPreview = $state(false);
 
   function handleRowClick() {
-    onSelect(file.id);
+    onSelect(Number(file.cid));
   }
 
   function handleCheckboxClick(e: Event) {
     e.stopPropagation();
-    onSelect(file.id);
+    onSelect(Number(file.cid));
   }
 
   function handleMouseEnter(e: MouseEvent) {
@@ -65,7 +65,7 @@
     <input
       type="checkbox"
       class="cursor-pointer rounded text-blue-600"
-      checked={selectedFiles.includes(file.id)}
+      checked={selectedFiles.includes(Number(file.cid))}
       onclick={handleCheckboxClick}
       onkeydown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -102,7 +102,7 @@
                 class="cursor-pointer text-gray-500 transition-colors hover:text-blue-900"
                 onclick={(e) => {
                   e.stopPropagation();
-                  handleTagRemove(tag, [file.id]);
+                  handleTagRemove(tag, [Number(file.cid)]);
                 }}
               >
                 <X size={10} strokeWidth={2} />

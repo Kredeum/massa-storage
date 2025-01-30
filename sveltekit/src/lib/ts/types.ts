@@ -8,7 +8,6 @@ export type FileStatus = "Pending" | "Approved" | "Rejected";
 
 export interface FileItem {
   arrayBuffer?: ArrayBuffer;
-  id?: number; // pas besoin
   name?: string; // récuperer en récupérant unixfs
   sizeInBytes: number; //unixfs
   type?: FileType; // getFileType(mimeType) à voir

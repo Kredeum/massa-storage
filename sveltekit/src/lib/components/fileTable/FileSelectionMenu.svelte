@@ -22,20 +22,20 @@
   let menuRef = $state<HTMLDivElement | null>(null);
 
   function handleSelectAll() {
-    const allFileIds = files.map((file: FileItem) => file.id);
+    const allFileIds = files.map((file: FileItem) => Number(file.cid));
     onSelectionChange(allFileIds);
     onClose();
   }
 
   function handleSelectCurrentPage() {
-    const currentPageIds = paginatedFiles.map((file: FileItem) => file.id);
+    const currentPageIds = paginatedFiles.map((file: FileItem) => Number(file.cid));
     onSelectionChange(currentPageIds);
     onClose();
   }
 
   function handleSelectApprovedFiles() {
     const approvedFiles = files.filter((file: { status: string }) => file.status === "Approved");
-    const approvedIds = approvedFiles.map((file: FileItem) => file.id);
+    const approvedIds = approvedFiles.map((file: FileItem) => Number(file.cid));
     onSelectionChange(approvedIds);
     onFilterChange("Approved");
     onClose();
@@ -43,7 +43,7 @@
 
   function handleSelectPendingFiles() {
     const pendingFiles = files.filter((file: { status: string }) => file.status === "Pending");
-    const pendingIds = pendingFiles.map((file: FileItem) => file.id);
+    const pendingIds = pendingFiles.map((file: FileItem) => Number(file.cid));
     onSelectionChange(pendingIds);
     onFilterChange("Pending");
     onClose();
