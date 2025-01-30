@@ -33,7 +33,7 @@
           indeterminate={selectedFiles.length > 0 && selectedFiles.length < filteredFiles.length}
           onchange={(e) => {
             const checked = e.currentTarget.checked;
-            onSelectionChange(checked ? filteredFiles.map((f: FileItem) => f.id) : []);
+            onSelectionChange(checked ? filteredFiles.map((f: FileItem) => Number(f.cid)) : []);
           }}
         />
         <button
