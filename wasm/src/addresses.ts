@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 export async function updateAddresses(chainId: string, address: string  ): Promise<void> {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
-  const addressesPath = path.join(__dirname, '../../commonaddresses.json');
+  const addressesPath = path.join(__dirname, '../../common/addresses.json');
   let addresses: Record<string, string> = {};
 
   if (fs.existsSync(addressesPath)) {

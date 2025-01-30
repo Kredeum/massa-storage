@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { shortenString } from "$lib/ts/utils";
+  import { shortenString } from "$lib/ts/utils";
 
   let { cid, fileName, onTooltipShow, onTooltipHide } = $props<{
     cid: string;

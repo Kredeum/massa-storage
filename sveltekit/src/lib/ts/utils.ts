@@ -5,7 +5,7 @@ const shortenString = (addr: string) => {
   if (!addr) return "";
   if (addr.length < 16) return addr;
   return addr?.slice(0, 10) + "..." + addr?.slice(-4);
-}
+};
 
 export { shortenString };
 

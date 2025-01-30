@@ -13,10 +13,11 @@ import type { Wallet } from "@massalabs/wallet-provider";
 import toast from "svelte-hot-french-toast";
 import { shortenString } from "$lib/ts/utils";
 import { MODERATOR, CID } from "../../../../common/src/constants";
+import { SvelteMap } from "svelte/reactivity";
 
 class Ipfs extends Client {
   #mods = $state<string[]>([]);
-  #cids = $state<string[]>([]);
+  #cids = $state<SvelteMap<string, boolean>>(new SvelteMap());
 
   has = async (type: string, value: string): Promise<boolean | undefined> => {
     if (!this.provider.readSC) return;
@@ -115,11 +116,17 @@ class Ipfs extends Client {
       return;
     }
 
-    const items: string[] = new Args(result.value).nextArray(ArrayTypes.STRING);
-    console.log(`${func} ${items}`);
+    const args = new Args(result.value);
+    const keys: string[] = args.nextArray(ArrayTypes.STRING);
+    console.log(`${func} ${keys}`);
 
-    if (type === MODERATOR) this.#mods = items;
-    if (type === CID) this.#cids = items;
+    if (type === MODERATOR) {
+      this.#mods = keys;
+    }
+    if (type === CID) {
+      const values: boolean[] = args.nextArray(ArrayTypes.BOOL);
+      this.#cids = new SvelteMap(keys.map((key, index) => [key, values[index]]));
+    }
   };
   moderatorsGet = async () => await this.get(MODERATOR);
   cidsGet = async () => await this.get(CID);

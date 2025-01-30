@@ -9,7 +9,6 @@
   import { shortenString } from "$lib/ts/utils";
   import { formatSize } from "$lib/ts/utils";
 
-
   let {
     file,
     selectedFiles = [],

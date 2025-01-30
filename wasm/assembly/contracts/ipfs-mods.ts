@@ -27,7 +27,7 @@ export function moderatorDelete(modArg: StaticArray<u8>): void {
 export function moderatorsGet(prefixArg: StaticArray<u8>): StaticArray<u8> {
   const prefix = _stringArgToString(prefixArg);
 
-  return new Args().add(moderatorMap.kvalues(prefix)).serialize();
+  return new Args().add(moderatorMap.keys(prefix)).serialize();
 }
 
 export function moderatorHas(modArg: StaticArray<u8>): StaticArray<u8> {

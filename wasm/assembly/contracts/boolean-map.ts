@@ -40,13 +40,21 @@ class BooleanMap {
     const _key = this._key(key);
     return Storage.has(_key) ? Storage.get(_key) : [];
   }
-  kvalues(prefix: string): string[] {
-    const values: string[] = [];
+  keys(prefix: string): string[] {
+    const _keys: string[] = [];
     const keys = this._keys(prefix);
     for (let i = 0; i < keys.length; i++) {
-      values.push(bytesToString(keys[i]).slice(this._key(prefix).length));
+      _keys.push(bytesToString(keys[i]).slice(this._key(prefix).length));
     }
-    return values;
+    return _keys;
+  }
+  values(prefix: string): bool[] {
+    const _values: bool[] = [];
+    const keys = this._keys(prefix);
+    for (let i = 0; i < keys.length; i++) {
+      _values.push(byteToBool(Storage.get(keys[i])));
+    }
+    return _values;
   }
   add(key: string): bool {
     return this._set(key, true);
