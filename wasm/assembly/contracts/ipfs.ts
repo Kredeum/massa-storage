@@ -7,12 +7,12 @@ import {
   moderatorHas,
   moderatorsGet,
 } from './ipfs-mods';
-import { cidAdd, cidDelete, cidHas, cidsGet } from './ipfs-cids';
+import { cidAdd, cidDelete, cidHas, cidSet, cidsGet } from './ipfs-cids';
 
 function constructor(_: StaticArray<u8>): void {
   assert(Context.isDeployingContract());
 
-  const caller = Context.caller().serialize();
+  const caller: StaticArray<u8> = Context.caller().serialize();
 
   ownership.setOwner(caller);
   moderatorAdd(caller);
@@ -27,5 +27,6 @@ export {
   cidAdd,
   cidDelete,
   cidHas,
+  cidSet,
   cidsGet,
 };

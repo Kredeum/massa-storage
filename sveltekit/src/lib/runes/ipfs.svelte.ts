@@ -4,6 +4,7 @@ import {
   type ReadSCData,
   Args,
   ArrayTypes,
+  boolToByte,
   OperationStatus
 } from "@massalabs/massa-web3";
 
@@ -15,9 +16,16 @@ import { shortenString } from "$lib/ts/utils";
 import { MODERATOR, CID } from "../../../../common/src/constants";
 import { SvelteMap } from "svelte/reactivity";
 
+type cidType = {
+  cid: string;
+  owner: string;
+  status: 0 | 1 | -1;
+  date: string;
+};
+
 class Ipfs extends Client {
   #mods = $state<string[]>([]);
-  #cids = $state<SvelteMap<string, boolean>>(new SvelteMap());
+  #cids = $state<SvelteMap<string, string>>(new SvelteMap());
 
   has = async (type: string, value: string): Promise<boolean | undefined> => {
     if (!this.provider.readSC) return;
@@ -37,10 +45,10 @@ class Ipfs extends Client {
 
     return has;
   };
-  isModeratorFunc = (value: string): boolean => this.#mods.includes(value);
-  moderatorHas = async (value: string): Promise<boolean | undefined> =>
-    await this.has(MODERATOR, value);
-  cidHas = async (value: string): Promise<boolean | undefined> => await this.has(CID, value);
+  isModeratorFunc = (moderator: string): boolean => this.#mods.includes(moderator);
+  moderatorHas = async (moderator: string): Promise<boolean | undefined> =>
+    await this.has(MODERATOR, moderator);
+  cidHas = async (cid: string): Promise<boolean | undefined> => await this.has(CID, cid);
 
   add = async (type: string, value: string) => {
     try {
@@ -68,8 +76,40 @@ class Ipfs extends Client {
       console.error("Error:", error);
     }
   };
-  moderatorAdd = async (value: string) => await this.add(MODERATOR, value);
-  cidAdd = async (value: string) => await this.add(CID, value);
+  moderatorAdd = async (moderator: string) => await this.add(MODERATOR, moderator);
+  cidAdd = async (cid: string) => await this.add(CID, cid);
+
+  cidSet = async (cid: string, value: string) => {
+    try {
+      const params = {
+        target: ipfsAddress(this.chainId),
+        func: `cidSet`,
+        parameter: new Args().addString(cid).addString(value).serialize()
+      };
+      const op = await this.provider.callSC(params);
+      console.info("cidSet ~ params:", params);
+      console.info("cidSet ~ op:", op);
+
+      const txHash = op.id;
+      toast.success("Transaction sent: " + shortenString(txHash));
+      console.log(`https://massexplo.io/tx/${txHash}`);
+      // console.log(`https://explorer.massa.net/mainnet/operation/${txHash}`);
+
+      const status = await op.waitSpeculativeExecution();
+      if (status !== OperationStatus.SpeculativeSuccess) {
+        console.error(`Failed to cidSet ~ status: ${status}`);
+        return toast.error(`Failed to cidSet`);
+      }
+
+      await this.moderatorsGet();
+      toast.success(`Moderator cidSet ok`);
+    } catch (error) {
+      toast.error(`Error cidSet`);
+      console.error("Error:", error);
+    }
+  };
+  cidValidate = async (cid: string) => await this.cidSet(cid, "1");
+  cidReject = async (cid: string) => await this.cidSet(cid, "0");
 
   del = async (type: string, value: string) => {
     try {
@@ -95,15 +135,15 @@ class Ipfs extends Client {
       console.error("Error:", error);
     }
   };
-  moderatorDelete = async (value: string) => await this.del(MODERATOR, value);
-  cidDelete = async (value: string) => await this.del(CID, value);
+  moderatorDelete = async (moderator: string) => await this.del(MODERATOR, moderator);
+  cidDelete = async (cid: string) => await this.del(CID, cid);
 
   get = async (type: string) => {
     if (!this.provider.readSC) return;
 
     const func = `${type}sGet`;
     console.log(func, $state.snapshot(this.#mods), $state.snapshot(this.#cids));
-    console.log(func, "~ ipfsAddress:", ipfsAddress);
+    console.log(func, "~ ipfsAddress:", ipfsAddress(this.chainId));
 
     const result: ReadSCData = await this.provider.readSC({
       target: ipfsAddress(this.chainId),
@@ -124,8 +164,8 @@ class Ipfs extends Client {
       this.#mods = keys;
     }
     if (type === CID) {
-      const values: boolean[] = args.nextArray(ArrayTypes.BOOL);
-      this.#cids = new SvelteMap(keys.map((key, index) => [key, values[index]]));
+      const values: string[] = args.nextArray(ArrayTypes.STRING);
+      this.#cids = new SvelteMap(keys.map((key, index) => [key, JSON.parse(values[index])]));
     }
   };
   moderatorsGet = async () => await this.get(MODERATOR);

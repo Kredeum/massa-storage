@@ -64,7 +64,7 @@
   const getFiles = async () => {
     await ipfs?.cidsGet();
     const cids = ipfs.cids;
-    cids.forEach(async (cid) => {
+    cids.forEach(async (value, cid) => {
       console.log("fileRetreive:", cid);
       if (!cid) return "";
 
@@ -88,7 +88,7 @@
         cid: fileCid,
         name: fileName,
         sizeInBytes: fileSizeInBytes,
-        status: "Pending",
+        status: value ? "Approved" : "Pending",
         isPinned: false,
         uploadDate: formatDate(),
         mimeType: undefined,
