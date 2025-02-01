@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { FilterState, SortConfig, FileItem } from "$lib/ts/types";
+import { STATUS_APPROVED, STATUS_PENDING, STATUS_REJECTED } from "@kredeum/massa-storage-common/src/constants";
 
   let {
     filters,
@@ -48,10 +49,10 @@
 
     <select class="rounded-md border border-gray-300 px-3 py-1.5 text-sm" onchange={handleStatusFilterChange} value={filters.status}>
       <option value="all">All Status</option>
-      <option value="Approved">Approved</option>
-      <option value="Pending">Pending</option>
-      <option value="Rejected">Rejected</option>
-    </select>
+      <option value={STATUS_APPROVED}>Approved</option>
+      <option value={STATUS_PENDING}>Pending</option>
+      <option value={STATUS_REJECTED}>Rejected</option>
+   </select>
 
     <select class="rounded-md border border-gray-300 px-3 py-1.5 text-sm" onchange={handleTagSelect} value={filters.tags[0] || ""} disabled={uniqueTags.length === 0}>
       <option value="">Search by tag...</option>

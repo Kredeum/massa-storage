@@ -3,6 +3,8 @@
   import { onMount } from "svelte";
   import { getContext } from "svelte";
 
+  import { type StatusType, statusLabel } from "@kredeum/massa-storage-common/src/constants";
+
   const ipfs: Ipfs = getContext("ipfs");
 
   let cid = $state<string>("");
@@ -22,12 +24,10 @@
 </script>
 
 <div class="flex flex-col items-center justify-center">
-  <!-- <Connect client={ipfs} /> -->
-
   <div class="w-[800px]">
     <div class="mt-4">
       {#each [...ipfs.cids.entries()] as [_cid, _value]}
-        <p>{_cid}: {_value}</p>
+        <p>{_cid}: {statusLabel(_value as StatusType)}</p>
         <button onclick={() => ipfs.cidDelete(_cid)} class="button-standard"> Delete cid </button>
         <button onclick={() => ipfs.cidValidate(_cid)} class="button-standard"> Validate cid </button>
         <button onclick={() => ipfs.cidReject(_cid)} class="button-standard"> Reject cid </button>

@@ -60,17 +60,12 @@ class PersistentMap {
   add(key: string): bool {
     if (this.has(key)) return false;
 
-    this._set(key, "1");
+    this._set(key, "-1");
 
     return true;
   }
-  set(paramsArg: StaticArray<u8>): void {
-    const args: Args = new Args(paramsArg); 
-    const key: string = args.nextString().expect('Invalid key');
-    const value: string = args.nextString().expect('Invalid value');
-  
+  set(key: string, value: string): void {
     this._set(key, value);
-    generateEvent(`Set ${this._mapPrefix}: ${key} -> ${value}`);
   }
   delete(key: string): bool {
     if (!this.has(key)) return false;

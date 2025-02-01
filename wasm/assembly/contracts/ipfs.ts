@@ -6,8 +6,8 @@ import {
   moderatorDelete,
   moderatorHas,
   moderatorsGet,
-} from './ipfs-mods';
-import { cidAdd, cidDelete, cidHas, cidSet, cidsGet } from './ipfs-cids';
+} from './mods';
+import { cidAdd, cidDelete, cidHas, cidSet, cidsGet } from './cids';
 
 function constructor(_: StaticArray<u8>): void {
   assert(Context.isDeployingContract());

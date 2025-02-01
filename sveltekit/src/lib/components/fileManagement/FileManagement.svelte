@@ -2,6 +2,7 @@
   import { getContext, onMount } from "svelte";
   import { createKuboClient } from "$lib/ts/kubo";
   import type { AddResult } from "kubo-rpc-client";
+  import { STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING } from "@kredeum/massa-storage-common/src/constants";
 
   import SearchBar from "./SearchBar.svelte";
   import FileFilters from "./FileFilters.svelte";
@@ -15,8 +16,9 @@
   import { FileStore } from "$lib/runes/FileStore.svelte";
   import { FilterStore } from "$lib/runes/FilterStore.svelte";
   import { UploadStore } from "$lib/runes/UploadStore.svelte";
-  import type { FileItem, FileStatus } from "$lib/ts/types";
+  import type { FileItem } from "$lib/ts/types";
   import { formatDate } from "$lib/ts/utils";
+  import type { StatusType } from "@kredeum/massa-storage-common/src/constants";
 
   import { Ipfs } from "$lib/runes/ipfs.svelte";
 
@@ -55,6 +57,18 @@
     console.log("dirCid", dirCid);
     return dirCid;
   };
+  const handleApprove =  (fileStore: FileStore) => {
+    fileStore.bulkApprove.bind(fileStore);
+    fileStore.files.map((file) =>
+     ipfs.cidValidate(file.cid)
+    );
+  };
+  const handleReject =  (fileStore: FileStore) => {
+    fileStore.bulkReject.bind(fileStore);
+    fileStore.files.map((file) =>
+     ipfs.cidReject(file.cid)
+    );
+  };
 
   onMount(async () => {
     kubo = await createKuboClient();
@@ -88,7 +102,7 @@
         cid: fileCid,
         name: fileName,
         sizeInBytes: fileSizeInBytes,
-        status: value ? "Approved" : "Pending",
+        status: value as StatusType,
         isPinned: false,
         uploadDate: formatDate(),
         mimeType: undefined,
@@ -116,8 +130,8 @@
         {#if fileStore.selectedFiles.length > 0}
           <FileSelectionBar
             selectedCount={fileStore.selectedFiles.length}
-            onApprove={fileStore.bulkApprove.bind(fileStore)}
-            onReject={fileStore.bulkReject.bind(fileStore)}
+            onApprove={handleApprove(fileStore)}
+            onReject={handleReject(fileStore)}
             onPin={fileStore.bulkPin.bind(fileStore)}
           />
         {/if}
@@ -142,11 +156,11 @@
       }
     }}
     onSelectionChange={fileStore.setSelectedFiles.bind(fileStore)}
-    onFilterChange={(status: FileStatus | "all") => filterStore.setStatusFilter(status)}
+    onFilterChange={(status: StatusType | "all") => filterStore.setStatusFilter(status)}
     {filteredFiles}
   >
     {#snippet actions(file)}
-      <FileActions {file} onModerate={(data) => fileStore.updateFileStatus(data.id, data.status)} onPin={(id) => fileStore.togglePin(id)} />
+      <FileActions {file} onModerate={(data) => fileStore.updateStatusType(data.id, data.status)} onPin={(id) => fileStore.togglePin(id)} />
     {/snippet}
   </FileTable>
 

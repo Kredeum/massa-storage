@@ -3,6 +3,7 @@
   import type { FileItem } from "$lib/ts/types";
   import { Check, X, Pin } from "lucide-svelte";
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
+  import { STATUS_APPROVED, STATUS_PENDING, STATUS_REJECTED, type StatusType } from "@kredeum/massa-storage-common/src/constants";
 
   const ipfs: Ipfs = getContext("ipfs");
 
@@ -14,19 +15,25 @@
     onPin
   }: {
     file: FileItem;
-    onModerate: (data: { id: string; status: FileItem["status"] }) => void;
+    onModerate: (data: { id: string; status: StatusType }) => void;
     onPin: (id: string) => void;
   } = $props();
 
-  function handleModerate(status: FileItem["status"]) {
+  const handleModerate = async (status: StatusType) => {
+    if (file.status == status) return;
+    if (status == STATUS_PENDING) return;
+
+    if (status == STATUS_APPROVED) await ipfs.cidValidate(file.cid);
+    if (status == STATUS_REJECTED) await ipfs.cidReject(file.cid);
+
     onModerate({ id: file.cid, status });
-  }
+  };
 
-  function handlePin() {
+  const handlePin = () => {
     onPin(file.cid);
-  }
+  };
 
-  async function handleDownload() {
+  const handleDownload = async () => {
     try {
       if (!file.blob) {
         console.error("File blob is not available");
@@ -43,7 +50,7 @@
     } catch (error) {
       console.error("Download failed:", error);
     }
-  }
+  };
 </script>
 
 <div class="flex items-center justify-end gap-2">
@@ -51,20 +58,20 @@
     <button
       onclick={(e) => {
         e.stopPropagation();
-        handleModerate("Approved");
+        handleModerate("1");
       }}
       class="cursor-pointer text-green-600 hover:text-green-900"
-      disabled={file.status === "Approved"}
+      disabled={file.status == STATUS_APPROVED}
     >
       <Check size={22} strokeWidth={3} />
     </button>
     <button
       onclick={(e) => {
         e.stopPropagation();
-        handleModerate("Rejected");
+        handleModerate("0");
       }}
       class="cursor-pointer text-red-600 hover:text-red-900"
-      disabled={file.status === "Rejected"}
+      disabled={file.status == STATUS_REJECTED}
     >
       <X size={22} strokeWidth={3} />
     </button>

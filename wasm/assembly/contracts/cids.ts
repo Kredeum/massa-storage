@@ -39,7 +39,13 @@ export function cidsGet(prefixArg: StaticArray<u8>): StaticArray<u8> {
 }
 
 export function cidSet(paramsArg: StaticArray<u8>): void {
-  cidMap.set(paramsArg);
+  const args: Args = new Args(paramsArg); 
+  const key: string = args.nextString().expect('Invalid key');
+  const value: string = args.nextString().expect('Invalid value');
+
+  cidMap.set(key, value);
+
+  generateEvent(`Set CID: ${key} -> ${value}`);
 }
 
 export function cidHas(cidArg: StaticArray<u8>): StaticArray<u8> {
