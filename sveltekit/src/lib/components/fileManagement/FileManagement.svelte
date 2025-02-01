@@ -57,17 +57,13 @@
     console.log("dirCid", dirCid);
     return dirCid;
   };
-  const handleApprove =  (fileStore: FileStore) => {
+  const handleApprove = (fileStore: FileStore) => {
     fileStore.bulkApprove.bind(fileStore);
-    fileStore.files.map((file) =>
-     ipfs.cidValidate(file.cid)
-    );
+    fileStore.files.map((file) => ipfs.cidValidate(file.cid));
   };
-  const handleReject =  (fileStore: FileStore) => {
+  const handleReject = (fileStore: FileStore) => {
     fileStore.bulkReject.bind(fileStore);
-    fileStore.files.map((file) =>
-     ipfs.cidReject(file.cid)
-    );
+    fileStore.files.map((file) => ipfs.cidReject(file.cid));
   };
 
   onMount(async () => {
@@ -130,8 +126,8 @@
         {#if fileStore.selectedFiles.length > 0}
           <FileSelectionBar
             selectedCount={fileStore.selectedFiles.length}
-            onApprove={handleApprove(fileStore)}
-            onReject={handleReject(fileStore)}
+            onApprove={() => handleApprove(fileStore)}
+            onReject={() => handleReject(fileStore)}
             onPin={fileStore.bulkPin.bind(fileStore)}
           />
         {/if}

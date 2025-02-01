@@ -57,7 +57,7 @@
     "it-filter": "^3.1.1",
     "it-foreach": "^2.1.1",
     "it-merge": "^3.0.5",
-    "lucide-svelte": "^0.471.0",
+    "lucide-svelte": "^0.474.0",
     "prettier": "^3.4.2",
     "prettier-plugin-svelte": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
@@ -68,8 +68,8 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.22.0",
     "vite": "^6.0.11",
-    "vite-plugin-node-polyfills": "^0.22.0",
-    "vitest": "^2.1.8"
+    "vite-plugin-node-polyfills": "^0.23.0",
+    "vitest": "^3.0.4"
   },
   "dependencies": {
     "@helia/unixfs": "^4.0.2",
