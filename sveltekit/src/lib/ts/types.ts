@@ -1,8 +1,14 @@
-import type { StatusType } from "@kredeum/massa-storage-common/src/constants";
+import type {
+  STATUS_APPROVED,
+  STATUS_PENDING,
+  STATUS_REJECTED
+} from "@kredeum/massa-storage-common/src/constants";
 
 type EmptyObject = Record<string, never>;
 
 export type { EmptyObject };
+
+export type StatusType = typeof STATUS_PENDING | typeof STATUS_APPROVED | typeof STATUS_REJECTED;
 
 export type FileType = "image" | "video" | "audio" | "document";
 

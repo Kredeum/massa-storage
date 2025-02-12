@@ -1,5 +1,4 @@
-import type { FileItem } from "$lib/ts/types";
-import type { StatusType } from "@kredeum/massa-storage-common/src/constants";
+import type { FileItem, StatusType } from "$lib/ts/types";
 
 import { toast } from "svelte-hot-french-toast";
 import { STATUS_APPROVED, STATUS_REJECTED } from "@kredeum/massa-storage-common/src/constants";

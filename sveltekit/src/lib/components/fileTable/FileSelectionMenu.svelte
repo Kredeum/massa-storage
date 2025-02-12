@@ -1,6 +1,5 @@
 <script lang="ts">
-  import type { FileItem } from "$lib/ts/types";
-  import type { StatusType } from "@kredeum/massa-storage-common/src/constants";
+  import type { FileItem, StatusType } from "$lib/ts/types";
 
   import { STATUS_APPROVED, STATUS_PENDING, STATUS_REJECTED } from "@kredeum/massa-storage-common/src/constants";
   let {

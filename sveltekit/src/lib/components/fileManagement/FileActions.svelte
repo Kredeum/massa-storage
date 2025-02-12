@@ -1,9 +1,9 @@
 <script lang="ts">
   import { getContext } from "svelte";
-  import type { FileItem } from "$lib/ts/types";
+  import type { FileItem, StatusType } from "$lib/ts/types";
   import { Check, X, Pin } from "lucide-svelte";
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
-  import { STATUS_APPROVED, STATUS_PENDING, STATUS_REJECTED, type StatusType } from "@kredeum/massa-storage-common/src/constants";
+  import { STATUS_APPROVED, STATUS_PENDING, STATUS_REJECTED } from "@kredeum/massa-storage-common/src/constants";
 
   const ipfs: Ipfs = getContext("ipfs");
 

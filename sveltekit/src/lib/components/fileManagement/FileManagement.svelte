@@ -16,9 +16,8 @@
   import { FileStore } from "$lib/runes/FileStore.svelte";
   import { FilterStore } from "$lib/runes/FilterStore.svelte";
   import { UploadStore } from "$lib/runes/UploadStore.svelte";
-  import type { FileItem } from "$lib/ts/types";
+  import type { FileItem, StatusType } from "$lib/ts/types";
   import { formatDate } from "$lib/ts/utils";
-  import type { StatusType } from "@kredeum/massa-storage-common/src/constants";
 
   import { Ipfs } from "$lib/runes/ipfs.svelte";
 

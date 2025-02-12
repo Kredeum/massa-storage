@@ -3,7 +3,8 @@
   import { onMount } from "svelte";
   import { getContext } from "svelte";
 
-  import { type StatusType, statusLabel } from "@kredeum/massa-storage-common/src/constants";
+  import { statusLabel } from "@kredeum/massa-storage-common/src/constants";
+  import type { StatusType } from "$lib/ts/types";
 
   const ipfs: Ipfs = getContext("ipfs");
 

@@ -1,4 +1,5 @@
-
+// common source to sveltekit typescript and wasm assemblyscript
+// BE CAREFULL: some typescript types not accepted by the wasm compiler
 
 const GREETING_KEY = "GREETING";
 
@@ -9,8 +10,11 @@ const STATUS_APPROVED = "1";
 const STATUS_REJECTED = "0";
 const STATUS_PENDING = "-1";
 
-type StatusType = typeof STATUS_PENDING | typeof STATUS_APPROVED | typeof STATUS_REJECTED;
+function statusLabel(status: string): string {
+  if (status == STATUS_APPROVED) return "Approved";
+  if (status == STATUS_REJECTED) return "Rejected";
+  if (status == STATUS_PENDING) return "Pending";
+  return "Unknown";
+}
 
-const statusLabel = (status: StatusType) => status == STATUS_APPROVED ? "Approved" : status == STATUS_REJECTED ? "Rejected" : "Pending";
-
-export { type StatusType, MODERATOR, CID, GREETING_KEY, STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING, statusLabel };
+export { MODERATOR, CID, GREETING_KEY, STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING, statusLabel };
