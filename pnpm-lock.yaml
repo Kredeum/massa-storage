@@ -177,6 +177,9 @@ importers:
         specifier: workspace:^
         version: link:../common
     devDependencies:
+      '@as-pect/assembly':
+        specifier: ^8.1.0
+        version: 8.1.0
       '@as-pect/cli':
         specifier: ^8.1.0
         version: 8.1.0(assemblyscript@0.27.34)
