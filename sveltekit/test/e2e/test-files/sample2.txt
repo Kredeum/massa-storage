@@ -1,0 +1,2 @@
+This is another sample file for testing IPFS upload functionality.
+This file will be used in the rejection flow test.
