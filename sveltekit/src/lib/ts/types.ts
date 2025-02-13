@@ -1,10 +1,16 @@
+import type {
+  STATUS_APPROVED,
+  STATUS_PENDING,
+  STATUS_REJECTED
+} from "@kredeum/massa-storage-common/src/constants";
+
 type EmptyObject = Record<string, never>;
 
 export type { EmptyObject };
 
-export type FileType = "image" | "video" | "audio" | "document";
+export type StatusType = typeof STATUS_PENDING | typeof STATUS_APPROVED | typeof STATUS_REJECTED;
 
-export type FileStatus = "Pending" | "Approved" | "Rejected";
+export type FileType = "image" | "video" | "audio" | "document";
 
 export interface FileItem {
   arrayBuffer?: ArrayBuffer;
@@ -12,7 +18,7 @@ export interface FileItem {
   sizeInBytes: number; //unixfs
   type?: FileType; // getFileType(mimeType) à voir
   tags: string[]; // on abandonne l'idée de tag générique? Enlever Tags complet
-  status: FileStatus; // pending, approved, rejected à chercher sur contrat?
+  status: StatusType; // pending, approved, rejected à chercher sur contrat?
   isPinned?: boolean; //à chercher sur kubo
   uploadDate: string; // à garder dans la blockchain?
   blob?: Blob; // pas besoin
@@ -23,7 +29,7 @@ export interface FileItem {
 
 export interface FilterState {
   type: "all" | "image" | "video" | "audio" | "document" | "tag";
-  status: "all" | FileStatus;
+  status: "all" | StatusType;
   tags: string[];
 }
 
@@ -45,7 +51,7 @@ export interface PropsFileTable {
   sortConfig: SortConfig;
   handleSort: (key: keyof FileItem) => void;
   onSelectionChange: (selected: string[]) => void;
-  onFilterChange: (status: FileStatus | "all") => void;
+  onFilterChange: (status: StatusType | "all") => void;
   actions?: import("svelte").Snippet<[FileItem]>;
   filteredFiles: FileItem[];
 }

@@ -25,8 +25,8 @@ export default ts.config(
       }
     },
     rules: {
-      "@typescript-eslint/no-unused-vars": "warn",
-      "no-unused-vars": "warn",
+      "@typescript-eslint/no-unused-vars": "off",
+      "no-unused-vars": "off",
       // to ignore @apply
       "no-unknown-animations": "off",
       "no-sequences": "off"

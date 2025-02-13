@@ -1,6 +1,7 @@
 <script lang="ts">
-  import type { FileItem } from "$lib/ts/types";
+  import type { FileItem, StatusType } from "$lib/ts/types";
 
+  import { STATUS_APPROVED, STATUS_PENDING, STATUS_REJECTED } from "@kredeum/massa-storage-common/src/constants";
   let {
     files = [],
     paginatedFiles = [],
@@ -13,7 +14,7 @@
     files: FileItem[];
     paginatedFiles: FileItem[];
     onSelectionChange: (selected: string[]) => void;
-    onFilterChange: (status: "Approved" | "Pending" | "all") => void;
+    onFilterChange: (status: StatusType | "all") => void;
     showMenu: boolean;
     buttonRef: HTMLButtonElement | null;
     onClose: () => void;
@@ -34,18 +35,18 @@
   }
 
   function handleSelectApprovedFiles() {
-    const approvedFiles = files.filter((file: { status: string }) => file.status === "Approved");
+    const approvedFiles = files.filter((file: { status: string }) => file.status == STATUS_APPROVED);
     const approvedIds = approvedFiles.map((file: FileItem) => file.cid);
     onSelectionChange(approvedIds);
-    onFilterChange("Approved");
+    onFilterChange(STATUS_APPROVED);
     onClose();
   }
 
   function handleSelectPendingFiles() {
-    const pendingFiles = files.filter((file: { status: string }) => file.status === "Pending");
+    const pendingFiles = files.filter((file: { status: string }) => file.status == STATUS_PENDING);
     const pendingIds = pendingFiles.map((file: FileItem) => file.cid);
     onSelectionChange(pendingIds);
-    onFilterChange("Pending");
+    onFilterChange(STATUS_PENDING);
     onClose();
   }
 </script>

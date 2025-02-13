@@ -5,6 +5,7 @@
   import FileCidCell from "./FileCidCell.svelte";
   import FilePreview from "$lib/components/fileTable/FilePreview.svelte";
   import TimeTooltip from "./TimeTooltip.svelte";
+  import { STATUS_PENDING, STATUS_APPROVED, STATUS_REJECTED, statusLabel } from "@kredeum/massa-storage-common/src/constants";
 
   import { shortenString } from "$lib/ts/utils";
   import { formatSize } from "$lib/ts/utils";
@@ -125,14 +126,14 @@
       <td class="w-[8%] cursor-default px-4 py-4 text-center">
         <span
           class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
-          class:bg-yellow-100={file.status === "Pending"}
-          class:text-yellow-800={file.status === "Pending"}
-          class:bg-green-100={file.status === "Approved"}
-          class:text-green-800={file.status === "Approved"}
-          class:bg-red-100={file.status === "Rejected"}
-          class:text-red-800={file.status === "Rejected"}
+          class:bg-yellow-100={file.status == STATUS_PENDING}
+          class:text-yellow-800={file.status == STATUS_PENDING}
+          class:bg-green-100={file.status == STATUS_APPROVED}
+          class:text-green-800={file.status == STATUS_APPROVED}
+          class:bg-red-100={file.status == STATUS_REJECTED}
+          class:text-red-800={file.status == STATUS_REJECTED}
         >
-          {file.status}
+          {statusLabel(file.status)}
         </span>
       </td>
     {:else if !column.key}

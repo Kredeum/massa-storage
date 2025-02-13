@@ -1,5 +1,7 @@
-import type { FileItem, FileStatus } from "$lib/ts/types";
+import type { FileItem, StatusType } from "$lib/ts/types";
+
 import { toast } from "svelte-hot-french-toast";
+import { STATUS_APPROVED, STATUS_REJECTED } from "@kredeum/massa-storage-common/src/constants";
 
 export class FileStore {
   files = $state<FileItem[]>([]);
@@ -12,7 +14,7 @@ export class FileStore {
     }
   }
 
-  updateFileStatus(cid: string, status: FileStatus) {
+  updateStatusType(cid: string, status: StatusType) {
     this.files = this.files.map((file) => (file.cid === cid ? { ...file, status } : file));
   }
 
@@ -40,14 +42,14 @@ export class FileStore {
 
   bulkApprove() {
     this.files = this.files.map((file) =>
-      this.selectedFiles.includes(file.cid) ? { ...file, status: "Approved" } : file
+      this.selectedFiles.includes(file.cid) ? { ...file, status: STATUS_APPROVED } : file
     );
     this.selectedFiles = [];
   }
 
   bulkReject() {
     this.files = this.files.map((file) =>
-      this.selectedFiles.includes(file.cid) ? { ...file, status: "Rejected" } : file
+      this.selectedFiles.includes(file.cid) ? { ...file, status: STATUS_REJECTED } : file
     );
     this.selectedFiles = [];
   }
