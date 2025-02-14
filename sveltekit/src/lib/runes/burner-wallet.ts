@@ -1,4 +1,4 @@
-import { Account } from '@massalabs/massa-web3';
+import { Account } from "@massalabs/massa-web3";
 
 export interface BurnerWallet {
   address: string;
@@ -11,7 +11,7 @@ export interface BurnerWallet {
  */
 export async function createBurnerWallet(): Promise<BurnerWallet> {
   const account = await Account.generate();
-  
+
   return {
     address: account.address.toString(),
     privateKey: account.privateKey.toString()
