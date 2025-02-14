@@ -77,19 +77,18 @@ class Client {
     if (!this.#wallet) return false;
 
     const connected = this.#isMassaWallet() ? true : await this.#wallet?.connect();
+    if (!connected) {
+      toast.error("Wallet not connected");
+      return false;
+    }
+    this.#walletConnected = true;
+
     const network = await this.provider.networkInfos();
     this.chainId = network.chainId.toString();
 
     const info = `Connect ${this.provider.address} on ${network.name} (${network.chainId})`;
     console.info(info, connected);
-
-    if (!connected) {
-      toast.error("Wallet not connected");
-      return false;
-    }
     toast.success(`${this.addressToDisplay} connected`);
-
-    this.#walletConnected = true;
 
     await this.refresh();
 
@@ -128,10 +127,12 @@ class Client {
     if (walletOrProvider && "providerName" in walletOrProvider) {
       wallet = undefined;
       provider = walletOrProvider;
+      info += `${walletOrProvider.providerName} `;
     } else {
       // walletOrProvider is WALLET
       if (walletOrProvider && "accounts" in walletOrProvider) {
         wallet = walletOrProvider;
+        info += `Wallet ${wallet?.name()} `;
       }
       // walletOrProvider is UNDEFINED
       else {
@@ -150,15 +151,17 @@ class Client {
       console.error(`Provider not found ${info}`);
       throw new Error("Provider not found");
     }
+    const network = await provider.networkInfos();
 
     if (provider.address) {
-      info += `Account ${provider.address} on ${(await provider.networkInfos()).name}`;
+      info += `Account ${provider.address} on ${network.name}`;
     } else {
       info += `no Account`;
     }
     console.info(info);
 
     this.provider = provider;
+    this.chainId = network.chainId.toString();
     this.#wallet = wallet;
 
     await this.connect();

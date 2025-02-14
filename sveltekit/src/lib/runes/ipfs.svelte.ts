@@ -142,8 +142,6 @@ class Ipfs extends Client {
     if (!this.provider.readSC) return;
 
     const func = `${type}sGet`;
-    console.log(func, $state.snapshot(this.#mods), $state.snapshot(this.#cids));
-    console.log(func, "~ ipfsAddress:", ipfsAddress(this.chainId));
 
     const result: ReadSCData = await this.provider.readSC({
       target: ipfsAddress(this.chainId),
@@ -158,7 +156,7 @@ class Ipfs extends Client {
 
     const args = new Args(result.value);
     const keys: string[] = args.nextArray(ArrayTypes.STRING);
-    console.log(`${func} ${keys}`);
+    // console.log(`${func} ${keys}`);
 
     if (type === MODERATOR) {
       this.#mods = keys;
@@ -168,8 +166,14 @@ class Ipfs extends Client {
       this.#cids = new SvelteMap(keys.map((key, index) => [key, JSON.parse(values[index])]));
     }
   };
-  moderatorsGet = async () => await this.get(MODERATOR);
-  cidsGet = async () => await this.get(CID);
+  moderatorsGet = async () => {
+    await this.get(MODERATOR);
+    return this.#mods;
+  };
+  cidsGet = async () => {
+    await this.get(CID);
+    return this.#cids;
+  };
 
   get mods() {
     return this.#mods;
