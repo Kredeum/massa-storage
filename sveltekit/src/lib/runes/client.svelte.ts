@@ -158,7 +158,7 @@ class Client {
     } else {
       info += `no Account`;
     }
-    console.info(info);
+    // console.info(info);
 
     this.provider = provider;
     this.chainId = network.chainId.toString();
