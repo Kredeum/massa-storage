@@ -21,7 +21,7 @@
     "clean": "pnpm -r clean && rm -rf node_modules .turbo pnpm-lock.yaml",
     "deploy": "pnpm run --filter wasm deploy"
   },
-  "packageManager": "pnpm@10.3.0",
+  "packageManager": "pnpm@10.4.0",
   "engines": {
     "node": "^22",
     "pnpm": "^10"

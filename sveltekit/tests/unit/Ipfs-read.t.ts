@@ -76,7 +76,7 @@ describe("IPFS class", () => {
     expect(hasCid).toBe(true);
   });
 
-  it.only("Should validate CID format", async () => {
+  it("Should validate CID format", async () => {
     const cids = await ipfs.cidsGet();
     cids.forEach((value, key) => {
       expect(typeof key).toBe("string");

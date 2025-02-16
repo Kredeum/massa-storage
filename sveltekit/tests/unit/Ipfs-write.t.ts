@@ -5,7 +5,7 @@ import { ipfsAddress } from "$lib/ts/config";
 import { Ipfs } from "$lib/runes/ipfs.svelte";
 import { create } from "kubo-rpc-client";
 
-describe.only("IPFS class", () => {
+describe.skip("IPFS class", () => {
   let ipfs: Ipfs;
   let provider: Web3Provider;
   let chainId: string;

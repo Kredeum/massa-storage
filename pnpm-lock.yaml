@@ -38,7 +38,7 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
       helia:
-        specifier: ^5.2.0
+        specifier: ^5.2.1
         version: 5.2.1(bufferutil@4.0.9)(react-native@0.77.1(@babel/core@7.26.9)(@babel/preset-env@7.26.9(@babel/core@7.26.9))(bufferutil@4.0.9)(react@18.3.1))
       ipfs-unixfs:
         specifier: ^11.2.0
@@ -75,7 +75,7 @@ importers:
         specifier: ^3.0.8
         version: 3.0.8(@sveltejs/kit@2.17.2(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.20.1)(vite@6.1.0(@types/node@22.13.4)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.0)))(svelte@5.20.1)(vite@6.1.0(@types/node@22.13.4)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.0)))
       '@sveltejs/kit':
-        specifier: ^2.17.1
+        specifier: ^2.17.2
         version: 2.17.2(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.20.1)(vite@6.1.0(@types/node@22.13.4)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.0)))(svelte@5.20.1)(vite@6.1.0(@types/node@22.13.4)(jiti@1.21.7)(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.0))
       '@sveltejs/vite-plugin-svelte':
         specifier: ^5.0.3
@@ -105,7 +105,7 @@ importers:
         specifier: ^5.2.1
         version: 5.2.1
       globals:
-        specifier: ^15.14.0
+        specifier: ^15.15.0
         version: 15.15.0
       interface-blockstore:
         specifier: ^5.3.1
@@ -126,8 +126,8 @@ importers:
         specifier: ^3.0.5
         version: 3.0.5
       kubo-rpc-client:
-        specifier: ^5.0.2
-        version: 5.0.2(undici@7.3.0)
+        specifier: ^5.1.0
+        version: 5.1.0(undici@7.3.0)
       lucide-svelte:
         specifier: ^0.475.0
         version: 0.475.0(svelte@5.20.1)
@@ -135,7 +135,7 @@ importers:
         specifier: ^13.3.2
         version: 13.3.2
       prettier:
-        specifier: ^3.5.0
+        specifier: ^3.5.1
         version: 3.5.1
       prettier-plugin-svelte:
         specifier: ^3.3.3
@@ -144,7 +144,7 @@ importers:
         specifier: ^0.6.11
         version: 0.6.11(prettier-plugin-svelte@3.3.3(prettier@3.5.1)(svelte@5.20.1))(prettier@3.5.1)
       svelte:
-        specifier: ^5.19.10
+        specifier: ^5.20.1
         version: 5.20.1
       svelte-check:
         specifier: ^4.1.4
@@ -153,7 +153,7 @@ importers:
         specifier: ^3.4.17
         version: 3.4.17
       turbo:
-        specifier: ^2.4.1
+        specifier: ^2.4.2
         version: 2.4.2
       typescript:
         specifier: ^5.7.3
@@ -177,6 +177,9 @@ importers:
         specifier: workspace:^
         version: link:../common
     devDependencies:
+      '@as-pect/assembly':
+        specifier: ^8.1.0
+        version: 8.1.0
       '@as-pect/cli':
         specifier: ^8.1.0
         version: 8.1.0(assemblyscript@0.27.34)
@@ -193,7 +196,7 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       '@massalabs/massa-sc-compiler':
-        specifier: 0.2.0
+        specifier: ^0.2.0
         version: 0.2.0
       '@massalabs/massa-sc-deployer':
         specifier: ^2.2.0
@@ -208,7 +211,7 @@ importers:
         specifier: ^1.3.0
         version: 1.3.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       '@types/node':
-        specifier: ^22.13.1
+        specifier: ^22.13.4
         version: 22.13.4
       as-base64:
         specifier: ^0.2.0
@@ -226,7 +229,7 @@ importers:
         specifier: ^16.4.7
         version: 16.4.7
       prettier:
-        specifier: ^3.5.0
+        specifier: ^3.5.1
         version: 3.5.1
       tslib:
         specifier: ^2.8.1
@@ -1690,9 +1693,6 @@ packages:
 
   '@multiformats/multiaddr-matcher@1.6.0':
     resolution: {integrity: sha512-E77lLvQR+50kTAfvjV3g4wr9qCu77Z+6yT0s1hgfh8B4sAXZ8u/YdQJGhjgstgW1kmGy7BXPppROKYijqQsesQ==}
-
-  '@multiformats/multiaddr-to-uri@10.1.2':
-    resolution: {integrity: sha512-6sicfYRjJlHJn4bwsQancs8kXncWU4dDN/+V9sMVTYp9hi8ovWgVkK75AbAv4SfhztmmI+oufVUncQ1n+SukKQ==}
 
   '@multiformats/multiaddr-to-uri@11.0.0':
     resolution: {integrity: sha512-9RNmlIGwZbBLsHekT50dbt4o4u8Iciw9kGjv+WHiGxQdsJ6xKKjU1+C0Vbas6RilMbaVOAOnEyfNcXbUmTkLxQ==}
@@ -3301,8 +3301,8 @@ packages:
     resolution: {integrity: sha512-ca9pw9fomFcKPvFLXhBKUK90ZvGibiGOvRJNbjljY7s7uq/5YO4BOzcYtJqExdx99rF6aAcnRxHmcUHcz6sQsg==}
     engines: {node: '>=0.10'}
 
-  esrap@1.4.4:
-    resolution: {integrity: sha512-tDN6xP/r/b3WmdpWm7LybrD252hY52IokcycPnO+WHfhFF0+n5AWtcLLK7VNV6m0uYgVRhGVs8OkZwRyfC7HzQ==}
+  esrap@1.4.5:
+    resolution: {integrity: sha512-CjNMjkBWWZeHn+VX+gS8YvFwJ5+NDhg8aWZBSFJPR8qQduDNjbJodA2WcwCm7uQa5Rjqj+nZvVmceg1RbHFB9g==}
 
   esrecurse@4.3.0:
     resolution: {integrity: sha512-KmfKL3b6G+RXvP8N1vr3Tq1kL/oCFgn2NYXEtqP8/L3pKapUA4G8cFVaoF3SU323CD4XypR/ffioHmkti6/Tag==}
@@ -4240,8 +4240,8 @@ packages:
   known-css-properties@0.35.0:
     resolution: {integrity: sha512-a/RAk2BfKk+WFGhhOCAYqSiFLc34k8Mt/6NWRI4joER0EYUzXIcFivjjnoD3+XU1DggLn/tZc3DOAgke7l8a4A==}
 
-  kubo-rpc-client@5.0.2:
-    resolution: {integrity: sha512-0w8VUwpxtkynLlJsAnM+es3qR6Nvv0/oqg0I+sCgI65rh8OPoBYpsk58/miD+u/OkIhJKBwslfeJ9y7Ujb40+g==}
+  kubo-rpc-client@5.1.0:
+    resolution: {integrity: sha512-yTBoyEN1Ymwi0Tzi8+Mfxylg3BRAatzykih8jzwaJjfYCqKUEqCX+43m4X78CdTPRXyIHUbdI9N0DcKRwNwk+A==}
 
   leven@3.1.0:
     resolution: {integrity: sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A==}
@@ -4938,8 +4938,8 @@ packages:
     resolution: {integrity: sha512-CTM5kuWR3sx9IFamcl5ErfPl6ea/N8IYwiJ+vpeB2g+1iknv7zBl5uPwbMbRVznRVbrNY6lGuDoE5b30grmbqg==}
     engines: {node: '>= 0.10'}
 
-  parse-duration@1.1.2:
-    resolution: {integrity: sha512-p8EIONG8L0u7f8GFgfVlL4n8rnChTt8O5FSxgxMz2tjc9FMP199wxVKVB6IbKx11uTbKHACSvaLVIKNnoeNR/A==}
+  parse-duration@2.1.3:
+    resolution: {integrity: sha512-MtbharL7Bets65qDBXuDOHHWyY1BxTJZmJ/xGmS90iEbKE0gZ6yZpZtCda7O79GeOi/f0NwBaplIuReExIoVsw==}
 
   parse-imports@2.2.1:
     resolution: {integrity: sha512-OL/zLggRp8mFhKL0rNORUTR4yBYujK/uU+xZL+/0Rgm2QE4nLO9v8PzEweSJEbMGKmDRjJE4R3IMJlL2di4JeQ==}
@@ -8724,10 +8724,6 @@ snapshots:
       '@multiformats/multiaddr': 12.3.5
       multiformats: 13.3.2
 
-  '@multiformats/multiaddr-to-uri@10.1.2':
-    dependencies:
-      '@multiformats/multiaddr': 12.3.5
-
   '@multiformats/multiaddr-to-uri@11.0.0':
     dependencies:
       '@multiformats/multiaddr': 12.3.5
@@ -10768,7 +10764,7 @@ snapshots:
     dependencies:
       estraverse: 5.3.0
 
-  esrap@1.4.4:
+  esrap@1.4.5:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.0
 
@@ -11848,7 +11844,7 @@ snapshots:
 
   known-css-properties@0.35.0: {}
 
-  kubo-rpc-client@5.0.2(undici@7.3.0):
+  kubo-rpc-client@5.1.0(undici@7.3.0):
     dependencies:
       '@ipld/dag-cbor': 9.2.2
       '@ipld/dag-json': 10.2.3
@@ -11858,7 +11854,7 @@ snapshots:
       '@libp2p/logger': 5.1.8
       '@libp2p/peer-id': 5.0.12
       '@multiformats/multiaddr': 12.3.5
-      '@multiformats/multiaddr-to-uri': 10.1.2
+      '@multiformats/multiaddr-to-uri': 11.0.0
       any-signal: 4.1.1
       blob-to-it: 2.0.7
       browser-readablestream-to-it: 2.0.7
@@ -11878,7 +11874,7 @@ snapshots:
       multiformats: 13.3.2
       nanoid: 5.1.0
       native-fetch: 4.0.2(undici@7.3.0)
-      parse-duration: 1.1.2
+      parse-duration: 2.1.3
       react-native-fetch-api: 3.0.0
       stream-to-it: 1.0.1
       uint8arrays: 5.1.0
@@ -12584,7 +12580,7 @@ snapshots:
       pbkdf2: 3.1.2
       safe-buffer: 5.2.1
 
-  parse-duration@1.1.2: {}
+  parse-duration@2.1.3: {}
 
   parse-imports@2.2.1:
     dependencies:
@@ -13600,7 +13596,7 @@ snapshots:
       axobject-query: 4.1.0
       clsx: 2.1.1
       esm-env: 1.2.2
-      esrap: 1.4.4
+      esrap: 1.4.5
       is-reference: 3.0.3
       locate-character: 3.0.0
       magic-string: 0.30.17
