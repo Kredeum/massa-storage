@@ -175,6 +175,38 @@ class Ipfs extends Client {
     return this.#cids;
   };
 
+  // cidGet = async (cid: string) => await this.get(CID, cid);
+  cidGet = async (cid: string) => {
+    if (!this.provider.readSC) return;
+
+    const func = `cidGet`;
+
+    const result: ReadSCData = await this.provider.readSC({
+      target: ipfsAddress(this.chainId),
+      func,
+      parameter: new Args().addString(cid).serialize()
+    });
+
+    if (result.info.error) {
+      console.log(`${func} ERROR ${result.info.error}`);
+      toast.error(`${func} ERROR`);
+      return;
+    }
+
+    const args = new Args(result.value);
+    const value = args.nextString();
+    if (!value) {
+      throw new Error("Invalid value");
+    }
+
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      console.error(`Error parsing value for CID ${cid}:`, error);
+      return value;
+    }
+  };
+
   get mods() {
     return this.#mods;
   }

@@ -37,7 +37,13 @@
         });
         const dirCid = getDirCid();
         try {
-          await ipfs?.cidAdd(dirCid);
+          const attributes = {
+            name: "dirName",
+            date: formatDate(),
+            value: "-1"
+          };
+          const attributesString = JSON.stringify(attributes);
+          await ipfs?.cidSet(dirCid, attributesString);
         } catch (error) {
           console.error("Failed to add directory:", error);
         }
@@ -56,10 +62,12 @@
     console.log("dirCid", dirCid);
     return dirCid;
   };
+
   const handleApprove = (fileStore: FileStore) => {
     fileStore.bulkApprove.bind(fileStore);
     fileStore.files.map((file) => ipfs.cidValidate(file.cid));
   };
+
   const handleReject = (fileStore: FileStore) => {
     fileStore.bulkReject.bind(fileStore);
     fileStore.files.map((file) => ipfs.cidReject(file.cid));
@@ -71,17 +79,31 @@
   });
 
   const getFiles = async () => {
-    await ipfs?.cidsGet();
+    if (!ipfs) return;
+    await ipfs.cidsGet();
     const cids = ipfs.cids;
     cids.forEach(async (value, cid) => {
-      console.log("fileRetreive:", cid);
-      if (!cid) return "";
+      if (!cid) return;
+
+      let attributes;
+      try {
+        // 1. Get the file data
+        const result = await ipfs.cidGet(cid);
+        if (result === undefined) return;
+        attributes = result;
+        console.log("result", result);
+      } catch (error) {
+        console.error(`Error fetching file data for CID ${cid}:`, error);
+        return;
+      }
 
       let fileName = "";
       let fileCid = "";
       let fileSizeInBytes = 0;
+      value = attributes.value;
 
       try {
+        // 2. Get file details from Kubo
         const files = await kubo.ls(cid);
         for await (const file of files) {
           console.log("file", file);
@@ -90,22 +112,29 @@
           fileSizeInBytes = file.size;
         }
       } catch (error) {
-        console.error("Error retrieving pinned files:", error);
+        console.error(`Error getting file details from Kubo for CID ${cid}:`, error);
+        return;
       }
 
-      const file: FileItem = {
-        cid: fileCid,
-        name: fileName,
-        sizeInBytes: fileSizeInBytes,
-        status: value as StatusType,
-        isPinned: false,
-        uploadDate: formatDate(),
-        mimeType: undefined,
-        arrayBuffer: undefined,
-        tags: []
-      };
-      fileStore.files.push(file);
+      try {
+        // 3. Create and store the file item
+        const file: FileItem = {
+          cid: fileCid,
+          name: fileName,
+          uploadDate: attributes.date,
+          sizeInBytes: fileSizeInBytes,
+          status: STATUS_PENDING,
+          isPinned: false,
+          mimeType: undefined,
+          arrayBuffer: undefined,
+          tags: []
+        };
+        fileStore.files.push(file);
+      } catch (error) {
+        console.error(`Error creating file item for CID ${cid}:`, error);
+      }
     });
+    // });
   };
 
   const filteredFiles = $derived(filterStore.filterFiles(fileStore.files));
