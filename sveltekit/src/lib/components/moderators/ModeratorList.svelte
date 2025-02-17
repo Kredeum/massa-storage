@@ -47,13 +47,14 @@
     <h2 class="mb-4 text-xl font-semibold text-gray-700">Add New Moderator</h2>
     <form onsubmit={handleSubmit} class="flex gap-4">
       <input
+        id="input-moderator-address"
         type="text"
         bind:value={newModeratorAddress}
         placeholder="Enter blockchain address (AU...)"
         class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
         aria-label="Blockchain Address Input"
       />
-      <button type="submit" class="button-standard"> Add Moderator </button>
+      <button id="button-moderator-add" type="submit" class="button-standard"> Add Moderator </button>
     </form>
   </div>
 
