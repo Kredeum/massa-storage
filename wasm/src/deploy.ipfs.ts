@@ -30,7 +30,6 @@ const contract = await SmartContract.deploy(provider, byteCode, undefined, {
   coins: Mas.fromString('1'),
 });
 
-
 const events = await provider.getEvents({
   smartContractAddress: contract.address,
 });

@@ -3,6 +3,7 @@
   import { createKuboClient } from "$lib/ts/kubo";
   import type { AddResult } from "kubo-rpc-client";
   import { STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING } from "@kredeum/massa-storage-common/src/constants";
+  import type { CidDataType } from "$lib/ts/types";
 
   import SearchBar from "./SearchBar.svelte";
   import FileFilters from "./FileFilters.svelte";
@@ -29,28 +30,6 @@
   const uploadStore = new UploadStore();
   const ipfs: Ipfs = getContext("ipfs");
 
-  $effect(() => {
-    if (uploadStore.uploadFiles) {
-      (async () => {
-        cids = (await uploadStore.processUploadedFiles()).filter((item): item is AddResult => {
-          return typeof item !== "string";
-        });
-        const dirCid = getDirCid();
-        try {
-          const attributes = {
-            name: "dirName",
-            date: formatDate(),
-            value: "-1"
-          };
-          const attributesString = JSON.stringify(attributes);
-          await ipfs?.cidSet(dirCid, attributesString);
-        } catch (error) {
-          console.error("Failed to add directory:", error);
-        }
-      })();
-    }
-  });
-
   const getDirCid = () => {
     const cidsArray = Array.from(cids); // Convert Proxy to Array
     console.log("cidsArray", cidsArray[0]);
@@ -62,6 +41,31 @@
     console.log("dirCid", dirCid);
     return dirCid;
   };
+
+  const uploadFiles = async () => {
+    if (!ipfs) return;
+    if (!uploadStore.uploadFiles) return;
+    cids = (await uploadStore.processUploadedFiles()).filter((item): item is AddResult => {
+      return typeof item !== "string";
+    });
+    const dirCid = getDirCid();
+    try {
+      const attributes: CidDataType = {
+        name: "dirName",
+        date: formatDate(),
+        owner: ipfs.address,
+        status: STATUS_PENDING
+      };
+      const attributesString = JSON.stringify(attributes);
+      await ipfs.cidSet(dirCid, attributesString);
+    } catch (error) {
+      console.error("Failed to add directory:", error);
+    }
+  };
+
+  $effect(() => {
+    uploadFiles();
+  });
 
   const handleApprove = (fileStore: FileStore) => {
     fileStore.bulkApprove.bind(fileStore);
@@ -87,43 +91,44 @@
       if (!cid) return;
 
       let attributes;
-      let statusValue;
       let currentStatus: StatusType = STATUS_PENDING;
+      let fileName = "";
+      let fileCid = "";
+      let fileSizeInBytes = 0;
+
       try {
         // 1. Get the file data
         const result = await ipfs.cidGet(cid);
         if (result === undefined) return;
         attributes = result;
-        console.log("result", result);
-
-        statusValue = cids.get(cid); // cids.get retourne la valeur 0 ou 1
-        console.log("Status pour CID", cid, ":", statusValue);
-
-        // let currentStatus: StatusType = STATUS_PENDING;
-        // try {
-        //   const statusResult = await ipfs.cidGet(cid);
-        //   if (statusResult && statusResult.value) {
-        //     if (statusResult.value === "1") {
-        //       currentStatus = STATUS_APPROVED;
-        //     } else if (statusResult.value === "0") {
-        //       currentStatus = STATUS_REJECTED;
-        //     }
-        //   }
-
-        if (statusValue === "1") {
-          currentStatus = STATUS_APPROVED;
-        } else if (statusValue === "0") {
-          currentStatus = STATUS_REJECTED;
-        }
+        console.log("attributes", attributes);
       } catch (error) {
         console.error(`Error fetching file data for CID ${cid}:`, error);
         return;
       }
 
-      let fileName = "";
-      let fileCid = "";
-      let fileSizeInBytes = 0;
-      value = attributes.value;
+      try {
+        if (!attributes || !attributes.status) return;
+        if (attributes.status === "1") {
+          currentStatus = STATUS_APPROVED;
+        } else if (attributes.status === "0") {
+          currentStatus = STATUS_REJECTED;
+        }
+      } catch (error) {
+        console.error(`Error determining status for CID ${cid}:`, error);
+        return;
+      }
+      // try {
+      //   if (!attributes || !attributes.status) return;
+      //   if (attributes.status === "1") {
+      //     currentStatus = STATUS_APPROVED;
+      //   } else if (attributes.status === "0") {
+      //     currentStatus = STATUS_REJECTED;
+      //   }
+      // } catch (error) {
+      //   console.error(`Error determining status for CID ${cid}:`, error);
+      //   return;
+      // }
 
       try {
         // 2. Get file details from Kubo
@@ -140,8 +145,10 @@
       }
 
       try {
+        if (!attributes) return;
         // 3. Create and store the file item
         const file: FileItem = {
+          owner: attributes.owner,
           cid: fileCid,
           name: fileName,
           uploadDate: attributes.date,

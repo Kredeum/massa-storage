@@ -13,6 +13,7 @@ export type StatusType = typeof STATUS_PENDING | typeof STATUS_APPROVED | typeof
 export type FileType = "image" | "video" | "audio" | "document";
 
 export interface FileItem {
+  owner: string;
   arrayBuffer?: ArrayBuffer;
   name: string; // récuperer en récupérant unixfs
   sizeInBytes: number; //unixfs
@@ -63,3 +64,10 @@ export interface PropsFilePagination {
   totalItems: number;
   setPage: (page: number) => void;
 }
+
+export type CidDataType = {
+  name: string;
+  owner: string;
+  status: StatusType;
+  date: string;
+};

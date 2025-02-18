@@ -83,4 +83,21 @@ describe("IPFS class", () => {
       expect(key.startsWith("baf")).toBe(true); // IPFS v1 CIDs start with 'bafy'
     });
   });
+  it.only("Should get cid", async () => {
+    if (!ipfs) return;
+    const cids = await ipfs.cidsGet();
+    const cid = cids.keys().next().value;
+    if (!cid) return;
+    const attributes = await ipfs.cidGet(cid);
+    if (!attributes) {
+      console.error("Failed to get attributes for CID:", cid);
+      return;
+    }
+    console.log("cid attributes:", attributes, cid, attributes.status);
+    expect(attributes).toBeDefined();
+    expect(attributes.name).toBeDefined();
+    expect(attributes.owner).toBeDefined();
+    expect(attributes.status).toBeDefined();
+    expect(attributes.date).toBeDefined();
+  });
 });
