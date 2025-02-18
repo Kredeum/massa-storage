@@ -112,7 +112,11 @@
       </td>
     {:else if column.key === "uploadDate"}
       <td class="w-[15%] px-4 py-4 text-center text-sm text-gray-500">
-        <TimeTooltip text={file.uploadDate.split(" ")[0].split("-").reverse().join("/")} tooltip={file.uploadDate.split(" ")[1]} />
+        {#if file.uploadDate && file.uploadDate.includes(" ")}
+          <TimeTooltip text={file.uploadDate.split(" ")[0].split("-").reverse().join("/")} tooltip={file.uploadDate.split(" ")[1]} />
+        {:else}
+          <span>No Date Available</span>
+        {/if}
       </td>
     {:else if column.key === "sizeInBytes"}
       <td class="w-[8%] cursor-default px-4 py-4 text-center text-sm text-gray-500">

@@ -82,16 +82,39 @@
     if (!ipfs) return;
     await ipfs.cidsGet();
     const cids = ipfs.cids;
+    console.log("cids", cids);
     cids.forEach(async (value, cid) => {
       if (!cid) return;
 
       let attributes;
+      let statusValue;
+      let currentStatus: StatusType = STATUS_PENDING;
       try {
         // 1. Get the file data
         const result = await ipfs.cidGet(cid);
         if (result === undefined) return;
         attributes = result;
         console.log("result", result);
+
+        statusValue = cids.get(cid); // cids.get retourne la valeur 0 ou 1
+        console.log("Status pour CID", cid, ":", statusValue);
+
+        // let currentStatus: StatusType = STATUS_PENDING;
+        // try {
+        //   const statusResult = await ipfs.cidGet(cid);
+        //   if (statusResult && statusResult.value) {
+        //     if (statusResult.value === "1") {
+        //       currentStatus = STATUS_APPROVED;
+        //     } else if (statusResult.value === "0") {
+        //       currentStatus = STATUS_REJECTED;
+        //     }
+        //   }
+
+        if (statusValue === "1") {
+          currentStatus = STATUS_APPROVED;
+        } else if (statusValue === "0") {
+          currentStatus = STATUS_REJECTED;
+        }
       } catch (error) {
         console.error(`Error fetching file data for CID ${cid}:`, error);
         return;
@@ -123,7 +146,7 @@
           name: fileName,
           uploadDate: attributes.date,
           sizeInBytes: fileSizeInBytes,
-          status: STATUS_PENDING,
+          status: currentStatus,
           isPinned: false,
           mimeType: undefined,
           arrayBuffer: undefined,
@@ -134,7 +157,6 @@
         console.error(`Error creating file item for CID ${cid}:`, error);
       }
     });
-    // });
   };
 
   const filteredFiles = $derived(filterStore.filterFiles(fileStore.files));
