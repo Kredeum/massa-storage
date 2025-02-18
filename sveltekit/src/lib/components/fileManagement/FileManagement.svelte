@@ -18,7 +18,7 @@
   import { FilterStore } from "$lib/runes/FilterStore.svelte";
   import { UploadStore } from "$lib/runes/UploadStore.svelte";
   import type { FileItem, StatusType } from "$lib/ts/types";
-  import { formatDate } from "$lib/ts/utils";
+  import { formatDate, getFileTypeFromName } from "$lib/ts/utils";
 
   import { Ipfs } from "$lib/runes/ipfs.svelte";
 
@@ -125,7 +125,7 @@
       try {
         const files = await kubo.ls(cid);
         for await (const file of files) {
-          console.log("file", file);
+          console.log("Kubo file details:", JSON.stringify(file, null, 2));
           fileName = file.name;
           fileCid = cid.toString();
           fileSizeInBytes = file.size;
@@ -148,7 +148,8 @@
           isPinned: false,
           mimeType: undefined,
           arrayBuffer: undefined,
-          tags: attributes.name ? [attributes.name] : []
+          tags: attributes.name ? [attributes.name] : [],
+          type: getFileTypeFromName(fileName)
         };
         fileStore.files.push(file);
       } catch (error) {

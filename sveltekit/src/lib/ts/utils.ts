@@ -71,3 +71,30 @@ export function formatDate(): string {
 
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
+
+export function getFileTypeFromName(fileName: string): FileType {
+  const extension = fileName.split(".").pop()?.toLowerCase() || "";
+
+  // Image extensions
+  if (["jpg", "jpeg", "png", "gif", "bmp", "webp", "svg"].includes(extension)) {
+    return "image";
+  }
+
+  // Video extensions
+  if (["mp4", "webm", "ogg", "mov", "avi", "mkv"].includes(extension)) {
+    return "video";
+  }
+
+  // Audio extensions
+  if (["mp3", "wav", "ogg", "aac", "m4a"].includes(extension)) {
+    return "audio";
+  }
+
+  // Document extensions
+  if (["pdf", "doc", "docx", "txt", "odt", "rtf"].includes(extension)) {
+    return "document";
+  }
+
+  // Default to document for unknown types
+  return "document";
+}
