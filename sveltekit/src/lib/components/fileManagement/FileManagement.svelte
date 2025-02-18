@@ -87,17 +87,18 @@
     await ipfs.cidsGet();
     const cids = ipfs.cids;
     console.log("cids", cids);
+
+    // NOTE: DONT USE VALUE FOR NOW!!!!
     cids.forEach(async (value, cid) => {
       if (!cid) return;
-
       let attributes;
       let currentStatus: StatusType = STATUS_PENDING;
       let fileName = "";
       let fileCid = "";
       let fileSizeInBytes = 0;
 
+      // Get the file data
       try {
-        // 1. Get the file data
         const result = await ipfs.cidGet(cid);
         if (result === undefined) return;
         attributes = result;
@@ -107,6 +108,7 @@
         return;
       }
 
+      // Determine the current status
       try {
         if (!attributes || !attributes.status) return;
         if (attributes.status === "1") {
@@ -118,20 +120,9 @@
         console.error(`Error determining status for CID ${cid}:`, error);
         return;
       }
-      // try {
-      //   if (!attributes || !attributes.status) return;
-      //   if (attributes.status === "1") {
-      //     currentStatus = STATUS_APPROVED;
-      //   } else if (attributes.status === "0") {
-      //     currentStatus = STATUS_REJECTED;
-      //   }
-      // } catch (error) {
-      //   console.error(`Error determining status for CID ${cid}:`, error);
-      //   return;
-      // }
 
+      // Get file details from Kubo
       try {
-        // 2. Get file details from Kubo
         const files = await kubo.ls(cid);
         for await (const file of files) {
           console.log("file", file);
@@ -144,9 +135,9 @@
         return;
       }
 
+      // Create and store the file item
       try {
         if (!attributes) return;
-        // 3. Create and store the file item
         const file: FileItem = {
           owner: attributes.owner,
           cid: fileCid,
