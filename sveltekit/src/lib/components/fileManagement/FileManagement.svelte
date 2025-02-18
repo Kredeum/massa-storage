@@ -148,7 +148,7 @@
           isPinned: false,
           mimeType: undefined,
           arrayBuffer: undefined,
-          tags: []
+          tags: attributes.name ? [attributes.name] : []
         };
         fileStore.files.push(file);
       } catch (error) {
