@@ -118,7 +118,7 @@ describe("File Upload", () => {
 
     uploadStore.uploadFiles = fileList;
     await uploadStore.processUploadedFiles();
-    console.log("largeFiledddddddddddddd", largeFile.name, largeFile.size);
+    console.log("largeFile", largeFile.name, largeFile.size);
 
     expect(toast.error).toHaveBeenCalledWith(
       expect.stringContaining(
