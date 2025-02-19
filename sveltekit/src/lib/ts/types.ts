@@ -35,15 +35,25 @@ export interface FilterState {
 }
 
 export interface SortConfig {
-  key: keyof FileItem;
+  key: keyof FileItem | keyof DirectoryItem;
   direction: "asc" | "desc";
 }
 
 export type Column = {
-  key: keyof FileItem | null;
+  key: keyof FileItem | keyof DirectoryItem | null;
   label: string;
   sortable: boolean;
 };
+
+export interface DirectoryItem {
+  owner: string;
+  dirCid: string;
+  name: string;
+  totalSizeBytes: number;
+  filesCount: number;
+  status: StatusType;
+  creationDate: string;
+}
 
 export interface PropsFileTable {
   files: FileItem[];
@@ -57,6 +67,18 @@ export interface PropsFileTable {
   filteredFiles: FileItem[];
 }
 
+export interface PropsDirectoryTable {
+  directories: DirectoryItem[];
+  paginatedDirectories: DirectoryItem[];
+  selectedDirectories?: string[];
+  sortConfig: SortConfig;
+  handleSort: (key: keyof DirectoryItem) => void;
+  onSelectionChange: (selected: string[]) => void;
+  onFilterChange: (status: StatusType | "all") => void;
+  onDirectoryClick: (dirCid: string) => void;
+  filteredDirectories: DirectoryItem[];
+}
+
 export interface PropsFilePagination {
   currentPage: number;
   totalPages: number;
@@ -68,6 +90,6 @@ export interface PropsFilePagination {
 export type CidDataType = {
   name: string;
   owner: string;
-  status: StatusType;
+  status: string;
   date: string;
 };

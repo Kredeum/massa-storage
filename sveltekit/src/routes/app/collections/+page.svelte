@@ -5,3 +5,5 @@
 <div class="container mx-auto py-6">
   <FileManagement />
 </div>
+
+<!-- lis dans le smart contrat affiche les repertoires -->

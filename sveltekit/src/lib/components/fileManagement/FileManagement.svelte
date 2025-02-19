@@ -22,8 +22,11 @@
 
   import { Ipfs } from "$lib/runes/ipfs.svelte";
 
+  const { dirCid = null } = $props<{ dirCid?: string | null }>();
+
   let kubo: ReturnType<typeof createKuboClient>;
   let cids = $state<AddResult[]>([]);
+  let uploadInProgress = $state(false);
 
   const fileStore = new FileStore();
   const filterStore = new FilterStore();
@@ -32,39 +35,53 @@
 
   const getDirCid = () => {
     const cidsArray = Array.from(cids); // Convert Proxy to Array
-    console.log("cidsArray", cidsArray[0]);
     const files = cidsArray.map(({ path, cid, size }) => {
       return { path, cid, size };
     });
-    console.log("files", files);
     const dirCid = files[files.length - 1].cid.toString();
     console.log("dirCid", dirCid);
     return dirCid;
   };
 
   const uploadFiles = async () => {
-    if (!ipfs) return;
-    if (!uploadStore.uploadFiles) return;
-    cids = (await uploadStore.processUploadedFiles()).filter((item): item is AddResult => {
-      return typeof item !== "string";
-    });
-    const dirCid = getDirCid();
+    console.log("uploadFiles called");
+    if (!ipfs || !uploadStore.uploadFiles || uploadInProgress) return;
+
     try {
-      const attributes: CidDataType = {
-        name: "dirName",
-        date: formatDate(),
-        owner: ipfs.address,
-        status: STATUS_PENDING
-      };
-      const attributesString = JSON.stringify(attributes);
-      await ipfs.cidSet(dirCid, attributesString);
+      uploadInProgress = true;
+      const newCids = await uploadStore.processUploadedFiles();
+      const validCids = newCids.filter((item): item is AddResult => {
+        return typeof item !== "string";
+      });
+      console.log("Processed files, got CIDs:", validCids.length);
+
+      if (validCids.length > 0) {
+        cids = validCids;
+        const dirCid = getDirCid();
+        console.log("Processing directory:", { dirCid });
+
+        const attributes: CidDataType = {
+          name: "dirName",
+          date: formatDate(),
+          owner: ipfs.address,
+          status: STATUS_PENDING
+        };
+
+        console.log("Setting attributes:", attributes);
+        const attributesString = JSON.stringify(attributes);
+        await ipfs.cidSet(dirCid, attributesString);
+      }
     } catch (error) {
       console.error("Failed to add directory:", error);
+    } finally {
+      uploadInProgress = false;
     }
   };
 
   $effect(() => {
-    uploadFiles();
+    if (uploadStore.uploadFiles) {
+      uploadFiles();
+    }
   });
 
   const handleApprove = (fileStore: FileStore) => {
@@ -84,29 +101,20 @@
 
   const getFiles = async () => {
     if (!ipfs) return;
-    await ipfs.cidsGet();
-    const cids = ipfs.cids;
-    console.log("cids", cids);
 
-    // NOTE: DONT USE VALUE FOR NOW!!!!
-    cids.forEach(async (value, cid) => {
-      if (!cid) return;
-      let attributes;
+    await ipfs.cidsGet();
+
+    const dirCids = ipfs.cids;
+    console.log("dirCids", dirCids);
+
+    // NOTE: WEDONT USE VALUE FOR NOW!!!!
+    dirCids.forEach(async (attributes: CidDataType, dirCid) => {
+      if (!dirCid) return;
+
       let currentStatus: StatusType = STATUS_PENDING;
       let fileName = "";
       let fileCid = "";
       let fileSizeInBytes = 0;
-
-      // Get the file data
-      try {
-        const result = await ipfs.cidGet(cid);
-        if (result === undefined) return;
-        attributes = result;
-        console.log("attributes", attributes);
-      } catch (error) {
-        console.error(`Error fetching file data for CID ${cid}:`, error);
-        return;
-      }
 
       // Determine the current status
       try {
@@ -117,21 +125,22 @@
           currentStatus = STATUS_REJECTED;
         }
       } catch (error) {
-        console.error(`Error determining status for CID ${cid}:`, error);
+        console.error(`Error determining status for CID ${dirCid}:`, error);
         return;
       }
 
-      // Get file details from Kubo
+      // Get other file details from Kubo
       try {
-        const files = await kubo.ls(cid);
+        const files = await kubo.ls(dirCid);
         for await (const file of files) {
+          console.log("file", file);
           console.log("Kubo file details:", JSON.stringify(file, null, 2));
           fileName = file.name;
-          fileCid = cid.toString();
+          fileCid = file.cid.toString();
           fileSizeInBytes = file.size;
         }
       } catch (error) {
-        console.error(`Error getting file details from Kubo for CID ${cid}:`, error);
+        console.error(`Error getting file details from Kubo for CID ${dirCid}:`, error);
         return;
       }
 
@@ -148,12 +157,25 @@
           isPinned: false,
           mimeType: undefined,
           arrayBuffer: undefined,
+          tags: fileName ? [fileName] : [],
+          type: getFileTypeFromName(fileName)
+        };
+        const dir: FileItem = {
+          owner: attributes.owner,
+          cid: dirCid,
+          name: attributes.name,
+          uploadDate: attributes.date,
+          sizeInBytes: fileSizeInBytes,
+          status: currentStatus,
+          isPinned: false,
+          mimeType: undefined,
+          arrayBuffer: undefined,
           tags: attributes.name ? [attributes.name] : [],
           type: getFileTypeFromName(fileName)
         };
         fileStore.files.push(file);
       } catch (error) {
-        console.error(`Error creating file item for CID ${cid}:`, error);
+        console.error(`Error creating file item for CID ${dirCid}:`, error);
       }
     });
   };

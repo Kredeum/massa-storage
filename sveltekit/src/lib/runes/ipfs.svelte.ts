@@ -19,7 +19,7 @@ import { SvelteMap } from "svelte/reactivity";
 
 class Ipfs extends Client {
   #mods = $state<string[]>([]);
-  #cids = $state<SvelteMap<string, string>>(new SvelteMap());
+  #cids = $state<SvelteMap<string, CidDataType>>(new SvelteMap());
 
   has = async (type: string, value: string): Promise<boolean | undefined> => {
     if (!this.provider.readSC) return;
