@@ -8,10 +8,10 @@
   import SearchBar from "../fileManagement/SearchBar.svelte";
   import FilePagination from "../fileManagement/FilePagination.svelte";
 
-  let directories: DirectoryItem[] = [];
-  let filteredDirectories: DirectoryItem[] = [];
-  let paginatedDirectories: DirectoryItem[] = [];
-  let selectedDirectories: string[] = [];
+  let collections: DirectoryItem[] = [];
+  let filteredCollections: DirectoryItem[] = [];
+  let paginatedCollections: DirectoryItem[] = [];
+  let selectedCollections: string[] = [];
   let currentPage = 1;
   let itemsPerPage = 10;
   let searchQuery = "";
@@ -25,36 +25,36 @@
   const kubo = createKuboClient();
 
   onMount(async () => {
-    await loadDirectories();
+    await loadCollections();
   });
 
-  async function loadDirectories() {
+  async function loadCollections() {
     if (!ipfs) return;
     await ipfs.cidsGet();
-    const dirCids = ipfs.cids;
-    console.log("dirCids", dirCids);
+    const collectionCids = ipfs.cids;
+    console.log("collectionCids", collectionCids);
 
-    const loadedDirectories: DirectoryItem[] = [];
+    const loadedCollections: DirectoryItem[] = [];
 
-    dirCids.forEach(async (value, dirCid) => {
-      if (!dirCid) return;
+    collectionCids.forEach(async (value, collectionCid) => {
+      if (!collectionCid) return;
 
       try {
-        const result = await ipfs.cidGet(dirCid);
+        const result = await ipfs.cidGet(collectionCid);
         if (result === undefined) return;
 
-        const dirStats = await kubo.ls(dirCid);
+        const collectionStats = await kubo.ls(collectionCid);
         let filesCount = 0;
         let totalSize = 0;
 
-        for await (const file of dirStats) {
+        for await (const file of collectionStats) {
           filesCount++;
           totalSize += file.size;
         }
 
-        const directoryItem: DirectoryItem = {
+        const collectionItem: DirectoryItem = {
           owner: result.owner,
-          dirCid: dirCid,
+          collectionCid: collectionCid,
           name: result.name,
           totalSizeBytes: totalSize,
           filesCount: filesCount,
@@ -62,24 +62,24 @@
           creationDate: result.date
         };
 
-        loadedDirectories.push(directoryItem);
-        directories = [...loadedDirectories];
-        updateFilteredDirectories();
+        loadedCollections.push(collectionItem);
+        collections = [...loadedCollections];
+        updateFilteredCollections();
       } catch (error) {
-        console.error(`Error loading directory ${dirCid}:`, error);
+        console.error(`Error loading collection ${collectionCid}:`, error);
       }
     });
   }
 
-  function updateFilteredDirectories() {
-    filteredDirectories = directories.filter((dir) => dir.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  function updateFilteredCollections() {
+    filteredCollections = collections.filter((collection) => collection.name.toLowerCase().includes(searchQuery.toLowerCase()));
     updatePagination();
   }
 
   function updatePagination() {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    paginatedDirectories = filteredDirectories.slice(startIndex, endIndex);
+    paginatedCollections = filteredCollections.slice(startIndex, endIndex);
   }
 
   function handleSort(key: keyof DirectoryItem) {
@@ -90,7 +90,7 @@
       sortConfig.direction = "asc";
     }
 
-    directories.sort((a, b) => {
+    collections.sort((a, b) => {
       const aValue = a[key];
       const bValue = b[key];
       const modifier = sortConfig.direction === "asc" ? 1 : -1;
@@ -100,16 +100,16 @@
       return 0;
     });
 
-    updateFilteredDirectories();
+    updateFilteredCollections();
   }
 
-  function handleDirectoryClick(dirCid: string) {
-    goto(`/app/files/${dirCid}`);
+  function handleCollectionClick(collectionCid: string) {
+    goto(`/app/files/${collectionCid}`);
   }
 
   function handleSearch(event: CustomEvent<string>) {
     searchQuery = event.detail;
-    updateFilteredDirectories();
+    updateFilteredCollections();
   }
 
   function setPage(page: number) {
@@ -121,15 +121,15 @@
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 flex flex-col gap-4">
     <div class="mb-8">
-      <h1 class="text-2xl font-bold">Directory Management</h1>
-      <p class="text-gray-600">Manage your IPFS directories</p>
+      <h1 class="text-2xl font-bold">Collection Management</h1>
+      <p class="text-gray-600">Manage your IPFS collections</p>
     </div>
 
     <div class="flex items-center justify-between">
       <SearchBar onsearch={handleSearch} />
     </div>
 
-    <!-- Directory Table -->
+    <!-- Collection Table -->
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
@@ -143,31 +143,31 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
-          {#each paginatedDirectories as directory}
-            <tr class="cursor-pointer hover:bg-gray-50" onclick={() => handleDirectoryClick(directory.dirCid)}>
+          {#each paginatedCollections as collection}
+            <tr class="cursor-pointer hover:bg-gray-50" onclick={() => handleCollectionClick(collection.collectionCid)}>
               <td class="whitespace-nowrap px-6 py-4">
-                <div class="text-sm font-medium text-gray-900">{directory.name}</div>
-                <div class="text-sm text-gray-500">{directory.dirCid}</div>
+                <div class="text-sm font-medium text-gray-900">{collection.name}</div>
+                <div class="text-sm text-gray-500">{collection.collectionCid}</div>
               </td>
               <td class="whitespace-nowrap px-6 py-4">
-                <div class="text-sm text-gray-900">{(directory.totalSizeBytes / 1024).toFixed(2)} KB</div>
+                <div class="text-sm text-gray-900">{(collection.totalSizeBytes / 1024).toFixed(2)} KB</div>
               </td>
               <td class="whitespace-nowrap px-6 py-4">
-                <div class="text-sm text-gray-900">{directory.filesCount}</div>
+                <div class="text-sm text-gray-900">{collection.filesCount}</div>
               </td>
               <td class="whitespace-nowrap px-6 py-4">
-                <div class="text-sm text-gray-900">{directory.owner}</div>
+                <div class="text-sm text-gray-900">{collection.owner}</div>
               </td>
               <td class="whitespace-nowrap px-6 py-4">
                 <span
                   class="inline-flex rounded-full px-2 text-xs font-semibold leading-5
-                    {directory.status === STATUS_APPROVED ? 'bg-green-100 text-green-800' : directory.status === STATUS_REJECTED ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}"
+                    {collection.status === STATUS_APPROVED ? 'bg-green-100 text-green-800' : collection.status === STATUS_REJECTED ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}"
                 >
-                  {directory.status}
+                  {collection.status}
                 </span>
               </td>
               <td class="whitespace-nowrap px-6 py-4">
-                <div class="text-sm text-gray-900">{new Date(directory.creationDate).toLocaleDateString()}</div>
+                <div class="text-sm text-gray-900">{new Date(collection.creationDate).toLocaleDateString()}</div>
               </td>
             </tr>
           {/each}
@@ -176,7 +176,7 @@
     </div>
 
     <div class="mt-4">
-      <FilePagination {currentPage} totalPages={Math.ceil(filteredDirectories.length / itemsPerPage)} {itemsPerPage} totalItems={filteredDirectories.length} {setPage} />
+      <FilePagination {currentPage} totalPages={Math.ceil(filteredCollections.length / itemsPerPage)} {itemsPerPage} totalItems={filteredCollections.length} {setPage} />
     </div>
   </div>
 </div>

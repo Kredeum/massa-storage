@@ -1,9 +1,9 @@
 <script lang="ts">
-  import FileManagement from "$lib/components/fileManagement/FileManagement.svelte";
+  import CollectionManagement from "$lib/components/collectionManagement/CollectionManagement.svelte";
 </script>
 
 <div class="container mx-auto py-6">
-  <FileManagement />
+  <CollectionManagement />
 </div>
 
 <!-- lis dans le smart contrat affiche les repertoires -->

@@ -15,7 +15,8 @@
         <img src={logoMassa} alt="Massa Logo" class="h-8 w-8" />
         Massa Storage
       </a>
-      <a href="{base}/app/files" class="text-sm text-gray-600 hover:text-gray-900">Files</a>
+      <a href="{base}/app/collections" class="text-sm text-gray-600 hover:text-gray-900">Collections</a>
+      <a href="{base}/app/collection" class="text-sm text-gray-600 hover:text-gray-900">Collection</a>
       <a href="{base}/app/moderators" class="text-sm text-gray-600 hover:text-gray-900">Moderators</a>
       <a href="{base}/tests" class="text-sm text-gray-600 hover:text-gray-900">Tests</a>
       <a href="https://github.com/kredeum/massa-storage" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-600 hover:text-gray-900">GitHub</a>

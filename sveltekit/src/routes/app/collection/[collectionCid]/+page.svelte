@@ -3,14 +3,14 @@
   import { page } from "$app/state";
   import FileManagement from "$lib/components/fileManagement/FileManagement.svelte";
 
-  let dirCid = $state<string | null>(null);
+  let collectionCid = $state<string | null>(null);
 
-  // Bind dirCid to page.data using a rune
+  // Bind collectionCid to page.data using a rune
   $effect(() => {
-    dirCid = page.data?.dirCid ?? null;
+    collectionCid = page.data?.collectionCid ?? null;
   });
 </script>
 
-<FileManagement {dirCid} />
+<FileManagement {collectionCid} />
 
 <!-- lis sur le kubo cid en parametre -->

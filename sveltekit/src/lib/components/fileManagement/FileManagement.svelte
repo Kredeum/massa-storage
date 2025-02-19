@@ -22,7 +22,7 @@
 
   import { Ipfs } from "$lib/runes/ipfs.svelte";
 
-  const { dirCid = null } = $props<{ dirCid?: string | null }>();
+  const { collectionCid = null } = $props<{ collectionCid?: string | null }>();
 
   let kubo: ReturnType<typeof createKuboClient>;
   let cids = $state<AddResult[]>([]);
