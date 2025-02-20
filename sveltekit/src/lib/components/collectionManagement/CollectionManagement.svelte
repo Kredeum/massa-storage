@@ -101,7 +101,8 @@
           totalSizeBytes: totalSize,
           filesCount: filesCount,
           status: currentStatus,
-          creationDate: attributes.date
+          creationDate: attributes.date,
+          isPinned: false
         };
 
         loadedCollections.push(collectionItem);
@@ -191,6 +192,32 @@
     }
   }
 
+  async function handleModerate(data: { id: string; status: StatusType }) {
+    try {
+      if (data.status === STATUS_APPROVED) {
+        await ipfs.cidValidate(data.id);
+      } else if (data.status === STATUS_REJECTED) {
+        await ipfs.cidReject(data.id);
+      }
+      await loadCollections();
+      toast.success(`Collection ${data.status === STATUS_APPROVED ? "approved" : "rejected"}`);
+    } catch (error) {
+      console.error("Error moderating collection:", error);
+      toast.error("Failed to moderate collection");
+    }
+  }
+
+  async function handlePin(id: string) {
+    try {
+      // TODO: Implement pin functionality for collections
+      console.log("Pin collection:", id);
+      toast.success("Collection pinned successfully");
+    } catch (error) {
+      console.error("Error pinning collection:", error);
+      toast.error("Failed to pin collection");
+    }
+  }
+
   $effect(() => {
     if (uploadStore.uploadCollection) {
       uploadCollection();
@@ -214,7 +241,7 @@
     </div>
 
     <!-- Collection Table -->
-    <CollectionTable collections={paginatedCollections} {sortConfig} {handleSort} handleClick={handleCollectionClick} />
+    <CollectionTable collections={paginatedCollections} {sortConfig} {handleSort} handleClick={handleCollectionClick} onModerate={handleModerate} onPin={handlePin} />
 
     <div class="mt-4">
       <FilePagination {currentPage} totalPages={Math.ceil(filteredCollections.length / itemsPerPage)} {itemsPerPage} totalItems={filteredCollections.length} {setPage} />

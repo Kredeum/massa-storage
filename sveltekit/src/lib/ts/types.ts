@@ -53,6 +53,7 @@ export interface CollectionItem {
   filesCount: number;
   status: StatusType;
   creationDate: string;
+  isPinned: boolean;
 }
 
 export interface PropsFileTable {

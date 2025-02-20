@@ -13,6 +13,7 @@ export default defineConfig({
   },
   server: { open: true },
   optimizeDeps: {
+    include: ['jszip'],
     esbuildOptions: {
       define: {
         global: "globalThis"

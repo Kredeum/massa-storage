@@ -8,7 +8,7 @@
   import SearchBar from "./SearchBar.svelte";
   import FileFilters from "./FileFilters.svelte";
   import FileTable from "../fileTable/FileTable.svelte";
-  import FileActions from "./FileActions.svelte";
+  import ButtonActions from "$lib/components/common/ButtonActions.svelte";
 
   import FileSelectionBar from "./FileSelectionBar.svelte";
   import FilePagination from "./FilePagination.svelte";
@@ -227,7 +227,7 @@
     {filteredFiles}
   >
     {#snippet actions(file)}
-      <FileActions {file} onModerate={(data) => fileStore.updateStatusType(data.id, data.status)} onPin={(id) => fileStore.togglePin(id)} />
+      <ButtonActions item={file} type="file" onModerate={(data) => fileStore.updateStatusType(data.id, data.status)} onPin={(id) => fileStore.togglePin(id)} />
     {/snippet}
   </FileTable>
 

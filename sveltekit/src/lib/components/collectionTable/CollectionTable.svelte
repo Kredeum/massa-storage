@@ -1,39 +1,26 @@
 <script lang="ts">
   import type { CollectionItem, SortConfig, StatusType } from "$lib/ts/types";
   import { formatSize, shortenString } from "$lib/ts/utils";
-  import { STATUS_PENDING, STATUS_APPROVED, STATUS_REJECTED, statusLabel } from "@kredeum/massa-storage-common/src/constants";
-  import { ChevronDown, ChevronUp, Check, X, Pin } from "lucide-svelte";
+  import { statusLabel, STATUS_APPROVED, STATUS_PENDING, STATUS_REJECTED } from "@kredeum/massa-storage-common/src/constants";
+  import { ChevronDown, ChevronUp } from "lucide-svelte";
   import { columns } from "$lib/constants/collections";
-  import { getContext } from "svelte";
-  import type { Ipfs } from "$lib/runes/ipfs.svelte";
-
-  const ipfs: Ipfs = getContext("ipfs");
-  let isModerator = $derived.by(() => ipfs?.isModeratorFunc(ipfs?.address));
+  import ButtonActions from "$lib/components/common/ButtonActions.svelte";
 
   let {
     collections = [],
     sortConfig,
     handleSort,
-    handleClick
+    handleClick,
+    onModerate,
+    onPin
   }: {
     collections: CollectionItem[];
     sortConfig: SortConfig;
     handleSort: (key: keyof CollectionItem) => void;
     handleClick: (collectionCid: string) => void;
+    onModerate: (data: { id: string; status: StatusType }) => void;
+    onPin: (id: string) => void;
   } = $props();
-
-  async function handleModerate(collection: CollectionItem, status: StatusType) {
-    if (collection.status == status) return;
-    if (status == STATUS_PENDING) return;
-
-    if (status == STATUS_APPROVED) await ipfs.cidValidate(collection.collectionCid);
-    if (status == STATUS_REJECTED) await ipfs.cidReject(collection.collectionCid);
-  }
-
-  async function handlePin(collection: CollectionItem) {
-    // TODO: Implement pin functionality for collections
-    console.log("Pin collection:", collection.collectionCid);
-  }
 </script>
 
 <div class="overflow-x-auto">
@@ -115,40 +102,7 @@
           </td>
           <td class="whitespace-nowrap px-6 py-4">
             <div class="flex items-center justify-end gap-2">
-              {#if isModerator}
-                <button
-                  onclick={(e) => {
-                    e.stopPropagation();
-                    handleModerate(collection, "1");
-                  }}
-                  class="cursor-pointer text-green-600 hover:text-green-900"
-                  disabled={collection.status == STATUS_APPROVED}
-                >
-                  <Check size={22} strokeWidth={3} />
-                </button>
-                <button
-                  onclick={(e) => {
-                    e.stopPropagation();
-                    handleModerate(collection, "0");
-                  }}
-                  class="cursor-pointer text-red-600 hover:text-red-900"
-                  disabled={collection.status == STATUS_REJECTED}
-                >
-                  <X size={22} strokeWidth={3} />
-                </button>
-              {/if}
-
-              <button
-                onclick={(e) => {
-                  e.stopPropagation();
-                  handlePin(collection);
-                }}
-                class="cursor-pointer transition-colors hover:text-blue-900"
-                class:text-blue-600={collection.isPinned}
-                class:text-gray-400={!collection.isPinned}
-              >
-                <Pin size={22} strokeWidth={2} class={!collection.isPinned ? "rotate-45" : ""} />
-              </button>
+              <ButtonActions item={collection} {onModerate} {onPin} type="collection" />
             </div>
           </td>
         </tr>
