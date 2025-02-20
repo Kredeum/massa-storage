@@ -1,4 +1,3 @@
-import { Client } from "./client.svelte";
 import {
   type Provider,
   type ReadSCData,
@@ -10,11 +9,12 @@ import {
 
 import { ipfsAddress } from "$lib/ts/config";
 
-import type { Wallet } from "@massalabs/wallet-provider";
+import type { Wallet, WalletName } from "@massalabs/wallet-provider";
 import toast from "svelte-hot-french-toast";
 import { shortenString } from "$lib/ts/utils";
 import { MODERATOR, CID } from "../../../../common/src/constants";
 import { SvelteMap } from "svelte/reactivity";
+import { Writer } from "./writer.svelte";
 
 type cidType = {
   cid: string;
@@ -23,7 +23,7 @@ type cidType = {
   date: string;
 };
 
-class Ipfs extends Client {
+class Ipfs extends Writer {
   #mods = $state<string[]>([]);
   #cids = $state<SvelteMap<string, string>>(new SvelteMap());
 
@@ -182,8 +182,8 @@ class Ipfs extends Client {
     return this.#cids;
   }
 
-  constructor(walletOrProvider?: Wallet | Provider, accountNum = 0, walletNum = 0) {
-    super(walletOrProvider, accountNum, walletNum);
+  constructor(provider?: Provider) {
+    super(provider);
   }
 }
 

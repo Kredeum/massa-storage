@@ -1,8 +1,9 @@
 <script lang="ts">
   import Connect from "$lib/components/Connect.svelte";
-  import { Client } from "$lib/runes/client.svelte";
+  import { Writer } from "$lib/runes/writer.svelte";
+  import { WalletName } from "@massalabs/wallet-provider";
 
-  const client = new Client();
+  const client = new Writer({ walletName: WalletName.Bearby });
 </script>
 
 <div class="flex h-32 flex-col items-center justify-center">
