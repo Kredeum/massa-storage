@@ -207,15 +207,16 @@
     }
   }
 
+  // TODO: Implement pin functionality for collections
+
   async function handlePin(id: string) {
-    try {
-      // TODO: Implement pin functionality for collections
-      console.log("Pin collection:", id);
-      toast.success("Collection pinned successfully");
-    } catch (error) {
-      console.error("Error pinning collection:", error);
-      toast.error("Failed to pin collection");
-    }
+    // try {
+    // console.log("Pin collection:", id);
+    // toast.success("Collection pinned successfully");
+    // } catch (error) {
+    // console.error("Error pinning collection:", error);
+    // toast.error("Failed to pin collection");
+    // }
   }
 
   $effect(() => {
@@ -230,21 +231,21 @@
   }
 </script>
 
-<div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
+  <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 flex flex-col gap-4">
-    <div class="mb-8">
-      <FileUpload bind:files={uploadStore.uploadCollection} />
-    </div>
+      <div class="mb-8">
+        <FileUpload bind:files={uploadStore.uploadCollection} />
+      </div>
 
-    <div class="flex items-center justify-between">
-      <SearchBar bind:searchTerm={filterStore.searchQuery} />
-    </div>
+      <div class="flex items-center justify-between">
+        <SearchBar bind:searchTerm={filterStore.searchQuery} />
+      </div>
 
-    <!-- Collection Table -->
-    <CollectionTable collections={paginatedCollections} {sortConfig} {handleSort} handleClick={handleCollectionClick} onModerate={handleModerate} onPin={handlePin} />
+      <!-- Collection Table -->
+      <CollectionTable collections={paginatedCollections} {sortConfig} {handleSort} handleClick={handleCollectionClick} onModerate={handleModerate} onPin={handlePin} />
 
-    <div class="mt-4">
-      <FilePagination {currentPage} totalPages={Math.ceil(filteredCollections.length / itemsPerPage)} {itemsPerPage} totalItems={filteredCollections.length} {setPage} />
+      <div class="mt-4">
+        <FilePagination {currentPage} totalPages={Math.ceil(filteredCollections.length / itemsPerPage)} {itemsPerPage} totalItems={filteredCollections.length} {setPage} />
+      </div>
     </div>
   </div>
-</div>

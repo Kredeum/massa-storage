@@ -9,7 +9,7 @@
 <title>Massa Storage</title>
 
 <Toaster />
-<div class="container">
+<div class="w-full">
   {@render children()}
 </div>
 
