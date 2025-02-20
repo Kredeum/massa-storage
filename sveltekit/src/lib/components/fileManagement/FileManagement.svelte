@@ -3,7 +3,7 @@
   import { createKuboClient } from "$lib/ts/kubo";
   import type { AddResult } from "kubo-rpc-client";
   import { STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING } from "@kredeum/massa-storage-common/src/constants";
-  import type { CidDataType } from "$lib/ts/types";
+  import type { CidDataType, CollectionItem } from "$lib/ts/types";
 
   import SearchBar from "./SearchBar.svelte";
   import FileFilters from "./FileFilters.svelte";
@@ -42,47 +42,6 @@
     console.log("dirCid", dirCid);
     return dirCid;
   };
-
-  // const uploadFiles = async () => {
-  //   console.log("uploadFiles called");
-  //   if (!ipfs || !uploadStore.uploadFiles || uploadInProgress) return;
-
-  //   try {
-  //     uploadInProgress = true;
-  //     const newCids = await uploadStore.processUploadedFiles();
-  //     const validCids = newCids.filter((item): item is AddResult => {
-  //       return typeof item !== "string";
-  //     });
-  //     console.log("Processed files, got CIDs:", validCids.length);
-
-  //     if (validCids.length > 0) {
-  //       cids = validCids;
-  //       const dirCid = getDirCid();
-  //       console.log("Processing directory:", { dirCid });
-
-  //       const attributes: CidDataType = {
-  //         name: `Collection ${timestamp()}`,
-  //         date: formatDate(),
-  //         owner: ipfs.address,
-  //         status: STATUS_PENDING
-  //       };
-
-  //       console.log("Setting attributes:", attributes);
-  //       const attributesString = JSON.stringify(attributes);
-  //       await ipfs.cidSet(dirCid, attributesString);
-  //     }
-  //   } catch (error) {
-  //     console.error("Failed to add directory:", error);
-  //   } finally {
-  //     uploadInProgress = false;
-  //   }
-  // };
-
-  $effect(() => {
-    // if (uploadStore.uploadFiles) {
-    //   uploadFiles();
-    // }
-  });
 
   const handleApprove = (fileStore: FileStore) => {
     fileStore.bulkApprove.bind(fileStore);
@@ -148,31 +107,17 @@
       try {
         if (!attributes) return;
         const file: FileItem = {
-          owner: attributes.owner,
           cid: fileCid,
           name: fileName,
           uploadDate: attributes.date,
           sizeInBytes: fileSizeInBytes,
           status: currentStatus,
           isPinned: false,
-          mimeType: undefined,
           arrayBuffer: undefined,
           tags: fileName ? [fileName] : [],
           type: getFileTypeFromName(fileName)
         };
-        const dir: FileItem = {
-          owner: attributes.owner,
-          cid: dirCid,
-          name: attributes.name,
-          uploadDate: attributes.date,
-          sizeInBytes: fileSizeInBytes,
-          status: currentStatus,
-          isPinned: false,
-          mimeType: undefined,
-          arrayBuffer: undefined,
-          tags: attributes.name ? [attributes.name] : [],
-          type: getFileTypeFromName(fileName)
-        };
+
         fileStore.files.push(file);
       } catch (error) {
         console.error(`Error creating file item for CID ${dirCid}:`, error);

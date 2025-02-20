@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { PageData } from "./$types";
   import { page } from "$app/state";
-  import FileManagement from "$lib/components/fileManagement/FileManagement.svelte";
+  import CollectionFiles from "$lib/components/fileManagement/CollectionFiles.svelte";
 
   let collectionCid = $state<string | null>(null);
 
@@ -12,7 +12,9 @@
 </script>
 
 <div class="container mx-auto py-6">
-  <FileManagement {collectionCid} />
+  {#if collectionCid}
+    <CollectionFiles {collectionCid} />
+  {/if}
 </div>
 
 <!--si cid définit montre la collection sinon affiche tous les fichiers-->

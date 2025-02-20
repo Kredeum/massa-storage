@@ -13,19 +13,28 @@ export type StatusType = typeof STATUS_PENDING | typeof STATUS_APPROVED | typeof
 export type FileType = "image" | "video" | "audio" | "document";
 
 export interface FileItem {
-  owner: string;
   arrayBuffer?: ArrayBuffer;
-  name: string; // récuperer en récupérant unixfs
-  sizeInBytes: number; //unixfs
-  type?: FileType; // getFileType(mimeType) à voir
-  tags: string[]; // on abandonne l'idée de tag générique? Enlever Tags complet
-  status: StatusType; // pending, approved, rejected à chercher sur contrat?
-  isPinned?: boolean; //à chercher sur kubo
-  uploadDate: string; // à garder dans la blockchain?
-  blob?: Blob; // pas besoin
-  file?: File | undefined; // pas besoin
-  cid: string; // à virer
-  mimeType?: string; // a garder// //soit unixfs soit on va le calculer en fonction de l'extension de name
+  name: string;
+  sizeInBytes: number;
+  status: StatusType;
+  type?: FileType;
+  tags: string[];
+  isPinned?: boolean;
+  blob?: Blob;
+  file?: File | undefined;
+  cid: string;
+  uploadDate: string;
+}
+
+export interface CollectionItem {
+  owner: string;
+  collectionCid: string;
+  name: string;
+  totalSizeBytes: number;
+  filesCount: number;
+  status: StatusType;
+  uploadDate: string;
+  isPinned: boolean;
 }
 
 export interface FilterState {
@@ -44,17 +53,6 @@ export type Column = {
   label: string;
   sortable: boolean;
 };
-
-export interface CollectionItem {
-  owner: string;
-  collectionCid: string;
-  name: string;
-  totalSizeBytes: number;
-  filesCount: number;
-  status: StatusType;
-  creationDate: string;
-  isPinned: boolean;
-}
 
 export interface PropsFileTable {
   files: FileItem[];
