@@ -3,9 +3,9 @@
   import { base } from "$app/paths";
   import logoMassa from "$lib/assets/logoMassa.svg";
   import Connect from "$lib/components/Connect.svelte";
-  import type { Client } from "$lib/runes/client.svelte";
+  import type { Writer } from "$lib/runes/writer.svelte";
 
-  let { client }: { client: Client } = $props();
+  let { client }: { client: Writer } = $props();
 </script>
 
 <header class="flex h-16 w-full items-center border-b border-gray-200 bg-white px-4 shadow-sm">
