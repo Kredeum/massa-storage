@@ -7,7 +7,7 @@ import { formatSize } from "$lib/ts/utils";
 import { MAX_FILE_SIZE } from "$lib/constants/files";
 
 export class UploadStore {
-  uploadFiles = $state<FileList | undefined>();
+  uploadCollection = $state<FileList | undefined>();
   cids = $state<Array<string | AddResult>>([]);
 
   #kubo: ReturnType<typeof createKuboClient>;
@@ -16,10 +16,10 @@ export class UploadStore {
     this.#kubo = createKuboClient();
   }
 
-  async processUploadedFiles(): Promise<(string | AddResult)[]> {
-    if (!this.uploadFiles) return [];
+  async processUploadedCollections(): Promise<(string | AddResult)[]> {
+    if (!this.uploadCollection) return [];
 
-    const valideFiles = Array.from(this.uploadFiles).filter((file) => {
+    const valideFiles = Array.from(this.uploadCollection).filter((file) => {
       if (file.size > MAX_FILE_SIZE) {
         toast.error(`File ${file.name} exceeds maximum size of ${formatSize(MAX_FILE_SIZE)}`);
         return false;
@@ -53,12 +53,12 @@ export class UploadStore {
       }
 
       console.log(`dir-cids:`, this.cids);
-      this.uploadFiles = undefined;
+      this.uploadCollection = undefined;
       return this.cids;
     } catch (error) {
       console.error(`Error uploading files:`, error);
       toast.error(`Failed to upload files`);
-      this.uploadFiles = undefined;
+      this.uploadCollection = undefined;
       return [];
     }
   }

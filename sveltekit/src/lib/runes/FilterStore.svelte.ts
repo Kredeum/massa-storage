@@ -1,4 +1,4 @@
-import type { FileItem, FilterState, SortConfig } from "$lib/ts/types";
+import type { FileItem, FilterState, SortConfig, CollectionItem } from "$lib/ts/types";
 
 export class FilterStore {
   currentPage = $state(0);
@@ -57,9 +57,9 @@ export class FilterStore {
     });
   }
 
-  sortFiles(files: FileItem[]): FileItem[] {
-    return [...files].sort((a, b) => {
-      if (this.sortConfig.key === "uploadDate") {
+  sortItems<T extends FileItem | CollectionItem>(items: T[]): T[] {
+    return [...items].sort((a, b) => {
+      if (this.sortConfig.key === "uploadDate" && "uploadDate" in a && "uploadDate" in b) {
         const dateA = new Date(a.uploadDate).getTime();
         const dateB = new Date(b.uploadDate).getTime();
         return this.sortConfig.direction === "desc" ? dateB - dateA : dateA - dateB;
@@ -71,17 +71,25 @@ export class FilterStore {
           : (a.name ? a.name.toLowerCase() : "").localeCompare(b.name ? b.name.toLowerCase() : "");
       }
 
-      if (this.sortConfig.key === "sizeInBytes") {
+      if (this.sortConfig.key === "sizeInBytes" && "sizeInBytes" in a && "sizeInBytes" in b) {
         return this.sortConfig.direction === "asc"
           ? b.sizeInBytes - a.sizeInBytes
           : a.sizeInBytes - b.sizeInBytes;
       }
 
-      const direction = this.sortConfig.direction === "desc" ? 1 : -1;
-      return (
-        direction * String(a[this.sortConfig.key]).localeCompare(String(b[this.sortConfig.key]))
-      );
+      if (this.sortConfig.key in a && this.sortConfig.key in b) {
+        const direction = this.sortConfig.direction === "desc" ? 1 : -1;
+        const valueA = a[this.sortConfig.key as keyof T];
+        const valueB = b[this.sortConfig.key as keyof T];
+        return direction * String(valueA).localeCompare(String(valueB));
+      }
+
+      return 0;
     });
+  }
+
+  sortFiles(files: FileItem[]): FileItem[] {
+    return this.sortItems(files);
   }
 
   getPaginatedFiles(files: FileItem[]): FileItem[] {

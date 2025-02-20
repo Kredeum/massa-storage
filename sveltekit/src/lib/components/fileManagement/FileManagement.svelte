@@ -9,7 +9,7 @@
   import FileFilters from "./FileFilters.svelte";
   import FileTable from "../fileTable/FileTable.svelte";
   import FileActions from "./FileActions.svelte";
-  import FileUpload from "./FileUpload.svelte";
+
   import FileSelectionBar from "./FileSelectionBar.svelte";
   import FilePagination from "./FilePagination.svelte";
   import TagInput from "./TagInput.svelte";
@@ -18,7 +18,7 @@
   import { FilterStore } from "$lib/runes/FilterStore.svelte";
   import { UploadStore } from "$lib/runes/UploadStore.svelte";
   import type { FileItem, StatusType } from "$lib/ts/types";
-  import { formatDate, getFileTypeFromName } from "$lib/ts/utils";
+  import { formatDate, timestamp, getFileTypeFromName } from "$lib/ts/utils";
 
   import { Ipfs } from "$lib/runes/ipfs.svelte";
 
@@ -43,45 +43,45 @@
     return dirCid;
   };
 
-  const uploadFiles = async () => {
-    console.log("uploadFiles called");
-    if (!ipfs || !uploadStore.uploadFiles || uploadInProgress) return;
+  // const uploadFiles = async () => {
+  //   console.log("uploadFiles called");
+  //   if (!ipfs || !uploadStore.uploadFiles || uploadInProgress) return;
 
-    try {
-      uploadInProgress = true;
-      const newCids = await uploadStore.processUploadedFiles();
-      const validCids = newCids.filter((item): item is AddResult => {
-        return typeof item !== "string";
-      });
-      console.log("Processed files, got CIDs:", validCids.length);
+  //   try {
+  //     uploadInProgress = true;
+  //     const newCids = await uploadStore.processUploadedFiles();
+  //     const validCids = newCids.filter((item): item is AddResult => {
+  //       return typeof item !== "string";
+  //     });
+  //     console.log("Processed files, got CIDs:", validCids.length);
 
-      if (validCids.length > 0) {
-        cids = validCids;
-        const dirCid = getDirCid();
-        console.log("Processing directory:", { dirCid });
+  //     if (validCids.length > 0) {
+  //       cids = validCids;
+  //       const dirCid = getDirCid();
+  //       console.log("Processing directory:", { dirCid });
 
-        const attributes: CidDataType = {
-          name: "dirName",
-          date: formatDate(),
-          owner: ipfs.address,
-          status: STATUS_PENDING
-        };
+  //       const attributes: CidDataType = {
+  //         name: `Collection ${timestamp()}`,
+  //         date: formatDate(),
+  //         owner: ipfs.address,
+  //         status: STATUS_PENDING
+  //       };
 
-        console.log("Setting attributes:", attributes);
-        const attributesString = JSON.stringify(attributes);
-        await ipfs.cidSet(dirCid, attributesString);
-      }
-    } catch (error) {
-      console.error("Failed to add directory:", error);
-    } finally {
-      uploadInProgress = false;
-    }
-  };
+  //       console.log("Setting attributes:", attributes);
+  //       const attributesString = JSON.stringify(attributes);
+  //       await ipfs.cidSet(dirCid, attributesString);
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to add directory:", error);
+  //   } finally {
+  //     uploadInProgress = false;
+  //   }
+  // };
 
   $effect(() => {
-    if (uploadStore.uploadFiles) {
-      uploadFiles();
-    }
+    // if (uploadStore.uploadFiles) {
+    //   uploadFiles();
+    // }
   });
 
   const handleApprove = (fileStore: FileStore) => {
@@ -187,9 +187,9 @@
 
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 flex flex-col gap-4">
-    <div class="mb-8">
+    <!-- <div class="mb-8">
       <FileUpload bind:files={uploadStore.uploadFiles} />
-    </div>
+    </div> -->
     <div class="flex items-center justify-between gap-4">
       <div class="flex flex-1 items-center gap-4">
         <SearchBar bind:searchTerm={filterStore.searchQuery} />

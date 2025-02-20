@@ -98,3 +98,7 @@ export function getFileTypeFromName(fileName: string): FileType {
   // Default to document for unknown types
   return "document";
 }
+
+export function timestamp(): string {
+  return Date.now().toString();
+}

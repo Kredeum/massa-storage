@@ -1,27 +1,47 @@
 <script lang="ts">
   import { getContext, onMount } from "svelte";
   import { createKuboClient } from "$lib/ts/kubo";
-  import { STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING } from "@kredeum/massa-storage-common/src/constants";
-  import type { DirectoryItem, StatusType } from "$lib/ts/types";
+  import type { AddResult } from "kubo-rpc-client";
+  import { STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING, statusLabel } from "@kredeum/massa-storage-common/src/constants";
+  import type { CollectionItem, StatusType, CidDataType } from "$lib/ts/types";
   import { goto } from "$app/navigation";
+  import { toast } from "svelte-hot-french-toast";
 
   import SearchBar from "../fileManagement/SearchBar.svelte";
   import FilePagination from "../fileManagement/FilePagination.svelte";
+  import FileUpload from "../fileManagement/FileUpload.svelte";
 
-  let collections: DirectoryItem[] = [];
-  let filteredCollections: DirectoryItem[] = [];
-  let paginatedCollections: DirectoryItem[] = [];
+  import { UploadStore } from "$lib/runes/UploadStore.svelte";
+  import { FilterStore } from "$lib/runes/FilterStore.svelte";
+
+  import { formatDate, formatSize, shortenString, timestamp } from "$lib/ts/utils";
+  import CollectionTable from "../collectionTable/CollectionTable.svelte";
+
+  import type { Ipfs } from "$lib/runes/ipfs.svelte";
+
+  let uploadStore = new UploadStore();
+  let filterStore = new FilterStore();
+  let uploadInProgress = false;
+
+  let collections: CollectionItem[] = [];
+  let filteredCollections: CollectionItem[] = $state([]);
+  let paginatedCollections: CollectionItem[] = $state([]);
   let selectedCollections: string[] = [];
-  let currentPage = 1;
-  let itemsPerPage = 10;
-  let searchQuery = "";
+  let currentPage = $state(1);
+  let itemsPerPage = $state(10);
+  let searchQuery = $state("");
 
-  const sortConfig = {
-    key: "creationDate",
-    direction: "desc"
+  type SortConfig = {
+    key: keyof CollectionItem;
+    direction: "asc" | "desc";
   };
 
-  const ipfs = getContext("ipfs");
+  let sortConfig: SortConfig = $state({
+    key: "creationDate" as keyof CollectionItem,
+    direction: "desc" as const
+  });
+
+  const ipfs: Ipfs = getContext("ipfs");
   const kubo = createKuboClient();
 
   onMount(async () => {
@@ -34,9 +54,9 @@
     const collectionCids = ipfs.cids;
     console.log("collectionCids", collectionCids);
 
-    const loadedCollections: DirectoryItem[] = [];
+    const loadedCollections: CollectionItem[] = [];
 
-    collectionCids.forEach(async (value, collectionCid) => {
+    collectionCids.forEach(async (attributes, collectionCid) => {
       if (!collectionCid) return;
 
       try {
@@ -52,14 +72,36 @@
           totalSize += file.size;
         }
 
-        const collectionItem: DirectoryItem = {
-          owner: result.owner,
+        // Determine the current status
+        let currentStatus: StatusType = STATUS_PENDING;
+        try {
+          if (!attributes || !attributes.status) return;
+          switch (attributes.status) {
+            case STATUS_APPROVED:
+              currentStatus = STATUS_APPROVED;
+              break;
+            case STATUS_REJECTED:
+              currentStatus = STATUS_REJECTED;
+              break;
+            case STATUS_PENDING:
+              currentStatus = STATUS_PENDING;
+              break;
+            default:
+              console.error(`Unknown status value: ${attributes.status}`);
+          }
+        } catch (error) {
+          console.error(`Error determining status for CID ${collectionCid}:`, error);
+          return;
+        }
+
+        const collectionItem: CollectionItem = {
+          owner: attributes.owner,
           collectionCid: collectionCid,
-          name: result.name,
+          name: attributes.name,
           totalSizeBytes: totalSize,
           filesCount: filesCount,
-          status: result.status as StatusType,
-          creationDate: result.date
+          status: currentStatus,
+          creationDate: attributes.date
         };
 
         loadedCollections.push(collectionItem);
@@ -82,7 +124,7 @@
     paginatedCollections = filteredCollections.slice(startIndex, endIndex);
   }
 
-  function handleSort(key: keyof DirectoryItem) {
+  function handleSort(key: keyof CollectionItem) {
     if (sortConfig.key === key) {
       sortConfig.direction = sortConfig.direction === "asc" ? "desc" : "asc";
     } else {
@@ -104,13 +146,56 @@
   }
 
   function handleCollectionClick(collectionCid: string) {
-    goto(`/app/files/${collectionCid}`);
+    goto(`/app/collection/${collectionCid}`);
   }
 
   function handleSearch(event: CustomEvent<string>) {
     searchQuery = event.detail;
     updateFilteredCollections();
   }
+
+  async function uploadCollection() {
+    if (!ipfs || uploadInProgress) return;
+
+    try {
+      uploadInProgress = true;
+      const newCids = await uploadStore.processUploadedCollections();
+      const validCids = newCids.filter((item): item is AddResult => {
+        return typeof item !== "string";
+      });
+      console.log("Processed files, got collection CIDs:", validCids.length);
+
+      if (validCids.length > 0) {
+        const lastCid = validCids[validCids.length - 1];
+        const collectionCid = lastCid.cid.toString();
+        console.log("Processing collection:", { collectionCid });
+
+        const attributes: CidDataType = {
+          name: `Collection ${timestamp()}`,
+          date: formatDate(),
+          owner: ipfs.address,
+          status: STATUS_PENDING
+        };
+
+        console.log("Setting attributes:", attributes);
+        const attributesString = JSON.stringify(attributes);
+        await ipfs.cidSet(collectionCid, attributesString);
+        toast.success("Collection created successfully");
+        await loadCollections();
+      }
+    } catch (error) {
+      console.error("Failed to add collection:", error);
+      toast.error("Failed to create collection");
+    } finally {
+      uploadInProgress = false;
+    }
+  }
+
+  $effect(() => {
+    if (uploadStore.uploadCollection) {
+      uploadCollection();
+    }
+  });
 
   function setPage(page: number) {
     currentPage = page;
@@ -121,59 +206,15 @@
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 flex flex-col gap-4">
     <div class="mb-8">
-      <h1 class="text-2xl font-bold">Collection Management</h1>
-      <p class="text-gray-600">Manage your IPFS collections</p>
+      <FileUpload bind:files={uploadStore.uploadCollection} />
     </div>
 
     <div class="flex items-center justify-between">
-      <SearchBar onsearch={handleSearch} />
+      <SearchBar bind:searchTerm={filterStore.searchQuery} />
     </div>
 
     <!-- Collection Table -->
-    <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500" onclick={() => handleSort("name")}> Name </th>
-            <th class="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500" onclick={() => handleSort("totalSizeBytes")}> Size </th>
-            <th class="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500" onclick={() => handleSort("filesCount")}> Files </th>
-            <th class="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500" onclick={() => handleSort("owner")}> Owner </th>
-            <th class="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500" onclick={() => handleSort("status")}> Status </th>
-            <th class="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500" onclick={() => handleSort("creationDate")}> Created </th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200 bg-white">
-          {#each paginatedCollections as collection}
-            <tr class="cursor-pointer hover:bg-gray-50" onclick={() => handleCollectionClick(collection.collectionCid)}>
-              <td class="whitespace-nowrap px-6 py-4">
-                <div class="text-sm font-medium text-gray-900">{collection.name}</div>
-                <div class="text-sm text-gray-500">{collection.collectionCid}</div>
-              </td>
-              <td class="whitespace-nowrap px-6 py-4">
-                <div class="text-sm text-gray-900">{(collection.totalSizeBytes / 1024).toFixed(2)} KB</div>
-              </td>
-              <td class="whitespace-nowrap px-6 py-4">
-                <div class="text-sm text-gray-900">{collection.filesCount}</div>
-              </td>
-              <td class="whitespace-nowrap px-6 py-4">
-                <div class="text-sm text-gray-900">{collection.owner}</div>
-              </td>
-              <td class="whitespace-nowrap px-6 py-4">
-                <span
-                  class="inline-flex rounded-full px-2 text-xs font-semibold leading-5
-                    {collection.status === STATUS_APPROVED ? 'bg-green-100 text-green-800' : collection.status === STATUS_REJECTED ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}"
-                >
-                  {collection.status}
-                </span>
-              </td>
-              <td class="whitespace-nowrap px-6 py-4">
-                <div class="text-sm text-gray-900">{new Date(collection.creationDate).toLocaleDateString()}</div>
-              </td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
-    </div>
+    <CollectionTable collections={paginatedCollections} {sortConfig} {handleSort} handleClick={handleCollectionClick} />
 
     <div class="mt-4">
       <FilePagination {currentPage} totalPages={Math.ceil(filteredCollections.length / itemsPerPage)} {itemsPerPage} totalItems={filteredCollections.length} {setPage} />

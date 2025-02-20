@@ -13,4 +13,5 @@
 
 <FileManagement {collectionCid} />
 
+<!--si cid définit montre la collection sinon affiche tous les fichiers-->
 <!-- lis sur le kubo cid en parametre -->
