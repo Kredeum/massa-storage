@@ -6,8 +6,7 @@ export class FilterStore {
   searchQuery = $state("");
 
   filters: FilterState = $state({
-    type: "all",
-    status: "all"
+    type: "all"
   });
 
   sortConfig: SortConfig = $state({
@@ -27,14 +26,6 @@ export class FilterStore {
     this.currentPage = 0;
   }
 
-  setStatusFilter(status: FilterState["status"]) {
-    this.filters = {
-      ...this.filters,
-      status
-    };
-    this.currentPage = 0;
-  }
-
   setSortConfig(config: SortConfig) {
     this.sortConfig = config;
   }
@@ -45,12 +36,22 @@ export class FilterStore {
 
   filterFiles(files: FileItem[]): FileItem[] {
     return files.filter((file) => {
-      const matchesType = this.filters.type === "all" || file.type === this.filters.type;
-      const matchesStatus = this.filters.status === "all" || file.status === this.filters.status;
+      const matchesType =
+        this.filters.type === "all" || (file.type && file.type === this.filters.type);
       const matchesSearch =
         !this.searchQuery || file.name.toLowerCase().includes(this.searchQuery.toLowerCase());
-      return matchesType && matchesStatus && matchesSearch;
+      return matchesType && matchesSearch;
     });
+  }
+
+  getTotalPages(files: FileItem[]): number {
+    const filteredFiles = this.filterFiles(files);
+    return Math.ceil(filteredFiles.length / this.itemsPerPage);
+  }
+
+  getPaginatedFiles(files: FileItem[]): FileItem[] {
+    const startIndex = this.currentPage * this.itemsPerPage;
+    return files.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
   sortItems<T extends FileItem | CollectionItem>(items: T[]): T[] {
@@ -86,18 +87,5 @@ export class FilterStore {
 
   sortFiles(files: FileItem[]): FileItem[] {
     return this.sortItems(files);
-  }
-
-  getPaginatedFiles(files: FileItem[]): FileItem[] {
-    const filteredFiles = this.filterFiles(files);
-    const sortedFiles = this.sortFiles(filteredFiles);
-    return sortedFiles.slice(
-      this.currentPage * this.itemsPerPage,
-      (this.currentPage + 1) * this.itemsPerPage
-    );
-  }
-
-  getTotalPages(files: FileItem[]): number {
-    return Math.ceil(this.filterFiles(files).length / this.itemsPerPage);
   }
 }

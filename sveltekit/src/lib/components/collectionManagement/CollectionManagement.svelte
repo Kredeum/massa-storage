@@ -3,13 +3,14 @@
   import { createKuboClient } from "$lib/ts/kubo";
   import type { AddResult } from "kubo-rpc-client";
   import { STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING, statusLabel } from "@kredeum/massa-storage-common/src/constants";
-  import type { CollectionItem, StatusType, CidDataType } from "$lib/ts/types";
+  import type { CollectionItem, StatusType, CidDataType, CollectionFilterState } from "$lib/ts/types";
   import { goto } from "$app/navigation";
   import { toast } from "svelte-hot-french-toast";
 
   import SearchBar from "../fileManagement/SearchBar.svelte";
   import FilePagination from "../fileManagement/FilePagination.svelte";
   import FileUpload from "../fileManagement/FileUpload.svelte";
+  import CollectionFilters from "../collectionTable/CollectionFilters.svelte";
 
   import { UploadStore } from "$lib/runes/UploadStore.svelte";
   import { FilterStore } from "$lib/runes/FilterStore.svelte";
@@ -30,6 +31,9 @@
   let currentPage = $state(1);
   let itemsPerPage = $state(10);
   let searchQuery = $state("");
+  let collectionFilters = $state<CollectionFilterState>({
+    status: "all"
+  });
 
   type SortConfig = {
     key: keyof CollectionItem;
@@ -115,7 +119,11 @@
   }
 
   function updateFilteredCollections() {
-    filteredCollections = collections.filter((collection) => collection.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    filteredCollections = collections.filter((collection) => {
+      const matchesSearch = collection.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = collectionFilters.status === "all" || collection.status === collectionFilters.status;
+      return matchesSearch && matchesStatus;
+    });
     updatePagination();
   }
 
@@ -152,6 +160,11 @@
 
   function handleSearch(event: CustomEvent<string>) {
     searchQuery = event.detail;
+    updateFilteredCollections();
+  }
+
+  function handleStatusFilter(status: StatusType | "all") {
+    collectionFilters.status = status;
     updateFilteredCollections();
   }
 
@@ -237,12 +250,22 @@
       <FileUpload bind:files={uploadStore.uploadCollection} />
     </div>
 
-    <div class="flex items-center justify-between">
-      <SearchBar bind:searchTerm={filterStore.searchQuery} />
+    <div class="flex items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <SearchBar bind:searchTerm={searchQuery} />
+        <CollectionFilters filters={collectionFilters} onStatusFilter={handleStatusFilter} />
+      </div>
     </div>
 
     <!-- Collection Table -->
-    <CollectionTable collections={paginatedCollections} {sortConfig} {handleSort} handleClick={handleCollectionClick} onModerate={handleModerate} onPin={handlePin} />
+    {#if filteredCollections.length === 0 && collectionFilters.status !== "all"}
+      <div class="flex flex-col items-center justify-center py-8 text-gray-500">
+        <p class="text-lg font-medium">No {collectionFilters.status.toLowerCase()} collections found</p>
+        <p class="mt-2">There are no collections with {collectionFilters.status.toLowerCase()} status</p>
+      </div>
+    {:else}
+      <CollectionTable collections={paginatedCollections} {sortConfig} {handleSort} handleClick={handleCollectionClick} onModerate={handleModerate} onPin={handlePin} />
+    {/if}
 
     <div class="mt-4">
       <FilePagination {currentPage} totalPages={Math.ceil(filteredCollections.length / itemsPerPage)} {itemsPerPage} totalItems={filteredCollections.length} {setPage} />

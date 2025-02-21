@@ -105,20 +105,7 @@
       <td class="w-[8%] cursor-default px-4 py-4 text-center text-sm text-gray-500">
         {file.type}
       </td>
-    {:else if column.key === "status"}
-      <td class="w-[8%] cursor-default px-4 py-4 text-center">
-        <span
-          class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
-          class:bg-yellow-100={file.status == STATUS_PENDING}
-          class:text-yellow-800={file.status == STATUS_PENDING}
-          class:bg-green-100={file.status == STATUS_APPROVED}
-          class:text-green-800={file.status == STATUS_APPROVED}
-          class:bg-red-100={file.status == STATUS_REJECTED}
-          class:text-red-800={file.status == STATUS_REJECTED}
-        >
-          {statusLabel(file.status)}
-        </span>
-      </td>
+
     {:else if !column.key}
       <td class="w-[13%] px-4 py-4 text-center">
         <FileCidCell cid={file.cid} fileName={file.name} {onTooltipShow} {onTooltipHide} />

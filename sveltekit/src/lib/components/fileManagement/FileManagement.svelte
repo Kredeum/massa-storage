@@ -124,8 +124,8 @@
   };
 
   const filteredFiles = $derived(filterStore.filterFiles(fileStore.files));
-  const paginatedFiles = $derived(filterStore.getPaginatedFiles(fileStore.files));
-  const totalPages = $derived(filterStore.getTotalPages(fileStore.files));
+  const paginatedFiles = $derived(filterStore.getPaginatedFiles(filteredFiles));
+  const totalPages = $derived(filterStore.getTotalPages(filteredFiles));
 </script>
 
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
@@ -149,29 +149,35 @@
     </div>
   </div>
 
-  <FileTable
-    files={fileStore.files}
-    {paginatedFiles}
-    selectedFiles={fileStore.selectedFiles}
-    sortConfig={filterStore.sortConfig}
-    handleSort={(key) => {
-      if (filterStore.sortConfig.key === key) {
-        filterStore.setSortConfig({
-          key,
-          direction: filterStore.sortConfig.direction === "asc" ? "desc" : "asc"
-        });
-      } else {
-        filterStore.setSortConfig({ key, direction: "desc" });
-      }
-    }}
-    onSelectionChange={fileStore.setSelectedFiles.bind(fileStore)}
-    onFilterChange={(status: StatusType | "all") => filterStore.setStatusFilter(status)}
-    {filteredFiles}
-  >
-    {#snippet actions(file)}
-      <ButtonActions item={file} type="file" onModerate={(data) => fileStore.updateStatusType(data.id, data.status)} onPin={(id) => fileStore.togglePin(id)} />
-    {/snippet}
-  </FileTable>
+  {#if filteredFiles.length === 0 && filterStore.filters.type !== "all"}
+    <div class="flex flex-col items-center justify-center py-8 text-gray-500">
+      <p class="text-lg font-medium">No {filterStore.filters.type} files found</p>
+      <p class="mt-2">Try uploading some {filterStore.filters.type} files or switch to a different filter</p>
+    </div>
+  {:else}
+    <FileTable
+      files={fileStore.files}
+      {paginatedFiles}
+      selectedFiles={fileStore.selectedFiles}
+      sortConfig={filterStore.sortConfig}
+      handleSort={(key) => {
+        if (filterStore.sortConfig.key === key) {
+          filterStore.setSortConfig({
+            key,
+            direction: filterStore.sortConfig.direction === "asc" ? "desc" : "asc"
+          });
+        } else {
+          filterStore.setSortConfig({ key, direction: "desc" });
+        }
+      }}
+      onSelectionChange={fileStore.setSelectedFiles.bind(fileStore)}
+      {filteredFiles}
+    >
+      {#snippet actions(file)}
+        <ButtonActions item={file} type="file" onModerate={(data) => fileStore.updateStatusType(data.id, data.status)} onPin={(id) => fileStore.togglePin(id)} />
+      {/snippet}
+    </FileTable>
+  {/if}
 
   <FilePagination currentPage={filterStore.currentPage} {totalPages} itemsPerPage={filterStore.itemsPerPage} totalItems={filteredFiles.length} setPage={filterStore.setPage.bind(filterStore)} />
 </div>

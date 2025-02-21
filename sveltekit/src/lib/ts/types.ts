@@ -3,6 +3,7 @@ import type {
   STATUS_PENDING,
   STATUS_REJECTED
 } from "@kredeum/massa-storage-common/src/constants";
+import type { Snippet } from "svelte";
 
 type EmptyObject = Record<string, never>;
 
@@ -38,6 +39,9 @@ export interface CollectionItem {
 
 export interface FilterState {
   type: "all" | "image" | "video" | "audio" | "document";
+}
+
+export interface CollectionFilterState {
   status: "all" | StatusType;
 }
 
@@ -55,12 +59,11 @@ export type Column = {
 export interface PropsFileTable {
   files: FileItem[];
   paginatedFiles: FileItem[];
-  selectedFiles?: string[];
+  selectedFiles: string[];
   sortConfig: SortConfig;
   handleSort: (key: keyof FileItem) => void;
-  onSelectionChange: (selected: string[]) => void;
-  onFilterChange: (status: StatusType | "all") => void;
-  actions?: import("svelte").Snippet<[FileItem]>;
+  onSelectionChange: (selectedIds: string[]) => void;
+  actions?: Snippet<[FileItem]>;
   filteredFiles: FileItem[];
 }
 

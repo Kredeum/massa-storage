@@ -6,7 +6,6 @@
     files = [],
     paginatedFiles = [],
     onSelectionChange,
-    onFilterChange,
     showMenu = false,
     buttonRef,
     onClose
@@ -14,7 +13,6 @@
     files: FileItem[];
     paginatedFiles: FileItem[];
     onSelectionChange: (selected: string[]) => void;
-    onFilterChange: (status: StatusType | "all") => void;
     showMenu: boolean;
     buttonRef: HTMLButtonElement | null;
     onClose: () => void;
@@ -38,7 +36,6 @@
     const approvedFiles = files.filter((file: { status: string }) => file.status == STATUS_APPROVED);
     const approvedIds = approvedFiles.map((file: FileItem) => file.cid);
     onSelectionChange(approvedIds);
-    onFilterChange(STATUS_APPROVED);
     onClose();
   }
 
@@ -46,7 +43,6 @@
     const pendingFiles = files.filter((file: { status: string }) => file.status == STATUS_PENDING);
     const pendingIds = pendingFiles.map((file: FileItem) => file.cid);
     onSelectionChange(pendingIds);
-    onFilterChange(STATUS_PENDING);
     onClose();
   }
 </script>

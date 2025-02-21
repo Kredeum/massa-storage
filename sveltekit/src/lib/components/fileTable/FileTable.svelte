@@ -5,7 +5,7 @@
   import FileSelectionMenu from "./FileSelectionMenu.svelte";
   import FileTooltip from "./FileTooltip.svelte";
 
-  let { files = [], paginatedFiles = [], selectedFiles = $bindable([]), sortConfig, handleSort, onSelectionChange, onFilterChange, actions, filteredFiles = [] }: PropsFileTable = $props();
+  let { files = [], paginatedFiles = [], selectedFiles = $bindable([]), sortConfig, handleSort, onSelectionChange, actions, filteredFiles = [] }: PropsFileTable = $props();
 
   let showSelectionMenu = $state(false);
   let buttonRef = $state<HTMLButtonElement | null>(null);
@@ -30,22 +30,13 @@
   <div class="min-w-full overflow-x-auto">
     <table class="min-w-full grid-cols-8 divide-y divide-gray-200">
       <colgroup>
-        <col class="w-12" />
-        <!-- Checkbox -->
-        <col class="w-[25%]" />
-        <!-- Name -->
-        <col class="w-[15%]" />
-        <!-- Date -->
-        <col class="w-[8%]" />
-        <!-- Size -->
-        <col class="w-[8%]" />
-        <!-- Type -->
-        <col class="w-[8%]" />
-        <!-- Status -->
-        <col class="w-[13%]" />
-        <!-- CID -->
-        <col class="w-[8%]" />
-        <!-- Actions -->
+        <col class="w-12" /> <!-- Checkbox -->
+        <col class="w-[25%]" /> <!-- Name -->
+        <col class="w-[15%]" /> <!-- Date -->
+        <col class="w-[8%]" /> <!-- Size -->
+        <col class="w-[8%]" /> <!-- Type -->
+        <col class="w-[13%]" /> <!-- CID -->
+        <col class="w-[8%]" /> <!-- Actions -->
       </colgroup>
 
       <FileTableHeader {selectedFiles} {sortConfig} {handleSort} {onSelectionChange} {filteredFiles} bind:buttonRef bind:showSelectionMenu />
@@ -65,7 +56,7 @@
     </table>
   </div>
 
-  <FileSelectionMenu {files} {paginatedFiles} {onSelectionChange} {onFilterChange} showMenu={showSelectionMenu} {buttonRef} onClose={() => (showSelectionMenu = false)} />
+  <FileSelectionMenu {files} {paginatedFiles} {onSelectionChange} showMenu={showSelectionMenu} {buttonRef} onClose={() => (showSelectionMenu = false)} />
 
   <FileTooltip bind:this={tooltip} content={tooltipContent} />
 </div>
