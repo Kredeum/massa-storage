@@ -7,7 +7,6 @@ import { create } from "kubo-rpc-client";
 describe.skip("IPFS class", () => {
   let ipfs: Ipfs;
   let provider: JsonRpcProvider;
-  let chainId: string;
   let target: string;
 
   beforeEach(async () => {
@@ -16,7 +15,7 @@ describe.skip("IPFS class", () => {
 
     ipfs = new Ipfs(provider);
 
-    target = ipfsAddress(await ipfs.getChainId());
+    target = ipfsAddress(await ipfs.fetchChainId());
   });
 
   it("Should add then delete one moderator", async () => {

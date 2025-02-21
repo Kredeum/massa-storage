@@ -1,21 +1,21 @@
 <script lang="ts">
   import { BURNER_WALLET_KEY_MODERATOR, BURNER_WALLET_KEY_UPLOADER, BURNER_WALLET_KEY_PINNER } from "$lib/ts/config";
-  import { Writer } from "$lib/runes/writer.svelte";
+  import { PrivateKeyProvider, Writer } from "$lib/runes/writer.svelte";
   import Connect from "$lib/components/Connect.svelte";
 
-  const client1 = new Writer({ privateKey: BURNER_WALLET_KEY_MODERATOR });
-  const client2 = new Writer({ privateKey: BURNER_WALLET_KEY_UPLOADER });
-  const client3 = new Writer({ privateKey: BURNER_WALLET_KEY_PINNER });
+  const clientUploader = new Writer(new PrivateKeyProvider(BURNER_WALLET_KEY_UPLOADER));
+  const clientModerator = new Writer(new PrivateKeyProvider(BURNER_WALLET_KEY_MODERATOR));
+  const clientPinner = new Writer(new PrivateKeyProvider(BURNER_WALLET_KEY_PINNER));
 </script>
 
 <div class="flex h-32 flex-col items-center justify-center">
   <div class="p-2">
-    <Connect client={client1} />
+    <Connect client={clientUploader} />
   </div>
   <div class="p-2">
-    <Connect client={client2} />
+    <Connect client={clientModerator} />
   </div>
   <div class="p-2">
-    <Connect client={client3} />
+    <Connect client={clientPinner} />
   </div>
 </div>

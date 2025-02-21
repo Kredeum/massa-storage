@@ -5,7 +5,7 @@
 
   const ipfs: Ipfs = getContext("ipfs");
 
-  let isModerator = $derived.by(() => ipfs?.isModeratorFunc(ipfs?.address));
+  const isModerator = $derived.by(() => ipfs.isModeratorFunc(ipfs.address));
 
   interface Props {
     selectedCount: number;

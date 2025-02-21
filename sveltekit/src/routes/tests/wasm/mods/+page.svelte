@@ -1,21 +1,16 @@
 <script lang="ts">
   import { Ipfs } from "$lib/runes/ipfs.svelte";
-  import { onMount } from "svelte";
   import { getContext } from "svelte";
 
   const ipfs: Ipfs = getContext("ipfs");
 
   let mod = $state<string>("");
 
-  // let moderatorHas = $state<boolean>(false);
+  const refresh = async () => await ipfs.moderatorsGet();
 
-  const refresh = async () => {
-    await ipfs?.moderatorsGet();
-    // const _modHas = await ipfs?.moderatorHas(mod);
-    // if (_modHas !== undefined) moderatorHas = _modHas;
-  };
-
-  onMount(refresh);
+  $effect(() => {
+    ipfs.provider && refresh();
+  });
 </script>
 
 <div class="flex flex-col items-center justify-center">
@@ -29,7 +24,6 @@
     <div class="mt-4">
       <input type="text" bind:value={mod} placeholder="Enter mod address" class="w-full rounded border p-3 text-lg" />
     </div>
-    <!-- Is mod {moderatorHas} -->
 
     <div class="mt-4 flex flex-col items-center gap-2">
       <div class="flex gap-2">

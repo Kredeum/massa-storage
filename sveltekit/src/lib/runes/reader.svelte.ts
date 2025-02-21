@@ -1,62 +1,56 @@
 import { toast } from "svelte-hot-french-toast";
 
-import {
-  type Network,
-  type Provider,
-  type NetworkName,
-  JsonRpcPublicProvider,
-  JsonRpcProvider
-} from "@massalabs/massa-web3";
-
+import type { Network, NetworkName, Provider, PublicProvider } from "@massalabs/massa-web3";
 import type { EmptyObject } from "$lib/ts/types";
 
 class Reader {
   // PROVIDER
-  #provider = $state<Provider | undefined>();
-  get provider(): Provider | EmptyObject {
+  #provider = $state<Provider | PublicProvider | undefined>();
+  get provider(): Provider | PublicProvider | EmptyObject {
     return this.#provider || {};
   }
   get noProvider(): boolean {
     return this.#provider === undefined;
   }
-  setProvider(provider: Provider | undefined) {
+  async setProvider(provider: Provider | PublicProvider | undefined) {
     if (!provider) return;
     this.#provider = provider;
-    this.refreshReader();
+    await this.fetchNetwork();
   }
 
   // NETWORK
-  #network = $state<Network | EmptyObject>();
+  #network = $state<Network | undefined>();
   get network(): Network | EmptyObject {
     return this.#network || {};
   }
-  get networkName(): NetworkName {
+  get noNetwork(): boolean {
+    return this.#network === undefined;
+  }
+  get networkName(): NetworkName | "No Network" {
+    if (this.noNetwork) return "No Network";
     return this.network.name as NetworkName;
   }
   get chainId(): string {
+    if (this.noNetwork) return "";
     return this.network.chainId?.toString() || "";
   }
 
-  async getChainId(): Promise<string> {
-    if (!this.#network) await this.refreshReader();
-    return this.chainId;
-  }
-
-  // REFRESH
-  async refreshReader(): Promise<boolean> {
-    if (this.noProvider) return false;
-
+  async fetchNetwork(): Promise<Network | EmptyObject> {
+    if (this.noProvider) return {};
     try {
       this.#network = await this.provider.networkInfos();
     } catch (error) {
-      console.error("Error while refreshing client:", error);
-      return false;
+      console.error("Error while refreshing network:", error);
+      return {};
     }
-
-    return true;
+    return this.#network;
+  }
+  async fetchChainId(): Promise<string> {
+    await this.fetchNetwork();
+    return this.chainId;
   }
 
-  constructor(provider?: Provider) {
+  constructor(provider?: Provider | PublicProvider) {
     this.setProvider(provider);
   }
 }

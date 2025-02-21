@@ -1,21 +1,21 @@
 import { SvelteMap } from "svelte/reactivity";
 import { describe, it, expect, beforeEach } from "vitest";
-import { bytesToStr, JsonRpcPublicProvider } from "@massalabs/massa-web3";
+import { bytesToStr, JsonRpcPublicProvider, type PublicProvider } from "@massalabs/massa-web3";
 import { ipfsAddress } from "$lib/ts/config";
 import { Ipfs } from "$lib/runes/ipfs.svelte";
 
 describe("IPFS class", () => {
   let ipfs: Ipfs;
-  let provider: JsonRpcPublicProvider;
+  let provider: PublicProvider;
   let chainId: string;
   let target: string;
 
   beforeEach(async () => {
-    provider = JsonRpcPublicProvider.buildnet();
+    provider = JsonRpcPublicProvider.buildnet() ;
 
     ipfs = new Ipfs(provider);
 
-    target = ipfsAddress(await ipfs.getChainId());
+    target = ipfsAddress(await ipfs.fetchChainId());
   });
 
   it("Before each OK", () => {});

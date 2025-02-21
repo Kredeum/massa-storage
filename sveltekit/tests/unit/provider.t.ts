@@ -1,8 +1,8 @@
-import { Account, JsonRpcProvider, JsonRpcPublicProvider } from "@massalabs/massa-web3";
+import { Account, JsonRpcProvider, JsonRpcPublicProvider, type PublicProvider } from "@massalabs/massa-web3";
 import { describe, it, beforeEach, expect } from "vitest";
 
 describe("Public Provider", () => {
-  let publicProvider: JsonRpcPublicProvider;
+  let publicProvider: PublicProvider;
 
   beforeEach(async () => {
     publicProvider = JsonRpcPublicProvider.buildnet();

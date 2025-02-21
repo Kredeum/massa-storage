@@ -1,4 +1,10 @@
-import { Account, JsonRpcProvider, JsonRpcPublicProvider } from "@massalabs/massa-web3";
+import {
+  Account,
+  JsonRpcProvider,
+  JsonRpcPublicProvider,
+  type Provider,
+  type PublicProvider
+} from "@massalabs/massa-web3";
 import { Reader } from "./reader.svelte";
 import { shortenString } from "$lib/ts/utils";
 import { getWallet, WalletName, type Wallet } from "@massalabs/wallet-provider";
@@ -9,6 +15,7 @@ class PrivateKeyProvider {
     this.privateKey = privateKey;
   }
 }
+
 class WalletProvider {
   walletName: WalletName;
   accountNum?: number;
@@ -37,7 +44,8 @@ class Writer extends Reader {
 
   // ACCOUNT
   get name(): string {
-    if (!this.provider.providerName) return "";
+    if (!("providerName" in this.provider && this.provider.providerName)) return "";
+
     if (this.#type === "PrivateKey") return "Burner Wallet";
     if (this.provider.accountName === this.provider.address) {
       return this.provider.providerName + " #" + (this.#accountNum + 1);
@@ -47,9 +55,11 @@ class Writer extends Reader {
   }
   #balance = $state<bigint | undefined>();
   get address() {
+    if (!("address" in this.provider)) return;
     return this.provider.address || "???";
   }
   get addressToDisplay() {
+    if (!("address" in this.provider)) return;
     return shortenString(this.provider.address || "???");
   }
   get balance() {
@@ -61,6 +71,7 @@ class Writer extends Reader {
 
   async refresh(): Promise<boolean> {
     if (this.noProvider) return false;
+    if (!("balance" in this.provider)) return true;
 
     try {
       this.#balance = await this.provider.balance(true);
@@ -69,7 +80,7 @@ class Writer extends Reader {
       return false;
     }
 
-    return super.refreshReader();
+    return true;
   }
 
   // CONNECT
@@ -98,14 +109,14 @@ class Writer extends Reader {
     return true;
   }
 
-  async setProviderJsonRpc(provider: JsonRpcProvider) {
+  async setProviderWithType(provider: Provider) {
     this.#type = "Provider";
-    this.setProvider(provider);
+    await super.setProvider(provider);
   }
 
-  async setProviderJsonRpcPublic(provider: JsonRpcPublicProvider) {
+  async setProviderJsonRpcPublic(provider: PublicProvider) {
     this.#type = "PublicProvider";
-    this.setProvider(provider);
+    await super.setProvider(provider);
   }
 
   async setProviderWallet(
@@ -125,7 +136,7 @@ class Writer extends Reader {
       );
 
     this.#type = "Wallet";
-    this.setProvider(provider);
+    await super.setProvider(provider);
 
     await this.connect();
   }
@@ -136,23 +147,21 @@ class Writer extends Reader {
     const account = await Account.fromPrivateKey(privateKeyProvider.privateKey);
 
     this.#type = "PrivateKey";
-    this.setProvider(JsonRpcProvider.buildnet(account));
+    await super.setProvider(JsonRpcProvider.buildnet(account));
 
     await this.connect();
   }
 
-  constructor(
-    param?: JsonRpcProvider | JsonRpcPublicProvider | WalletProvider | PrivateKeyProvider
-  ) {
+  constructor(param?: Provider | PublicProvider | WalletProvider | PrivateKeyProvider) {
     super();
 
     if (!param) this.setProviderWallet();
-    else if (param instanceof JsonRpcProvider) this.setProviderJsonRpc(param);
-    else if (param instanceof JsonRpcPublicProvider) this.setProviderJsonRpcPublic(param);
-    else if (param instanceof WalletProvider) this.setProviderWallet(param);
-    else if (param instanceof PrivateKeyProvider) this.setProviderPrivateKey(param);
+    else if ("providerName" in param) this.setProviderWithType(param);
+    else if ("networkInfos" in param) this.setProviderJsonRpcPublic(param);
+    else if ("walletName" in param) this.setProviderWallet(param);
+    else if ("privateKey" in param) this.setProviderPrivateKey(param);
     else throw new Error("Invalid Writer constructor parameter");
   }
 }
 
-export { Writer };
+export { Writer, PrivateKeyProvider, WalletProvider };
