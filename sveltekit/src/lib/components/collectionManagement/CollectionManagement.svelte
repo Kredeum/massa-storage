@@ -12,7 +12,6 @@
   import CollectionFilters from "../collectionTable/CollectionFilters.svelte";
 
   import { UploadStore } from "$lib/runes/UploadStore.svelte";
-  import { FilterStore } from "$lib/runes/FilterStore.svelte";
 
   import { formatDate, timestamp } from "$lib/ts/utils";
   import CollectionTable from "../collectionTable/CollectionTable.svelte";

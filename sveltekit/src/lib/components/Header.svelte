@@ -11,7 +11,7 @@
 <header class="flex h-16 w-full items-center border-b border-gray-200 bg-white px-4 shadow-sm">
   <nav class="container mx-auto flex items-center justify-between">
     <div class="flex items-center gap-8">
-      <a href="{base}/" class="flex items-center gap-2 text-lg font-semibold text-gray-900">
+      <a href="{base}/app/collections" class="flex items-center gap-2 text-lg font-semibold text-gray-900">
         <img src={logoMassa} alt="Massa Logo" class="h-8 w-8" />
         Massa Storage
       </a>

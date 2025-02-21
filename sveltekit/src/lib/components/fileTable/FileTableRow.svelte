@@ -60,7 +60,7 @@
   role="button"
   tabindex="0"
 >
-  <td class="w-12 px-4 py-4">
+  <td class="w-12 px-4 py-[18px]">
     <input
       type="checkbox"
       class="cursor-pointer rounded text-blue-600"
@@ -78,42 +78,24 @@
 
   {#each columns as column}
     {#if column.key === "name"}
-      <td class="w-[25%] px-4 py-4">
+      <td class="w-[25%] px-4 py-[18px]">
         <div class="flex items-center">
           <FileIcon type={file.type} />
-          <span class="ml-2 cursor-pointer truncate hover:text-blue-600" onmouseenter={handleMouseEnter} onmouseleave={handleMouseLeave} role="button" tabindex="0">
-            {shortenString(file.name)}
-          </span>
-          {#if hoveredPreview}
-            <FilePreview {file} />
-          {/if}
+          <div class="ml-2 text-sm font-medium text-gray-600 hover:text-blue-600">{shortenString(file.name)}</div>
         </div>
       </td>
-    {:else if column.key === "uploadDate"}
-      <td class="w-[15%] px-4 py-4 text-center text-sm text-gray-500">
-        {#if file.uploadDate && file.uploadDate.includes(" ")}
-          <TimeTooltip text={file.uploadDate.split(" ")[0].split("-").reverse().join("/")} tooltip={file.uploadDate.split(" ")[1]} />
-        {:else}
-          <span>No Date Available</span>
-        {/if}
-      </td>
     {:else if column.key === "sizeInBytes"}
-      <td class="w-[8%] cursor-default px-4 py-4 text-center text-sm text-gray-500">
-        {formatSize(file.sizeInBytes)}
-      </td>
+      <td class="w-[15%] px-4 py-[18px] text-center text-sm text-gray-500">{formatSize(file.sizeInBytes)}</td>
     {:else if column.key === "type"}
-      <td class="w-[8%] cursor-default px-4 py-4 text-center text-sm text-gray-500">
-        {file.type}
-      </td>
-
+      <td class="w-[15%] px-4 py-[18px] text-center text-sm text-gray-500">{file.type}</td>
     {:else if !column.key}
-      <td class="w-[13%] px-4 py-4 text-center">
+      <td class="w-[15%] px-4 py-[18px] text-center text-sm text-gray-500">
         <FileCidCell cid={file.cid} fileName={file.name} {onTooltipShow} {onTooltipHide} />
       </td>
     {/if}
   {/each}
 
-  <td class="w-[8%] px-4 py-4 text-center">
+  <td class="w-[15%] px-4 py-[18px] text-center">
     <div class="flex items-center justify-center space-x-2">
       {@render actions?.(file)}
     </div>

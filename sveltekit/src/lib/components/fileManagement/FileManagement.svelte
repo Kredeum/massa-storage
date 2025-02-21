@@ -1,116 +1,58 @@
 <script lang="ts">
   import { getContext, onMount } from "svelte";
   import { createKuboClient } from "$lib/ts/kubo";
-  import type { AddResult } from "kubo-rpc-client";
-  import { STATUS_PENDING, STATUS_APPROVED, STATUS_REJECTED } from "@kredeum/massa-storage-common/src/constants";
-  import type { CidDataType, CollectionItem } from "$lib/ts/types";
+  import { STATUS_PENDING } from "@kredeum/massa-storage-common/src/constants";
 
   import SearchBar from "./SearchBar.svelte";
   import FileFilters from "./FileFilters.svelte";
   import FileTable from "../fileTable/FileTable.svelte";
   import ButtonActions from "$lib/components/common/ButtonActions.svelte";
 
-  import FileSelectionBar from "./FileSelectionBar.svelte";
   import FilePagination from "./FilePagination.svelte";
 
   import { FileStore } from "$lib/runes/FileStore.svelte";
   import { FilterStore } from "$lib/runes/FilterStore.svelte";
-  import { UploadStore } from "$lib/runes/UploadStore.svelte";
-  import type { FileItem, StatusType } from "$lib/ts/types";
-  import { formatDate, timestamp, getFileTypeFromName } from "$lib/ts/utils";
+
+  import type { FileItem } from "$lib/ts/types";
+  import { formatDate, getFileTypeFromName } from "$lib/ts/utils";
 
   import { Ipfs } from "$lib/runes/ipfs.svelte";
 
   const { collectionCid = null } = $props<{ collectionCid?: string | null }>();
 
   let kubo: ReturnType<typeof createKuboClient>;
-  let cids = $state<AddResult[]>([]);
-  let uploadInProgress = $state(false);
-
   const fileStore = new FileStore();
   const filterStore = new FilterStore();
-  const uploadStore = new UploadStore();
   const ipfs: Ipfs = getContext("ipfs");
-
-  const getDirCid = () => {
-    const cidsArray = Array.from(cids); // Convert Proxy to Array
-    const files = cidsArray.map(({ path, cid, size }) => {
-      return { path, cid, size };
-    });
-    const dirCid = files[files.length - 1].cid.toString();
-    console.log("dirCid", dirCid);
-    return dirCid;
-  };
 
   onMount(async () => {
     kubo = await createKuboClient();
-    await getFiles();
+    await loadFiles();
   });
 
-  const getFiles = async () => {
-    if (!ipfs) return;
+  const loadFiles = async () => {
+    if (!ipfs || !collectionCid) return;
 
-    await ipfs.cidsGet();
+    try {
+      const files = await kubo.ls(collectionCid);
+      for await (const file of files) {
+        console.log("Collection file:", file);
 
-    const dirCids = ipfs.cids;
-    console.log("dirCids", dirCids);
-
-    // NOTE: WEDONT USE VALUE FOR NOW!!!!
-    dirCids.forEach(async (attributes: CidDataType, dirCid) => {
-      if (!dirCid) return;
-
-      let currentStatus: StatusType = STATUS_PENDING;
-      let fileName = "";
-      let fileCid = "";
-      let fileSizeInBytes = 0;
-
-      // Determine the current status
-      try {
-        if (!attributes || !attributes.status) return;
-        if (attributes.status === "1") {
-          currentStatus = STATUS_APPROVED;
-        } else if (attributes.status === "0") {
-          currentStatus = STATUS_REJECTED;
-        }
-      } catch (error) {
-        console.error(`Error determining status for CID ${dirCid}:`, error);
-        return;
-      }
-
-      // Get other file details from Kubo
-      try {
-        const files = await kubo.ls(dirCid);
-        for await (const file of files) {
-          console.log("file", file);
-          console.log("Kubo file details:", JSON.stringify(file, null, 2));
-          fileName = file.name;
-          fileCid = file.cid.toString();
-          fileSizeInBytes = file.size;
-        }
-      } catch (error) {
-        console.error(`Error getting file details from Kubo for CID ${dirCid}:`, error);
-        return;
-      }
-
-      // Create and store the file item
-      try {
-        if (!attributes) return;
-        const file: FileItem = {
-          cid: fileCid,
-          name: fileName,
-          uploadDate: attributes.date,
-          sizeInBytes: fileSizeInBytes,
-          status: currentStatus,
+        const fileItem: FileItem = {
+          cid: file.cid.toString(),
+          name: file.name,
+          sizeInBytes: file.size,
+          status: STATUS_PENDING,
           isPinned: false,
           arrayBuffer: undefined,
-          type: getFileTypeFromName(fileName)
+          type: getFileTypeFromName(file.name)
         };
 
-        fileStore.files.push(file);
-      } catch (error) {
-        console.error(`Error creating file item for CID ${dirCid}:`, error);
+        fileStore.files.push(fileItem);
       }
-    });
+    } catch (error) {
+      console.error(`Error loading files from collection ${collectionCid}:`, error);
+    }
   };
 
   const filteredFiles = $derived(filterStore.filterFiles(fileStore.files));
@@ -120,9 +62,6 @@
 
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 flex flex-col gap-4">
-    <!-- <div class="mb-8">
-      <FileUpload bind:files={uploadStore.uploadFiles} />
-    </div> -->
     <div class="flex items-center justify-between gap-4">
       <div class="flex flex-1 items-center gap-4">
         <SearchBar bind:searchTerm={filterStore.searchQuery} />

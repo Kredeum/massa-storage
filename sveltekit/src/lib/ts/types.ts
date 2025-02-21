@@ -23,7 +23,6 @@ export interface FileItem {
   blob?: Blob;
   file?: File | undefined;
   cid: string;
-  uploadDate: string;
 }
 
 export interface CollectionItem {

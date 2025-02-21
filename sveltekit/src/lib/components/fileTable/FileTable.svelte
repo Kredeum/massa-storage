@@ -28,15 +28,20 @@
 
 <div class="w-full">
   <div class="min-w-full overflow-x-auto">
-    <table class="min-w-full grid-cols-8 divide-y divide-gray-200">
+    <table class="min-w-full divide-y divide-gray-200">
       <colgroup>
-        <col class="w-12" /> <!-- Checkbox -->
-        <col class="w-[25%]" /> <!-- Name -->
-        <col class="w-[15%]" /> <!-- Date -->
-        <col class="w-[8%]" /> <!-- Size -->
-        <col class="w-[8%]" /> <!-- Type -->
-        <col class="w-[13%]" /> <!-- CID -->
-        <col class="w-[8%]" /> <!-- Actions -->
+        <col class="w-6" />
+        <!-- Checkbox -->
+        <col class="w-[80%]" />
+        <!-- Name -->
+        <col class="w-[35%]" />
+        <!-- Size -->
+        <col class="w-[15%]" />
+        <!-- Type -->
+        <col class="w-[15%]" />
+        <!-- CID -->
+        <col class="w-[15%]" />
+        <!-- Actions -->
       </colgroup>
 
       <FileTableHeader {selectedFiles} {sortConfig} {handleSort} {onSelectionChange} {filteredFiles} bind:buttonRef bind:showSelectionMenu />
