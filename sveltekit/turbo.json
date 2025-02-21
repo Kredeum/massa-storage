@@ -3,8 +3,9 @@
     "//"
   ],
   "globalPassThroughEnv": [
-    "PUBLIC_BURNER_WALLET_KEY",
-    "PUBLIC_COUNTER_ADDRESS"
+    "PUBLIC_BURNER_WALLET_KEY_MODERATOR",
+    "PUBLIC_BURNER_WALLET_KEY_UPLOADER",
+    "PUBLIC_BURNER_WALLET_KEY_PINNER"
   ],
   "tasks": {
     "dev": {

@@ -42,9 +42,10 @@ describe('IPFS Smart Contract Tests', () => {
     test('Moderators list should not be empty', () => {
       const prefixArg = new Args().add('').serialize();
       const result = moderatorsGet(prefixArg);
-      const moderators = new Args(result).nextStringArray().expect('Invalid result');
+      const moderators = new Args(result)
+        .nextStringArray()
+        .expect('Invalid result');
       expect(moderators.length).toBeGreaterThan(0);
     });
-
   });
 });

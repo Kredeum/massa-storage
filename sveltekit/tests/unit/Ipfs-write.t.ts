@@ -1,25 +1,22 @@
-import { SvelteMap } from "svelte/reactivity";
 import { describe, it, expect, beforeEach } from "vitest";
-import { Account, Web3Provider, Args, type ReadSCData, bytesToStr } from "@massalabs/massa-web3";
+import { Account, JsonRpcProvider } from "@massalabs/massa-web3";
 import { ipfsAddress } from "$lib/ts/config";
 import { Ipfs } from "$lib/runes/ipfs.svelte";
 import { create } from "kubo-rpc-client";
 
 describe.skip("IPFS class", () => {
   let ipfs: Ipfs;
-  let provider: Web3Provider;
+  let provider: JsonRpcProvider;
   let chainId: string;
   let target: string;
 
   beforeEach(async () => {
-    const account = await Account.fromEnv();
-    provider = Web3Provider.buildnet(account);
-
-    const network = await provider.networkInfos();
-    chainId = network.chainId.toString();
-    target = ipfsAddress(chainId);
+    const account = await Account.fromEnv("PRIVATE_DEPLOYER_KEY");
+    provider = JsonRpcProvider.buildnet(account);
 
     ipfs = new Ipfs(provider);
+
+    target = ipfsAddress(await ipfs.getChainId());
   });
 
   it("Should add then delete one moderator", async () => {
@@ -34,7 +31,7 @@ describe.skip("IPFS class", () => {
     await ipfs.moderatorDelete(address);
     const isModeratorAfterDelete = await ipfs.moderatorHas(address);
     expect(isModeratorAfterDelete).toBe(false);
-  }, 40000 );
+  }, 40000);
 
   it("Should add then delete one CID", async () => {
     const testString = `Test string ${Date.now()}`;

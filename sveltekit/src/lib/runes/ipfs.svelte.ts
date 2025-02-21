@@ -1,9 +1,9 @@
 import {
-  type Provider,
   type ReadSCData,
   Args,
   ArrayTypes,
-  boolToByte,
+  JsonRpcProvider,
+  JsonRpcPublicProvider,
   OperationStatus
 } from "@massalabs/massa-web3";
 
@@ -182,7 +182,7 @@ class Ipfs extends Writer {
     return this.#cids;
   }
 
-  constructor(provider?: Provider) {
+  constructor(provider?: JsonRpcProvider | JsonRpcPublicProvider) {
     super(provider);
   }
 }

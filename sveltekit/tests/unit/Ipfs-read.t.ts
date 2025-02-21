@@ -1,25 +1,24 @@
 import { SvelteMap } from "svelte/reactivity";
 import { describe, it, expect, beforeEach } from "vitest";
-import { Account, Web3Provider, Args, type ReadSCData, bytesToStr } from "@massalabs/massa-web3";
+import { bytesToStr, JsonRpcPublicProvider } from "@massalabs/massa-web3";
 import { ipfsAddress } from "$lib/ts/config";
 import { Ipfs } from "$lib/runes/ipfs.svelte";
 
 describe("IPFS class", () => {
   let ipfs: Ipfs;
-  let provider: Web3Provider;
+  let provider: JsonRpcPublicProvider;
   let chainId: string;
   let target: string;
 
   beforeEach(async () => {
-    const account = await Account.fromEnv();
-    provider = Web3Provider.buildnet(account);
-
-    const network = await provider.networkInfos();
-    chainId = network.chainId.toString();
-    target = ipfsAddress(chainId);
+    provider = JsonRpcPublicProvider.buildnet();
 
     ipfs = new Ipfs(provider);
+
+    target = ipfsAddress(await ipfs.getChainId());
   });
+
+  it("Before each OK", () => {});
 
   it("Should have valid provider", () => {
     expect(provider).toBeDefined();

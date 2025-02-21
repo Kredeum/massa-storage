@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import {
   Account,
   Mas,
@@ -8,7 +7,7 @@ import {
 import { getScByteCode } from './utils';
 import { updateAddresses } from './addresses';
 
-const account = await Account.fromEnv();
+const account = await Account.fromEnv(process.env.PRIVATE_DEPLOYER_KEY);
 
 // const provider = Web3Provider.fromRPCUrl('http://127.0.0.1:33035', account);
 // const provider = Web3Provider.mainnet(account);
@@ -29,7 +28,6 @@ if (!deployer) {
 const contract = await SmartContract.deploy(provider, byteCode, undefined, {
   coins: Mas.fromString('1'),
 });
-
 
 const events = await provider.getEvents({
   smartContractAddress: contract.address,

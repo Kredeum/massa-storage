@@ -4,10 +4,16 @@
 //
 
 import { generateEvent, Storage } from '@massalabs/massa-as-sdk';
-import { stringToBytes, boolToByte, bytesToString, byteToBool, Args } from '@massalabs/as-types';
+import {
+  stringToBytes,
+  boolToByte,
+  bytesToString,
+  byteToBool,
+  Args,
+} from '@massalabs/as-types';
 import { MODERATOR, CID } from '../../../common/src/constants';
 
-// PersistentMap : map of cid => string  
+// PersistentMap : map of cid => string
 class PersistentMap {
   private _mapPrefix: string;
 
@@ -22,8 +28,8 @@ class PersistentMap {
     return Storage.getKeys(this._key(prefix));
   }
   private _set(key: string, value: string): void {
-    const _key:StaticArray<u8> = this._key(key);
-    const _value:StaticArray<u8> = stringToBytes(value);
+    const _key: StaticArray<u8> = this._key(key);
+    const _value: StaticArray<u8> = stringToBytes(value);
 
     Storage.set(_key, _value);
   }
@@ -36,7 +42,7 @@ class PersistentMap {
   }
   get(key: string): string {
     const _key: StaticArray<u8> = this._key(key);
-    return Storage.has(_key) ? bytesToString(Storage.get(_key)) : "";
+    return Storage.has(_key) ? bytesToString(Storage.get(_key)) : '';
   }
   keys(prefix: string): string[] {
     const keys: StaticArray<u8>[] = this._keys(prefix);
@@ -60,7 +66,7 @@ class PersistentMap {
   add(key: string): bool {
     if (this.has(key)) return false;
 
-    this._set(key, "-1");
+    this._set(key, '-1');
 
     return true;
   }
@@ -76,8 +82,7 @@ class PersistentMap {
   }
 }
 
-
-// moderatorMap : map of moerator => "1"  
+// moderatorMap : map of moerator => "1"
 const moderatorMap: PersistentMap = new PersistentMap(MODERATOR);
 
 // cidMap : map of cid => json

@@ -1,0 +1,15 @@
+{
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "overrides": [
+    {
+      "files": ["assembly/**/*.ts"],
+      "options": {
+        "plugins": ["@massalabs/prettier-config-as"]
+      }
+    }
+  ]
+}
