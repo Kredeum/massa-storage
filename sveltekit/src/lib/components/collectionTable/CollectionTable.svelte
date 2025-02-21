@@ -75,14 +75,14 @@
             </button>
           </th>
         {/each}
-        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
+        <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
       </tr>
     </thead>
     <tbody class="divide-y divide-gray-200 bg-white">
       {#each collections as collection}
         <tr class="cursor-pointer hover:bg-gray-50" onclick={() => handleClick(collection.collectionCid)}>
           <td class="w-[25%] px-4 py-4">
-            <div class="text-sm font-medium text-gray-900">{collection.name}</div>
+            <div class="text-sm font-medium text-gray-600">{collection.name}</div>
           </td>
           <td class="w-[15%] px-4 py-4 text-center text-sm text-gray-500">
             {#if collection.uploadDate && collection.uploadDate.includes(" ")}
@@ -101,6 +101,9 @@
             {shortenString(collection.owner)}
           </td>
           <td class="whitespace-nowrap px-6 py-4">
+            <div class="text-sm text-gray-500">{shortenString(collection.collectionCid)}</div>
+          </td>
+          <td class="whitespace-nowrap px-6 py-4 text-center">
             <span
               class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
               class:bg-yellow-100={collection.status === STATUS_PENDING}
@@ -112,9 +115,6 @@
             >
               {statusLabel(collection.status)}
             </span>
-          </td>
-          <td class="whitespace-nowrap px-6 py-4">
-            <div class="text-sm text-gray-500">{shortenString(collection.collectionCid)}</div>
           </td>
           <td class="whitespace-nowrap px-6 py-4">
             <div class="flex items-center justify-end gap-2">

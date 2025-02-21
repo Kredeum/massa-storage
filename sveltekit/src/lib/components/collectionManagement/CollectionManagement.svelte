@@ -2,7 +2,7 @@
   import { getContext, onMount } from "svelte";
   import { createKuboClient } from "$lib/ts/kubo";
   import type { AddResult } from "kubo-rpc-client";
-  import { STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING, statusLabel } from "@kredeum/massa-storage-common/src/constants";
+  import { STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING } from "@kredeum/massa-storage-common/src/constants";
   import type { CollectionItem, StatusType, CidDataType, CollectionFilterState } from "$lib/ts/types";
   import { goto } from "$app/navigation";
   import { toast } from "svelte-hot-french-toast";
@@ -14,19 +14,17 @@
   import { UploadStore } from "$lib/runes/UploadStore.svelte";
   import { FilterStore } from "$lib/runes/FilterStore.svelte";
 
-  import { formatDate, formatSize, shortenString, timestamp } from "$lib/ts/utils";
+  import { formatDate, timestamp } from "$lib/ts/utils";
   import CollectionTable from "../collectionTable/CollectionTable.svelte";
 
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
 
   let uploadStore = new UploadStore();
-  let filterStore = new FilterStore();
   let uploadInProgress = false;
 
   let collections: CollectionItem[] = [];
   let filteredCollections: CollectionItem[] = $state([]);
   let paginatedCollections: CollectionItem[] = $state([]);
-  let selectedCollections: string[] = [];
   let currentPage = $state(1);
   let itemsPerPage = $state(10);
 

@@ -6,8 +6,8 @@ export const columns = [
   { key: "filesCount", label: "Files", sortable: true },
   { key: "totalSizeBytes", label: "Size", sortable: true },
   { key: "owner", label: "Owner", sortable: false },
-  { key: "status", label: "Status", sortable: true },
-  { key: "collectionCid", label: "CID", sortable: false }
+  { key: "collectionCid", label: "CID", sortable: false },
+  { key: "status", label: "Status", sortable: true }
 ] as const satisfies Array<{
   key: keyof CollectionItem;
   label: string;
