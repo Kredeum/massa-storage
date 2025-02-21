@@ -89,27 +89,6 @@
           {/if}
         </div>
       </td>
-    {:else if column.key === "tags"}
-      <td class="w-[15%] px-4 py-4 text-center">
-        <div class="flex flex-wrap items-center justify-center gap-1">
-          {#each file.tags || [] as tag}
-            <div class="inline-flex items-center rounded-full bg-blue-100 px-2 text-xs text-blue-800">
-              <span class="flex items-center justify-center">
-                {tag}
-              </span>
-              <!-- <button
-                class="cursor-pointer text-gray-500 transition-colors hover:text-blue-900"
-                onclick={(e) => {
-                  e.stopPropagation();
-                  handleTagRemove(tag, [file.cid]);
-                }}
-              >
-                <X size={10} strokeWidth={2} />
-              </button> -->
-            </div>
-          {/each}
-        </div>
-      </td>
     {:else if column.key === "uploadDate"}
       <td class="w-[15%] px-4 py-4 text-center text-sm text-gray-500">
         {#if file.uploadDate && file.uploadDate.includes(" ")}

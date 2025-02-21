@@ -6,10 +6,6 @@ describe("SearchAndFilter", () => {
     // Test name search
   });
 
-  it("Should filter by multiple tags", () => {
-    // Test tag combinations
-  });
-
   it("Should combine search with filters", () => {
     // Test search + status + type filters
   });

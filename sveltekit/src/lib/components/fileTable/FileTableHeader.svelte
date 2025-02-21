@@ -62,7 +62,7 @@
         class="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500"
         class:text-left={column.key === "name"}
         class:text-center={column.key !== "name"}
-        style="width: {column.key === 'name' ? '25%' : column.key === 'tags' || column.key === 'uploadDate' ? '15%' : column.key === null ? '13%' : '8%'}"
+        style="width: {column.key === 'name' ? '25%' : column.key === 'uploadDate' ? '15%' : column.key === null ? '13%' : '8%'}"
       >
         <button
           class="inline-flex items-center gap-1"
@@ -73,7 +73,7 @@
           onclick={() => column.key && column.sortable && handleSort(column.key)}
         >
           <span>{column.label}</span>
-          {#if column.sortable && column.key !== "tags"}
+          {#if column.sortable}
             <span class="ml-1">
               {#if sortConfig.key === column.key}
                 {#if sortConfig.direction === "desc"}

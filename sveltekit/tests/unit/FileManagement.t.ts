@@ -8,10 +8,6 @@ describe("FileManagement", () => {
     // fileManagement = new FileManagement();
   });
 
-  it("Should correctly tag files from directory", () => {
-    // Test if files inherit directory name as tag
-  });
-
   it("Should detect file types from extensions", () => {
     // Test various file extensions
   });

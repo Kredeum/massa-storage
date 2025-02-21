@@ -18,7 +18,6 @@ export interface FileItem {
   sizeInBytes: number;
   status: StatusType;
   type?: FileType;
-  tags: string[];
   isPinned?: boolean;
   blob?: Blob;
   file?: File | undefined;
@@ -38,9 +37,8 @@ export interface CollectionItem {
 }
 
 export interface FilterState {
-  type: "all" | "image" | "video" | "audio" | "document" | "tag";
+  type: "all" | "image" | "video" | "audio" | "document";
   status: "all" | StatusType;
-  tags: string[];
 }
 
 export interface SortConfig {

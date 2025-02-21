@@ -12,7 +12,6 @@
 
   import FileSelectionBar from "./FileSelectionBar.svelte";
   import FilePagination from "./FilePagination.svelte";
-  import TagInput from "./TagInput.svelte";
 
   import { FileStore } from "$lib/runes/FileStore.svelte";
   import { FilterStore } from "$lib/runes/FilterStore.svelte";
@@ -114,7 +113,6 @@
           status: currentStatus,
           isPinned: false,
           arrayBuffer: undefined,
-          tags: fileName ? [fileName] : [],
           type: getFileTypeFromName(fileName)
         };
 
@@ -138,7 +136,6 @@
     <div class="flex items-center justify-between gap-4">
       <div class="flex flex-1 items-center gap-4">
         <SearchBar bind:searchTerm={filterStore.searchQuery} />
-        <TagInput selectedFiles={fileStore.selectedFiles} files={fileStore.files} onAddTag={fileStore.addTag.bind(fileStore)} />
         {#if fileStore.selectedFiles.length > 0}
           <FileSelectionBar
             selectedCount={fileStore.selectedFiles.length}

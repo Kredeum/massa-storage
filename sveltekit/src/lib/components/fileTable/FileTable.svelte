@@ -35,8 +35,6 @@
         <col class="w-[25%]" />
         <!-- Name -->
         <col class="w-[15%]" />
-        <!-- Tags -->
-        <col class="w-[15%]" />
         <!-- Date -->
         <col class="w-[8%]" />
         <!-- Size -->

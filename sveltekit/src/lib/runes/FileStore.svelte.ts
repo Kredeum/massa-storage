@@ -24,22 +24,6 @@ export class FileStore {
     );
   }
 
-  addTag(tag: string, fileIds: string[]) {
-    if (fileIds.length === 0) return;
-    this.files = this.files.map((file) =>
-      fileIds.includes(file.cid) ? { ...file, tags: [...file.tags, tag] } : file
-    );
-    this.selectedFiles = [];
-  }
-
-  removeTag(tag: string, fileIds: string[]) {
-    if (fileIds.length === 0) return;
-    this.files = this.files.map((file) =>
-      fileIds.includes(file.cid) ? { ...file, tags: file.tags.filter((t) => t !== tag) } : file
-    );
-    this.selectedFiles = [];
-  }
-
   bulkApprove() {
     this.files = this.files.map((file) =>
       this.selectedFiles.includes(file.cid) ? { ...file, status: STATUS_APPROVED } : file

@@ -7,8 +7,7 @@ export class FilterStore {
 
   filters: FilterState = $state({
     type: "all",
-    status: "all",
-    tags: []
+    status: "all"
   });
 
   sortConfig: SortConfig = $state({
@@ -48,12 +47,9 @@ export class FilterStore {
     return files.filter((file) => {
       const matchesType = this.filters.type === "all" || file.type === this.filters.type;
       const matchesStatus = this.filters.status === "all" || file.status === this.filters.status;
-      const matchesTags =
-        this.filters.tags.length === 0 ||
-        (file.tags && file.tags.some((tag) => this.filters.tags.includes(tag)));
       const matchesSearch =
         !this.searchQuery || file.name.toLowerCase().includes(this.searchQuery.toLowerCase());
-      return matchesType && matchesStatus && matchesTags && matchesSearch;
+      return matchesType && matchesStatus && matchesSearch;
     });
   }
 

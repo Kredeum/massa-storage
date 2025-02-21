@@ -20,7 +20,6 @@ describe("FileStore", () => {
         status: STATUS_PENDING,
         uploadDate: new Date().toISOString(),
         sizeInBytes: 1000,
-        tags: ["tag1"],
         type: "image",
         isPinned: false
       },
@@ -30,7 +29,6 @@ describe("FileStore", () => {
         status: STATUS_PENDING,
         uploadDate: new Date().toISOString(),
         sizeInBytes: 2000,
-        tags: ["tag2"],
         type: "document",
         isPinned: false
       }
@@ -56,20 +54,6 @@ describe("FileStore", () => {
     fileStore.togglePin("test-cid-1");
     expect(fileStore.files[0].isPinned).toBe(true);
     expect(fileStore.files[1].isPinned).toBe(false);
-  });
-
-  it("should add tags to files", () => {
-    fileStore.addFiles(testFiles);
-    fileStore.addTag("newtag", ["test-cid-1"]);
-    expect(fileStore.files[0].tags).toContain("newtag");
-    expect(fileStore.files[1].tags).not.toContain("newtag");
-  });
-
-  it("should remove tags from files", () => {
-    fileStore.addFiles(testFiles);
-    fileStore.removeTag("tag1", ["test-cid-1"]);
-    expect(fileStore.files[0].tags).not.toContain("tag1");
-    expect(fileStore.files[1].tags).toContain("tag2");
   });
 
   it("should bulk approve files", () => {

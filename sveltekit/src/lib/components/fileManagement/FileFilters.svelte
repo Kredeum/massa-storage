@@ -14,9 +14,6 @@
     files: FileItem[];
   } = $props();
 
-  // Get unique tags from files
-  const uniqueTags: string[] = $derived(Array.from(new Set(files.flatMap((f) => f.tags || []))));
-
   function handleTypeFilterChange(e: Event) {
     const value = (e.target as HTMLSelectElement).value as FilterState["type"];
     onTypeFilter(value);
@@ -25,15 +22,6 @@
   function handleStatusFilterChange(e: Event) {
     const value = (e.target as HTMLSelectElement).value as FilterState["status"];
     filters.status = value;
-  }
-
-  function handleTagSelect(e: Event) {
-    const value = (e.target as HTMLSelectElement).value;
-    if (value) {
-      filters.tags = [value];
-    } else {
-      filters.tags = [];
-    }
   }
 </script>
 
@@ -52,17 +40,6 @@
       <option value={STATUS_APPROVED}>Approved</option>
       <option value={STATUS_PENDING}>Pending</option>
       <option value={STATUS_REJECTED}>Rejected</option>
-    </select>
-
-    <select class="rounded-md border border-gray-300 px-3 py-1.5 text-sm" onchange={handleTagSelect} value={filters.tags[0] || ""} disabled={uniqueTags.length === 0}>
-      <option value="">Search by tag...</option>
-      {#if uniqueTags.length === 0}
-        <option value="" disabled>No tags available</option>
-      {:else}
-        {#each uniqueTags as tag}
-          <option value={tag}>{tag}</option>
-        {/each}
-      {/if}
     </select>
   </div>
 </div>
