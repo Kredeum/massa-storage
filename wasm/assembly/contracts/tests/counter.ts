@@ -8,7 +8,10 @@ import { ownership } from '@massalabs/sc-standards';
  * @param deployer The deployer's address serialized as a `StaticArray<u8>`.
  */
 export function constructor(deployer: StaticArray<u8>): void {
-  assert(Context.isDeployingContract(), "Constructor can only be called during deployment");
+  assert(
+    Context.isDeployingContract(),
+    'Constructor can only be called during deployment',
+  );
   ownership.setOwner(deployer); // Set the deployer as the owner
   initialize(); // Set initial counter value
 }
@@ -54,7 +57,9 @@ export function increment(n: StaticArray<u8>): void {
   const incrementValue = new Args(n)
     .nextU64()
     .expect('increment argument is missing or invalid');
-  const countValue = new Args(getCount()).nextU64().expect('getCount is missing or invalid');
+  const countValue = new Args(getCount())
+    .nextU64()
+    .expect('getCount is missing or invalid');
   const totalCount = countValue + incrementValue; // Calculate the new counter value
   setCount(u64ToBytes(totalCount)); // Update the counter
 }

@@ -1,11 +1,27 @@
-import { Account, Web3Provider, type Provider } from "@massalabs/massa-web3";
+import { Account, JsonRpcProvider, JsonRpcPublicProvider } from "@massalabs/massa-web3";
 import { Reader } from "./reader.svelte";
 import { shortenString } from "$lib/ts/utils";
 import { getWallet, WalletName, type Wallet } from "@massalabs/wallet-provider";
 
+class PrivateKeyProvider {
+  privateKey: string;
+  constructor(privateKey: string) {
+    this.privateKey = privateKey;
+  }
+}
+class WalletProvider {
+  walletName: WalletName;
+  accountNum?: number;
+  constructor(walletName: WalletName, accountNum?: number) {
+    this.walletName = walletName;
+    this.accountNum = accountNum;
+  }
+}
+
 class Writer extends Reader {
   #wallet = $state<Wallet | undefined>();
-  #type = $state<"Provider" | "Wallet" | "PrivateKey">("Provider");
+  #type = $state<"PublicProvider" | "Provider" | "Wallet" | "PrivateKey">("PublicProvider");
+  #accountNum = $state<number>(0);
 
   get wallet() {
     return this.#wallet;
@@ -21,9 +37,13 @@ class Writer extends Reader {
 
   // ACCOUNT
   get name(): string {
-    return this.#type === "PrivateKey"
-      ? "Burner Wallet"
-      : this.provider.providerName || this.provider.accountName || "No name";
+    if (!this.provider.providerName) return "";
+    if (this.#type === "PrivateKey") return "Burner Wallet";
+    if (this.provider.accountName === this.provider.address) {
+      return this.provider.providerName + " #" + (this.#accountNum + 1);
+    } else {
+      return this.provider.accountName;
+    }
   }
   #balance = $state<bigint | undefined>();
   get address() {
@@ -49,7 +69,7 @@ class Writer extends Reader {
       return false;
     }
 
-    return super.refresh();
+    return super.refreshReader();
   }
 
   // CONNECT
@@ -78,57 +98,60 @@ class Writer extends Reader {
     return true;
   }
 
-  async setProviderFromWallet(walletName = WalletName.Bearby, accountNum = 0): Promise<void> {
-    const wallet = await getWallet(walletName);
-    if (!wallet) throw new Error(`Wallet ${walletName} not found`);
+  async setProviderJsonRpc(provider: JsonRpcProvider) {
+    this.#type = "Provider";
+    this.setProvider(provider);
+  }
+
+  async setProviderJsonRpcPublic(provider: JsonRpcPublicProvider) {
+    this.#type = "PublicProvider";
+    this.setProvider(provider);
+  }
+
+  async setProviderWallet(
+    walletProvider: WalletProvider = { walletName: WalletName.Bearby }
+  ): Promise<void> {
+    const wallet = await getWallet(walletProvider.walletName);
+    if (!wallet) throw new Error(`Wallet ${walletProvider.walletName} not found`);
 
     this.#wallet = wallet;
+    this.#accountNum = walletProvider?.accountNum ?? 0;
 
     const accounts = await wallet.accounts();
-    const provider = accounts[accountNum];
-    if (!provider) throw new Error(`Wallet ${walletName} Account #${accountNum} not found`);
+    const provider = accounts[this.#accountNum];
+    if (!provider)
+      throw new Error(
+        `Wallet ${walletProvider.walletName} Account #${walletProvider.accountNum} not found`
+      );
 
     this.#type = "Wallet";
-    this.provider = provider;
+    this.setProvider(provider);
 
     await this.connect();
   }
 
   // ONLY for testnet address
   // DO NOT use with address with real value on mainnet !!!
-  async setProviderFromPrivateKey(privateKey: string): Promise<void> {
-    const account = await Account.fromPrivateKey(privateKey);
-    console.log("setProviderFromPrivateKey", account.address.toString());
+  async setProviderPrivateKey(privateKeyProvider: PrivateKeyProvider): Promise<void> {
+    const account = await Account.fromPrivateKey(privateKeyProvider.privateKey);
 
     this.#type = "PrivateKey";
-    this.provider = Web3Provider.buildnet(account);
+    this.setProvider(JsonRpcProvider.buildnet(account));
 
     await this.connect();
   }
 
   constructor(
-    param?: Provider | { privateKey: string } | { walletName: WalletName; accountNum?: number }
+    param?: JsonRpcProvider | JsonRpcPublicProvider | WalletProvider | PrivateKeyProvider
   ) {
-    // Default Wallet
-    if (!param) {
-      super();
-      this.setProviderFromWallet();
-      return;
-    }
-
-    // Provider
-    if ("address" in param) {
-      super(param);
-      return;
-    }
-
     super();
 
-    // Wallet
-    if ("walletName" in param) this.setProviderFromWallet(param.walletName, param.accountNum);
-
-    // PrivateKey
-    if ("privateKey" in param) this.setProviderFromPrivateKey(param.privateKey);
+    if (!param) this.setProviderWallet();
+    else if (param instanceof JsonRpcProvider) this.setProviderJsonRpc(param);
+    else if (param instanceof JsonRpcPublicProvider) this.setProviderJsonRpcPublic(param);
+    else if (param instanceof WalletProvider) this.setProviderWallet(param);
+    else if (param instanceof PrivateKeyProvider) this.setProviderPrivateKey(param);
+    else throw new Error("Invalid Writer constructor parameter");
   }
 }
 

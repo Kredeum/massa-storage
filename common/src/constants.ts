@@ -1,8 +1,6 @@
 // common source to sveltekit typescript and wasm assemblyscript
 // BE CAREFULL: some typescript types not accepted by the wasm compiler
 
-const GREETING_KEY = "GREETING";
-
 const MODERATOR = "moderator";
 const CID = "cid";
 
@@ -17,4 +15,4 @@ function statusLabel(status: string): string {
   return "Unknown";
 }
 
-export { MODERATOR, CID, GREETING_KEY, STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING, statusLabel };
+export { MODERATOR, CID,  STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING, statusLabel };
