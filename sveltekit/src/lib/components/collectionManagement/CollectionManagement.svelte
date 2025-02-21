@@ -7,7 +7,6 @@
   import { goto } from "$app/navigation";
   import { toast } from "svelte-hot-french-toast";
 
-  import SearchBar from "../fileManagement/SearchBar.svelte";
   import FilePagination from "../fileManagement/FilePagination.svelte";
   import FileUpload from "../fileManagement/FileUpload.svelte";
   import CollectionFilters from "../collectionTable/CollectionFilters.svelte";
@@ -30,7 +29,7 @@
   let selectedCollections: string[] = [];
   let currentPage = $state(1);
   let itemsPerPage = $state(10);
-  let searchQuery = $state("");
+
   let collectionFilters = $state<CollectionFilterState>({
     status: "all"
   });
@@ -120,9 +119,7 @@
 
   function updateFilteredCollections() {
     filteredCollections = collections.filter((collection) => {
-      const matchesSearch = collection.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = collectionFilters.status === "all" || collection.status === collectionFilters.status;
-      return matchesSearch && matchesStatus;
+      return collectionFilters.status === "all" || collection.status === collectionFilters.status;
     });
     updatePagination();
   }
@@ -156,11 +153,6 @@
 
   function handleCollectionClick(collectionCid: string) {
     goto(`/app/collection/${collectionCid}`);
-  }
-
-  function handleSearch(event: CustomEvent<string>) {
-    searchQuery = event.detail;
-    updateFilteredCollections();
   }
 
   function handleStatusFilter(status: StatusType | "all") {
@@ -250,11 +242,8 @@
       <FileUpload bind:files={uploadStore.uploadCollection} />
     </div>
 
-    <div class="flex items-center justify-between gap-4">
-      <div class="flex items-center gap-4">
-        <SearchBar bind:searchTerm={searchQuery} />
-        <CollectionFilters filters={collectionFilters} onStatusFilter={handleStatusFilter} />
-      </div>
+    <div class="flex items-center justify-end gap-4">
+      <CollectionFilters filters={collectionFilters} onStatusFilter={handleStatusFilter} />
     </div>
 
     <!-- Collection Table -->
