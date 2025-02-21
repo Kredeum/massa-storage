@@ -37,7 +37,7 @@
   };
 
   let sortConfig: SortConfig = $state({
-    key: "creationDate" as keyof CollectionItem,
+    key: "uploadDate" as keyof CollectionItem,
     direction: "desc" as const
   });
 
@@ -101,7 +101,7 @@
           totalSizeBytes: totalSize,
           filesCount: filesCount,
           status: currentStatus,
-          creationDate: attributes.date,
+          uploadDate: attributes.date,
           isPinned: false
         };
 
@@ -231,21 +231,21 @@
   }
 </script>
 
-  <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
+<div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 flex flex-col gap-4">
-      <div class="mb-8">
-        <FileUpload bind:files={uploadStore.uploadCollection} />
-      </div>
+    <div class="mb-8">
+      <FileUpload bind:files={uploadStore.uploadCollection} />
+    </div>
 
-      <div class="flex items-center justify-between">
-        <SearchBar bind:searchTerm={filterStore.searchQuery} />
-      </div>
+    <div class="flex items-center justify-between">
+      <SearchBar bind:searchTerm={filterStore.searchQuery} />
+    </div>
 
-      <!-- Collection Table -->
-      <CollectionTable collections={paginatedCollections} {sortConfig} {handleSort} handleClick={handleCollectionClick} onModerate={handleModerate} onPin={handlePin} />
+    <!-- Collection Table -->
+    <CollectionTable collections={paginatedCollections} {sortConfig} {handleSort} handleClick={handleCollectionClick} onModerate={handleModerate} onPin={handlePin} />
 
-      <div class="mt-4">
-        <FilePagination {currentPage} totalPages={Math.ceil(filteredCollections.length / itemsPerPage)} {itemsPerPage} totalItems={filteredCollections.length} {setPage} />
-      </div>
+    <div class="mt-4">
+      <FilePagination {currentPage} totalPages={Math.ceil(filteredCollections.length / itemsPerPage)} {itemsPerPage} totalItems={filteredCollections.length} {setPage} />
     </div>
   </div>
+</div>

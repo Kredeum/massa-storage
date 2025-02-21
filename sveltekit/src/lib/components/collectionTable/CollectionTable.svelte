@@ -72,7 +72,7 @@
           </td>
           <td class="whitespace-nowrap px-6 py-4">
             <div class="text-sm text-gray-900">
-              {new Date(collection.creationDate).toLocaleDateString()}
+              {collection.uploadDate}
             </div>
           </td>
           <td class="whitespace-nowrap px-6 py-4">
