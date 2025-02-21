@@ -2,7 +2,7 @@
   import { getContext, onMount } from "svelte";
   import { createKuboClient } from "$lib/ts/kubo";
   import type { AddResult } from "kubo-rpc-client";
-  import { STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING } from "@kredeum/massa-storage-common/src/constants";
+  import { STATUS_PENDING, STATUS_APPROVED, STATUS_REJECTED } from "@kredeum/massa-storage-common/src/constants";
   import type { CidDataType, CollectionItem } from "$lib/ts/types";
 
   import SearchBar from "./SearchBar.svelte";
@@ -40,16 +40,6 @@
     const dirCid = files[files.length - 1].cid.toString();
     console.log("dirCid", dirCid);
     return dirCid;
-  };
-
-  const handleApprove = (fileStore: FileStore) => {
-    fileStore.bulkApprove.bind(fileStore);
-    fileStore.files.map((file) => ipfs.cidValidate(file.cid));
-  };
-
-  const handleReject = (fileStore: FileStore) => {
-    fileStore.bulkReject.bind(fileStore);
-    fileStore.files.map((file) => ipfs.cidReject(file.cid));
   };
 
   onMount(async () => {
@@ -136,14 +126,6 @@
     <div class="flex items-center justify-between gap-4">
       <div class="flex flex-1 items-center gap-4">
         <SearchBar bind:searchTerm={filterStore.searchQuery} />
-        {#if fileStore.selectedFiles.length > 0}
-          <FileSelectionBar
-            selectedCount={fileStore.selectedFiles.length}
-            onApprove={() => handleApprove(fileStore)}
-            onReject={() => handleReject(fileStore)}
-            onPin={fileStore.bulkPin.bind(fileStore)}
-          />
-        {/if}
       </div>
       <FileFilters filters={filterStore.filters} files={fileStore.files} onTypeFilter={filterStore.setTypeFilter.bind(filterStore)} onSort={(config) => filterStore.setSortConfig(config)} />
     </div>
@@ -174,7 +156,7 @@
       {filteredFiles}
     >
       {#snippet actions(file)}
-        <ButtonActions item={file} type="file" onModerate={(data) => fileStore.updateStatusType(data.id, data.status)} onPin={(id) => fileStore.togglePin(id)} />
+        <ButtonActions item={file} type="file" />
       {/snippet}
     </FileTable>
   {/if}

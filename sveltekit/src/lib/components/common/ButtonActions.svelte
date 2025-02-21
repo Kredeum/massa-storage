@@ -20,8 +20,8 @@
     type = "file"
   }: {
     item: FileItem | CollectionItem;
-    onModerate: (data: { id: string; status: StatusType }) => void;
-    onPin: (id: string) => void;
+    onModerate?: (data: { id: string; status: StatusType }) => void;
+    onPin?: (id: string) => void;
     type?: "file" | "collection";
   } = $props();
 
@@ -33,12 +33,16 @@
     if (status == STATUS_APPROVED) await ipfs.cidValidate(id);
     if (status == STATUS_REJECTED) await ipfs.cidReject(id);
 
-    onModerate({ id, status });
+    if (onModerate) {
+      onModerate({ id, status });
+    }
   };
 
   const handlePin = () => {
     const id = type === "file" ? (item as FileItem).cid : (item as CollectionItem).collectionCid;
-    onPin(id);
+    if (onPin) {
+      onPin(id);
+    }
   };
 
   const getErrorMessage = (error: unknown): string => {
@@ -131,7 +135,7 @@
 </script>
 
 <div class="flex items-center justify-end gap-2">
-  {#if isModerator}
+  {#if isModerator && onModerate}
     <button
       onclick={(e) => {
         e.stopPropagation();
@@ -154,17 +158,19 @@
     </button>
   {/if}
 
-  <button
-    onclick={(e) => {
-      e.stopPropagation();
-      handlePin();
-    }}
-    class="cursor-pointer transition-colors hover:text-blue-900"
-    class:text-blue-600={item.isPinned}
-    class:text-gray-400={!item.isPinned}
-  >
-    <Pin size={22} strokeWidth={2} class={!item.isPinned ? "rotate-45" : ""} />
-  </button>
+  {#if onPin}
+    <button
+      onclick={(e) => {
+        e.stopPropagation();
+        handlePin();
+      }}
+      class="cursor-pointer transition-colors hover:text-blue-900"
+      class:text-blue-600={item.isPinned}
+      class:text-gray-400={!item.isPinned}
+    >
+      <Pin size={22} strokeWidth={2} class={!item.isPinned ? "rotate-45" : ""} />
+    </button>
+  {/if}
 
   <button onclick={handleDownload} class="cursor-pointer text-gray-500 transition-colors hover:text-blue-900" aria-label={type === "file" ? "Download file" : "Download collection"}>
     <Download size={22} strokeWidth={2} />
