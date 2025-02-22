@@ -1,23 +1,28 @@
 import { expect, test } from "@playwright/test";
 import { Account } from "@massalabs/massa-web3";
+import { URL_APP } from "./common";
 
 test("can add and remove moderator", async ({ page }) => {
   const account: Account = await Account.generate();
   const testAddress = account.address.toString();
+  console.log("testAddress:", testAddress);
 
-  await page.goto("http://localhost:5173/app/moderators", { waitUntil: "networkidle" });
+  const url = `${URL_APP}/moderators?key=${process.env.PRIVATE_KEY_DEPLOYER}`;
+
+  await page.goto(url, { waitUntil: "networkidle" });
   await expect(page.locator("#button-disconnect")).toBeVisible();
   await expect(page.locator("#button-moderator-add")).toBeVisible();
 
   await page.locator("#input-moderator-address").fill(testAddress);
+  await expect(page.locator("#input-moderator-address")).toHaveValue(testAddress);
   await page.locator("#button-moderator-add").click();
 
-  await expect(page.getByText(testAddress)).toBeVisible();
+  const moderatorTr = page.locator(`tr:has-text("${testAddress}")`);
+  await expect(moderatorTr).toBeVisible({ timeout: 30000 });
 
-  // // Remove moderator
-  // await page.getByRole("button", { name: "❌" }).click();
+  const moderatorDeleteButton = moderatorTr.locator("button");
+  await expect(moderatorDeleteButton).toBeVisible();
+  await moderatorDeleteButton.click();
 
-  // // Verify moderator is removed from the list
-  // await expect(page.getByText(testAddress)).not.toBeVisible();
-  // await expect(page.getByText("❌")).toBeVisible();
+  await expect(page.locator(`tr:has-text("${testAddress}")`)).not.toBeVisible({ timeout: 30000 });
 });

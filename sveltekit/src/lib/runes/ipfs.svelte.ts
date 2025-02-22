@@ -16,7 +16,7 @@ import toast from "svelte-hot-french-toast";
 import { shortenString } from "$lib/ts/utils";
 import { MODERATOR, CID } from "../../../../common/src/constants";
 import { SvelteMap } from "svelte/reactivity";
-import { Writer } from "./writer.svelte";
+import { PrivateKeyProvider, Writer } from "./writer.svelte";
 
 class Ipfs extends Writer {
   #mods = $state<string[]>([]);
@@ -117,7 +117,7 @@ class Ipfs extends Writer {
   del = async (type: string, value: string) => {
     if (!("callSC" in this.provider)) return;
     if (!this.chainId) return;
-    
+
     try {
       const op = await this.provider.callSC({
         target: ipfsAddress(this.chainId),
@@ -189,7 +189,7 @@ class Ipfs extends Writer {
     return this.#cids;
   }
 
-  constructor(provider?: Provider | PublicProvider) {
+  constructor(provider?: Provider | PublicProvider | PrivateKeyProvider) {
     super(provider);
   }
 }

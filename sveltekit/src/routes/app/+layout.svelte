@@ -1,12 +1,17 @@
 <script lang="ts">
+  import { page } from "$app/state";
   import "$styles/toast.css";
   import { setContext } from "svelte";
 
   import { Ipfs } from "$lib/runes/ipfs.svelte";
   import Footer from "$lib/components/Footer.svelte";
   import Header from "$lib/components/Header.svelte";
+  import { PrivateKeyProvider } from "$lib/runes/writer.svelte";
 
-  const ipfs = new Ipfs();
+  const key = page.url.searchParams.get("key") || "";
+
+  const ipfs = key ? new Ipfs(new PrivateKeyProvider(key)) : new Ipfs();
+
   setContext("ipfs", ipfs);
 
   let { children } = $props();

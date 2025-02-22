@@ -1,13 +1,12 @@
 import {
   Account,
   JsonRpcProvider,
-  JsonRpcPublicProvider,
   type Provider,
   type PublicProvider
 } from "@massalabs/massa-web3";
 import { Reader } from "./reader.svelte";
 import { shortenString } from "$lib/ts/utils";
-import { getWallet, WalletName, type Wallet } from "@massalabs/wallet-provider";
+import { getWallet, getWallets, WalletName, type Wallet } from "@massalabs/wallet-provider";
 
 class PrivateKeyProvider {
   privateKey: string;
@@ -17,9 +16,9 @@ class PrivateKeyProvider {
 }
 
 class WalletProvider {
-  walletName: WalletName;
+  walletName?: WalletName;
   accountNum?: number;
-  constructor(walletName: WalletName, accountNum?: number) {
+  constructor(walletName?: WalletName, accountNum?: number) {
     this.walletName = walletName;
     this.accountNum = accountNum;
   }
@@ -119,22 +118,27 @@ class Writer extends Reader {
     await super.setProvider(provider);
   }
 
-  async setProviderWallet(
-    walletProvider: WalletProvider = { walletName: WalletName.Bearby }
-  ): Promise<void> {
-    const wallet = await getWallet(walletProvider.walletName);
-    if (!wallet) throw new Error(`Wallet ${walletProvider.walletName} not found`);
+  async setProviderWallet(walletProvider: WalletProvider = {}): Promise<void> {
+    let wallet: Wallet | undefined;
+
+    if (!walletProvider.walletName) {
+      const wallets = await getWallets();
+      if (wallets.length === 0) throw new Error("No wallet installed");
+      wallet = wallets[0];
+    } else {
+      wallet = await getWallet(walletProvider.walletName);
+      if (!wallet) throw new Error(`Wallet ${walletProvider.walletName} not found`);
+    }
+
+    const accountNum = walletProvider.accountNum ?? 0;
+    const accounts = await wallet.accounts();
+    const provider = accounts[accountNum];
+    if (!provider) {
+      throw new Error(`Wallet ${wallet.name()} Account #${accountNum} not found`);
+    }
 
     this.#wallet = wallet;
-    this.#accountNum = walletProvider?.accountNum ?? 0;
-
-    const accounts = await wallet.accounts();
-    const provider = accounts[this.#accountNum];
-    if (!provider)
-      throw new Error(
-        `Wallet ${walletProvider.walletName} Account #${walletProvider.accountNum} not found`
-      );
-
+    this.#accountNum = accountNum;
     this.#type = "Wallet";
     await super.setProvider(provider);
 

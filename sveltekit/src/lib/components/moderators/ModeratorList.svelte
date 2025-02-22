@@ -74,14 +74,15 @@
           {#each ipfs?.mods as moderator}
             <tr>
               <td class="whitespace-nowrap px-6 py-4">
-                <button
-                  type="button"
+                <div
+                  role="button"
+                  tabindex="0"
                   class="font-mono text-sm text-gray-900 hover:text-gray-700 focus:outline-none"
                   onclick={() => handleCopyAddress(moderator)}
                   onkeydown={(e) => e.key === "Enter" && handleCopyAddress(moderator)}
                 >
                   {moderator}
-                </button>
+                </div>
               </td>
 
               <td class="whitespace-nowrap px-6 py-4 text-center">

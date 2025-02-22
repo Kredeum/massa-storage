@@ -7,7 +7,7 @@ import {
 import { getScByteCode } from './utils';
 import { updateAddresses } from './addresses';
 
-const account = await Account.fromEnv(process.env.PRIVATE_DEPLOYER_KEY);
+const account = await Account.fromEnv(process.env.PRIVATE_KEY_DEPLOYER);
 
 // const provider = Web3Provider.fromRPCUrl('http://127.0.0.1:33035', account);
 // const provider = Web3Provider.mainnet(account);

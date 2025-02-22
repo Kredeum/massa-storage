@@ -1,6 +1,11 @@
 import { SvelteMap } from "svelte/reactivity";
 import { describe, it, expect, beforeEach } from "vitest";
-import { bytesToStr, JsonRpcPublicProvider, type PublicProvider } from "@massalabs/massa-web3";
+import {
+  Account,
+  bytesToStr,
+  JsonRpcPublicProvider,
+  type PublicProvider
+} from "@massalabs/massa-web3";
 import { ipfsAddress } from "$lib/ts/config";
 import { Ipfs } from "$lib/runes/ipfs.svelte";
 
@@ -9,9 +14,12 @@ describe("IPFS class", () => {
   let provider: PublicProvider;
   let chainId: string;
   let target: string;
+  let deployer: string;
 
   beforeEach(async () => {
-    provider = JsonRpcPublicProvider.buildnet() ;
+    deployer = (await Account.fromEnv("PRIVATE_KEY_DEPLOYER")).address.toString();
+
+    provider = JsonRpcPublicProvider.buildnet();
 
     ipfs = new Ipfs(provider);
 
@@ -25,15 +33,13 @@ describe("IPFS class", () => {
     expect(ipfs.provider).toBe(provider);
   });
 
-  it("Should get contract owner", async () => {
+  it("Owner should be deployer", async () => {
     const dataStoreVal = await provider.readStorage(target, ["OWNER"], false);
 
     const owner = bytesToStr(dataStoreVal[0]);
     console.log("Owner:", owner);
 
-    expect(owner).toBeDefined();
-    expect(typeof owner).toBe("string");
-    expect(owner.length).toBeGreaterThan(0);
+    expect(owner).toBe(deployer);
   });
 
   it("Should get list of moderators as Array", async () => {

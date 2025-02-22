@@ -10,7 +10,7 @@ describe.skip("IPFS class", () => {
   let target: string;
 
   beforeEach(async () => {
-    const account = await Account.fromEnv("PRIVATE_DEPLOYER_KEY");
+    const account = await Account.fromEnv("PRIVATE_KEY_DEPLOYER");
     provider = JsonRpcProvider.buildnet(account);
 
     ipfs = new Ipfs(provider);

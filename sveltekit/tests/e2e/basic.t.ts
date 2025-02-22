@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
+import { URL_APP } from "./common";
 
 test("home page has connect button and log invite", async ({ page }) => {
-  await page.goto("http://localhost:5173/");
+  await page.goto(URL_APP);
 
   await expect(page.getByRole("button", { name: "Connect" })).toBeVisible();
   await expect(page.locator("#button-connect")).toHaveText("Connect");

@@ -1,4 +1,9 @@
-import { Account, JsonRpcProvider, JsonRpcPublicProvider, type PublicProvider } from "@massalabs/massa-web3";
+import {
+  Account,
+  JsonRpcProvider,
+  JsonRpcPublicProvider,
+  type PublicProvider
+} from "@massalabs/massa-web3";
 import { describe, it, beforeEach, expect } from "vitest";
 
 describe("Public Provider", () => {
@@ -46,7 +51,7 @@ describe("Provider", () => {
   let provider: JsonRpcProvider;
 
   beforeEach(async () => {
-    const account = await Account.fromEnv("PRIVATE_DEPLOYER_KEY");
+    const account = await Account.fromEnv("PRIVATE_KEY_DEPLOYER");
     provider = JsonRpcProvider.buildnet(account);
   });
 
