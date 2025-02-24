@@ -43,9 +43,28 @@
 
   const ipfs: Ipfs = getContext("ipfs");
   const kubo = createKuboClient();
+  let isModerator = $state(false);
 
   onMount(async () => {
+    if (ipfs?.address) {
+      await ipfs.moderatorsGet();
+      isModerator = ipfs.isModeratorFunc(ipfs.address);
+      console.log("onMount - isModerator:", isModerator, "address:", ipfs.address);
+    }
     await loadCollections();
+  });
+
+  $effect(() => {
+    if (ipfs?.address) {
+      ipfs.moderatorsGet().then(() => {
+        isModerator = ipfs.isModeratorFunc(ipfs.address);
+        console.log("effect - isModerator:", isModerator, "address:", ipfs.address);
+      });
+    }
+  });
+
+  $effect(() => {
+    console.log("Current isModerator state:", isModerator);
   });
 
   async function loadCollections() {
@@ -249,7 +268,7 @@
         <p class="mt-2">There are no collections with {collectionFilters.status.toLowerCase()} status</p>
       </div>
     {:else}
-      <CollectionTable collections={paginatedCollections} {sortConfig} {handleSort} handleClick={handleCollectionClick} onModerate={handleModerate} onPin={handlePin} />
+      <CollectionTable collections={paginatedCollections} {sortConfig} {handleSort} handleClick={handleCollectionClick} onModerate={isModerator ? handleModerate : undefined} onPin={handlePin} />
     {/if}
 
     <div class="mt-4">
