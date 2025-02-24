@@ -115,6 +115,16 @@
   }
 
   function updateFilteredCollections() {
+    collections.sort((a, b) => {
+      const aValue = a[sortConfig.key];
+      const bValue = b[sortConfig.key];
+      const modifier = sortConfig.direction === "asc" ? 1 : -1;
+
+      if (aValue < bValue) return -1 * modifier;
+      if (aValue > bValue) return 1 * modifier;
+      return 0;
+    });
+
     filteredCollections = collections.filter((collection) => {
       return collectionFilters.status === "all" || collection.status === collectionFilters.status;
     });
@@ -134,17 +144,6 @@
       sortConfig.key = key;
       sortConfig.direction = "asc";
     }
-
-    collections.sort((a, b) => {
-      const aValue = a[key];
-      const bValue = b[key];
-      const modifier = sortConfig.direction === "asc" ? 1 : -1;
-
-      if (aValue < bValue) return -1 * modifier;
-      if (aValue > bValue) return 1 * modifier;
-      return 0;
-    });
-
     updateFilteredCollections();
   }
 

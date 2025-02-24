@@ -1,7 +1,7 @@
 import type { CollectionItem } from "$lib/ts/types";
 
 export const columns = [
-  { key: "name", label: "Name", sortable: true },
+  { key: "name", label: "Name", sortable: false },
   { key: "uploadDate", label: "Date", sortable: true, defaultSort: { direction: "desc" } },
   { key: "filesCount", label: "Files", sortable: true },
   { key: "totalSizeBytes", label: "Size", sortable: true },
