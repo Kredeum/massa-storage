@@ -7,7 +7,7 @@ import {
   moderatorHas,
   moderatorsGet,
 } from './mods';
-import { cidAdd, cidDelete, cidHas, cidSet, cidsGet } from './cids';
+import { cidAdd, cidDelete, cidHas, cidSet, cidsGet, cidGet } from './cids';
 
 function constructor(_: StaticArray<u8>): void {
   assert(Context.isDeployingContract());
@@ -29,4 +29,5 @@ export {
   cidHas,
   cidSet,
   cidsGet,
+  cidGet,
 };

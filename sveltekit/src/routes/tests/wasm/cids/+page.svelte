@@ -28,7 +28,7 @@
   <div class="w-[800px]">
     <div class="mt-4">
       {#each [...ipfs.cids.entries()] as [_cid, _value]}
-        <p>{_cid}: {statusLabel(_value as StatusType)}</p>
+        <p>{_cid}: {statusLabel(_value.status)}</p>
         <button onclick={() => ipfs.cidDelete(_cid)} class="button-standard"> Delete cid </button>
         <button onclick={() => ipfs.cidValidate(_cid)} class="button-standard"> Validate cid </button>
         <button onclick={() => ipfs.cidReject(_cid)} class="button-standard"> Reject cid </button>

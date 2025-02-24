@@ -35,6 +35,15 @@ export function cidsGet(prefixArg: StaticArray<u8>): StaticArray<u8> {
   // return new Args().serialize();
 }
 
+export function cidGet(cidArg: StaticArray<u8>): StaticArray<u8> {
+  const args: Args = new Args(cidArg);
+  const cid: string = args.nextString().expect('Invalid CID');
+
+  const value: string = cidMap.get(cid);
+
+  return new Args().add(value).serialize();
+}
+
 export function cidSet(paramsArg: StaticArray<u8>): void {
   const args: Args = new Args(paramsArg);
   const key: string = args.nextString().expect('Invalid key');

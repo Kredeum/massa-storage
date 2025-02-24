@@ -14,13 +14,14 @@ import { ipfsAddress } from "$lib/ts/config";
 import type { Wallet, WalletName } from "@massalabs/wallet-provider";
 import toast from "svelte-hot-french-toast";
 import { shortenString } from "$lib/ts/utils";
-import { MODERATOR, CID } from "../../../../common/src/constants";
+import { MODERATOR, CID, STATUS_APPROVED, STATUS_REJECTED } from "../../../../common/src/constants";
+import type { CidDataType } from "$lib/ts/types";
 import { SvelteMap } from "svelte/reactivity";
 import { PrivateKeyProvider, Writer } from "./writer.svelte";
 
 class Ipfs extends Writer {
   #mods = $state<string[]>([]);
-  #cids = $state<SvelteMap<string, string>>(new SvelteMap());
+  #cids = $state<SvelteMap<string, CidDataType>>(new SvelteMap());
 
   has = async (type: string, value: string): Promise<boolean | undefined> => {
     if (!("readSC" in this.provider)) return;
@@ -111,8 +112,46 @@ class Ipfs extends Writer {
       console.error("Error:", error);
     }
   };
-  cidValidate = async (cid: string) => await this.cidSet(cid, "1");
-  cidReject = async (cid: string) => await this.cidSet(cid, "0");
+
+  cidValidate = async (cid: string) => {
+    try {
+      // First, get the current attributes
+      const attributes: CidDataType | null = await this.cidGet(cid);
+      if (!attributes) {
+        throw new Error("CID not found");
+      }
+
+      attributes.status = STATUS_APPROVED;
+
+      // Set the updated attributes
+      await this.cidSet(cid, JSON.stringify(attributes));
+
+      toast.success(`CID ${shortenString(cid)} validated successfully`);
+    } catch (error) {
+      toast.error(`Error validating CID ${shortenString(cid)}`);
+      console.error("Error:", error);
+    }
+  };
+
+  cidReject = async (cid: string) => {
+    try {
+      // First, get the current attributes
+      const attributes: CidDataType | null = await this.cidGet(cid);
+      if (!attributes) {
+        throw new Error("CID not found");
+      }
+
+      attributes.status = STATUS_REJECTED;
+
+      // Set the updated attributes
+      await this.cidSet(cid, JSON.stringify(attributes));
+
+      toast.success(`CID ${shortenString(cid)} rejected successfully`);
+    } catch (error) {
+      toast.error(`Error rejecting CID ${shortenString(cid)}`);
+      console.error("Error:", error);
+    }
+  };
 
   del = async (type: string, value: string) => {
     if (!("callSC" in this.provider)) return;
@@ -180,6 +219,43 @@ class Ipfs extends Writer {
   cidsGet = async () => {
     await this.get(CID);
     return this.#cids;
+  };
+
+  // cidGet = async (cid: string) => await this.get(CID, cid);
+  cidGet = async (cid: string): Promise<CidDataType | null> => {
+    if (!this.provider.readSC) {
+      console.error("ReadSC not available");
+      return null;
+    }
+
+    const func = `cidGet`;
+
+    const result: ReadSCData = await this.provider.readSC({
+      target: ipfsAddress(this.chainId),
+      func,
+      parameter: new Args().addString(cid).serialize()
+    });
+
+    if (result.info.error) {
+      console.error(`${func} ERROR ${result.info.error}`);
+      toast.error(`${func} ERROR`);
+      return null;
+    }
+
+    const args = new Args(result.value);
+    const value = args.nextString();
+    if (!value) {
+      console.error("Empty value returned from smart contract");
+      return null;
+    }
+
+    try {
+      const parsed = JSON.parse(value);
+      return parsed as CidDataType;
+    } catch (error) {
+      console.error(`Error parsing value for CID ${cid}:`, error);
+      return null;
+    }
   };
 
   get mods() {
