@@ -37,7 +37,7 @@
         <div class="flex items-center">
           <FileIcon type={file.type} />
           <div class="relative inline-block">
-            <div class="ml-2 cursor-pointer text-sm font-medium text-gray-600 hover:text-blue-600" on:mouseenter={handleMouseEnter} on:mouseleave={handleMouseLeave}>
+            <div class="ml-2 cursor-pointer text-sm font-medium text-gray-600 hover:text-blue-600" role="button" tabindex="0" onmouseenter={handleMouseEnter} onmouseleave={handleMouseLeave}>
               {shortenString(file.name)}
             </div>
             {#if hoveredPreview && (file.type === "image" || file.type === "video")}
