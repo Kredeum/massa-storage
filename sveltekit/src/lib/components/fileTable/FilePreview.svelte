@@ -15,7 +15,40 @@
 </script>
 
 {#if file.blob}
-  <div class="absolute z-50 rounded-lg border border-gray-200 bg-white p-2 shadow-lg" style="bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 8px; width: 200px; height: 150px;">
-    <img src={objectUrl} alt={file.name} class="h-full w-full object-contain" />
+  <div
+    class="absolute z-[9999] rounded-lg border border-gray-200 bg-white shadow-lg"
+    style="bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 8px;"
+    class:p-2={file.type === "image" || file.type === "video"}
+    class:p-4={file.type === "audio" || file.type === "document"}
+    class:h-[200px]={file.type === "image" || file.type === "video"}
+    class:h-[100px]={file.type === "audio"}
+    class:h-[150px]={file.type === "document"}
+    class:w-[300px]={file.type === "image" || file.type === "video"}
+    class:w-[250px]={file.type === "audio"}
+    class:w-[200px]={file.type === "document"}
+  >
+    {#if file.type === "image"}
+      <img src={objectUrl} alt={file.name} class="h-full w-full object-contain" />
+    {:else if file.type === "video"}
+      <video src={objectUrl} controls class="h-full w-full object-contain">
+        <track kind="captions" />
+      </video>
+    {:else if file.type === "audio"}
+      <audio src={objectUrl} controls class="w-full">
+        <track kind="captions" />
+      </audio>
+    {:else if file.type === "document"}
+      <div class="flex flex-col items-center justify-center gap-4 p-4 text-gray-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
+        <span class="text-sm">{file.name}</span>
+      </div>
+    {/if}
   </div>
 {/if}

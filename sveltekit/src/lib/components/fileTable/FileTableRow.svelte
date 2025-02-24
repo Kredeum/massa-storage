@@ -20,7 +20,7 @@
   let hoveredPreview = $state(false);
 
   function handleMouseEnter(e: MouseEvent) {
-    if (file.type === "image") {
+    if (file.type === "image" || file.type === "video") {
       hoveredPreview = true;
     }
   }
@@ -36,7 +36,14 @@
       <td class="w-[25%] px-4 py-[18px]">
         <div class="flex items-center">
           <FileIcon type={file.type} />
-          <div class="ml-2 text-sm font-medium text-gray-600 hover:text-blue-600">{shortenString(file.name)}</div>
+          <div class="relative inline-block">
+            <div class="ml-2 cursor-pointer text-sm font-medium text-gray-600 hover:text-blue-600" on:mouseenter={handleMouseEnter} on:mouseleave={handleMouseLeave}>
+              {shortenString(file.name)}
+            </div>
+            {#if hoveredPreview && (file.type === "image" || file.type === "video")}
+              <FilePreview {file} />
+            {/if}
+          </div>
         </div>
       </td>
     {:else if column.key === "sizeInBytes"}
