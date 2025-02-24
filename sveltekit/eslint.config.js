@@ -25,6 +25,7 @@ export default ts.config(
       }
     },
     rules: {
+      "@typescript-eslint/no-unused-expressions": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "no-unused-vars": "off",
       // to ignore @apply

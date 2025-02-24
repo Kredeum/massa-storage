@@ -175,7 +175,7 @@
         const attributes: CidDataType = {
           name: `Collection ${timestamp()}`,
           date: formatDate(),
-          owner: ipfs.address,
+          owner: ipfs.address || "",
           status: STATUS_PENDING
         };
 
