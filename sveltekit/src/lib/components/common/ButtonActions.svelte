@@ -11,7 +11,6 @@
 
   const ipfs: Ipfs = getContext("ipfs");
   const kubo = createKuboClient();
-  let isModerator = $derived.by(() => ipfs?.isModeratorFunc(ipfs?.address));
 
   let {
     item,
@@ -141,7 +140,7 @@
 </script>
 
 <div class="flex items-center justify-end gap-2">
-  {#if isModerator && onModerate}
+  {#if onModerate}
     <button
       onclick={(e) => {
         e.stopPropagation();

@@ -19,7 +19,7 @@
     sortConfig: SortConfig;
     handleSort: (key: keyof CollectionItem) => void;
     handleClick: (collectionCid: string) => void;
-    onModerate: (data: { id: string; status: StatusType }) => void;
+    onModerate?: (data: { id: string; status: StatusType }) => void;
     onPin: (id: string) => void;
   } = $props();
 </script>
