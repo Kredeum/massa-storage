@@ -2,7 +2,7 @@ import type { CollectionItem } from "$lib/ts/types";
 
 export const columns = [
   { key: "name", label: "Name", sortable: true },
-  { key: "uploadDate", label: "Date", sortable: true },
+  { key: "uploadDate", label: "Date", sortable: true, defaultSort: { direction: "desc" } },
   { key: "filesCount", label: "Files", sortable: true },
   { key: "totalSizeBytes", label: "Size", sortable: true },
   { key: "owner", label: "Owner", sortable: false },
@@ -12,4 +12,5 @@ export const columns = [
   key: keyof CollectionItem;
   label: string;
   sortable: boolean;
+  defaultSort?: { direction: "asc" | "desc" };
 }>;

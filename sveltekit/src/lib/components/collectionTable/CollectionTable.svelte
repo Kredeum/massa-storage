@@ -60,7 +60,7 @@
               {#if sortable && key !== "name"}
                 <span class="ml-1">
                   {#if sortConfig.key === key}
-                    {#if sortConfig.direction === "desc"}
+                    {#if sortConfig.direction === "asc"}
                       <ChevronDown class="h-4 w-4" />
                     {:else}
                       <ChevronUp class="h-4 w-4" />

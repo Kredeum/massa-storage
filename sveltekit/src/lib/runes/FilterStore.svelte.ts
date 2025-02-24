@@ -62,6 +62,22 @@ export class FilterStore {
         return this.sortConfig.direction === "desc" ? dateB - dateA : dateA - dateB;
       }
 
+      if (
+        this.sortConfig.key === "totalSizeBytes" &&
+        "totalSizeBytes" in a &&
+        "totalSizeBytes" in b
+      ) {
+        return this.sortConfig.direction === "desc"
+          ? a.totalSizeBytes - b.totalSizeBytes
+          : b.totalSizeBytes - a.totalSizeBytes;
+      }
+
+      if (this.sortConfig.key === "filesCount" && "filesCount" in a && "filesCount" in b) {
+        return this.sortConfig.direction === "desc"
+          ? a.filesCount - b.filesCount
+          : b.filesCount - a.filesCount;
+      }
+
       if (this.sortConfig.key === "name") {
         return this.sortConfig.direction === "desc"
           ? a.name.toLowerCase().localeCompare(b.name.toLowerCase())
