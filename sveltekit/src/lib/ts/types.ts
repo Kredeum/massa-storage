@@ -58,12 +58,9 @@ export type Column = {
 export interface PropsFileTable {
   files: FileItem[];
   paginatedFiles: FileItem[];
-  selectedFiles: string[];
   sortConfig: SortConfig;
   handleSort: (key: keyof FileItem) => void;
-  onSelectionChange: (selectedIds: string[]) => void;
   actions?: Snippet<[FileItem]>;
-  filteredFiles: FileItem[];
 }
 
 export interface PropsCollectionTable {

@@ -10,32 +10,14 @@
   import { shortenString } from "$lib/ts/utils";
   import { formatSize } from "$lib/ts/utils";
 
-  let {
-    file,
-    selectedFiles = [],
-    onSelect,
-    actions,
-    onTooltipShow,
-    onTooltipHide
-  } = $props<{
+  let { file, actions, onTooltipShow, onTooltipHide } = $props<{
     file: FileItem;
-    selectedFiles: string[];
-    onSelect: (id: string) => void;
     actions?: import("svelte").Snippet<[FileItem]>;
     onTooltipShow: (content: string, event: MouseEvent) => void;
     onTooltipHide: () => void;
   }>();
 
   let hoveredPreview = $state(false);
-
-  function handleRowClick() {
-    onSelect(file.cid);
-  }
-
-  function handleCheckboxClick(e: Event) {
-    e.stopPropagation();
-    onSelect(file.cid);
-  }
 
   function handleMouseEnter(e: MouseEvent) {
     if (file.type === "image") {
@@ -48,34 +30,7 @@
   }
 </script>
 
-<tr
-  class="cursor-pointer"
-  onclick={handleRowClick}
-  onkeydown={(e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      handleRowClick();
-    }
-  }}
-  role="button"
-  tabindex="0"
->
-  <td class="w-12 px-4 py-[18px]">
-    <input
-      type="checkbox"
-      class="cursor-pointer rounded text-blue-600"
-      checked={selectedFiles.includes(file.cid)}
-      onclick={handleCheckboxClick}
-      onkeydown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          handleCheckboxClick(e);
-        }
-      }}
-      aria-label={`Select ${file.name}`}
-    />
-  </td>
-
+<tr class="hover:bg-gray-50">
   {#each columns as column}
     {#if column.key === "name"}
       <td class="w-[25%] px-4 py-[18px]">

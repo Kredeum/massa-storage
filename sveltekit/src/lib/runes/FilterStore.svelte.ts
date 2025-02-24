@@ -63,15 +63,21 @@ export class FilterStore {
       }
 
       if (this.sortConfig.key === "name") {
-        return this.sortConfig.direction === "asc"
-          ? (b.name ? b.name.toLowerCase() : "").localeCompare(a.name ? a.name.toLowerCase() : "")
-          : (a.name ? a.name.toLowerCase() : "").localeCompare(b.name ? b.name.toLowerCase() : "");
+        return this.sortConfig.direction === "desc"
+          ? a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+          : b.name.toLowerCase().localeCompare(a.name.toLowerCase());
       }
 
       if (this.sortConfig.key === "sizeInBytes" && "sizeInBytes" in a && "sizeInBytes" in b) {
-        return this.sortConfig.direction === "asc"
-          ? b.sizeInBytes - a.sizeInBytes
-          : a.sizeInBytes - b.sizeInBytes;
+        return this.sortConfig.direction === "desc"
+          ? a.sizeInBytes - b.sizeInBytes
+          : b.sizeInBytes - a.sizeInBytes;
+      }
+
+      if (this.sortConfig.key === "type" && "type" in a && "type" in b) {
+        return this.sortConfig.direction === "desc"
+          ? (a.type || "").localeCompare(b.type || "")
+          : (b.type || "").localeCompare(a.type || "");
       }
 
       if (this.sortConfig.key in a && this.sortConfig.key in b) {

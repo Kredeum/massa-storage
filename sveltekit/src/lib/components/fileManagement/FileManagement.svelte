@@ -56,7 +56,8 @@
   };
 
   const filteredFiles = $derived(filterStore.filterFiles(fileStore.files));
-  const paginatedFiles = $derived(filterStore.getPaginatedFiles(filteredFiles));
+  const sortedFiles = $derived(filterStore.sortFiles(filteredFiles));
+  const paginatedFiles = $derived(filterStore.getPaginatedFiles(sortedFiles));
   const totalPages = $derived(filterStore.getTotalPages(filteredFiles));
 </script>
 
@@ -79,20 +80,17 @@
     <FileTable
       files={fileStore.files}
       {paginatedFiles}
-      selectedFiles={fileStore.selectedFiles}
       sortConfig={filterStore.sortConfig}
       handleSort={(key) => {
         if (filterStore.sortConfig.key === key) {
           filterStore.setSortConfig({
             key,
-            direction: filterStore.sortConfig.direction === "asc" ? "desc" : "asc"
+            direction: filterStore.sortConfig.direction === "desc" ? "asc" : "desc"
           });
         } else {
           filterStore.setSortConfig({ key, direction: "desc" });
         }
       }}
-      onSelectionChange={fileStore.setSelectedFiles.bind(fileStore)}
-      {filteredFiles}
     >
       {#snippet actions(file)}
         <ButtonActions item={file} type="file" />
