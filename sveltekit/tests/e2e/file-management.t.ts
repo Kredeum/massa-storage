@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("File Management Component", () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the page containing the file management component
-    await page.goto("/app/files");
+    await page.goto("/app/collections");
     // Wait for the initial load
     await page.waitForSelector("table", { state: "visible" });
     // Wait for data to load

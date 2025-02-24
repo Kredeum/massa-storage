@@ -18,7 +18,6 @@ describe("FileStore", () => {
         cid: "test-cid-1",
         name: "test1.jpg",
         status: STATUS_PENDING,
-        uploadDate: new Date().toISOString(),
         sizeInBytes: 1000,
         type: "image",
         isPinned: false
@@ -27,7 +26,6 @@ describe("FileStore", () => {
         cid: "test-cid-2",
         name: "test2.pdf",
         status: STATUS_PENDING,
-        uploadDate: new Date().toISOString(),
         sizeInBytes: 2000,
         type: "document",
         isPinned: false
