@@ -224,15 +224,15 @@
     }
   }
 
-  // TODO: Implement pin functionality for collections
-
   async function handlePin(cid: string) {
     console.log("handlePin:", cid);
     try {
+      const id = toast.loading("Pinning Collection ...");
       console.log("AVANT kubo.pin:", cid);
       const newCid = await kubo.pin(cid);
       console.log("APRES kubo.pin:", cid);
       console.log("Pin collection:", newCid);
+      toast.dismiss(id);
       toast.success("Collection pinned successfully");
     } catch (error) {
       console.error("Error pinning collection:", error);
