@@ -3,12 +3,7 @@
   import { page } from "$app/state";
   import FileManagement from "$lib/components/fileManagement/FileManagement.svelte";
 
-  let collectionCid = $state<string | null>(null);
-
-  // Bind collectionCid to page.data using a rune
-  $effect(() => {
-    collectionCid = page.data?.collectionCid ?? null;
-  });
+  const collectionCid = $derived(page.data?.collectionCid ?? null);
 </script>
 
 <div class="container mx-auto py-6">

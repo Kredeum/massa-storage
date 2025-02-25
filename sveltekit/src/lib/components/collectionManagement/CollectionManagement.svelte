@@ -63,9 +63,7 @@
     }
   });
 
-  $effect(() => {
-    console.log("Current isModerator state:", isModerator);
-  });
+  $inspect("Current isModerator state:", isModerator);
 
   async function loadCollections() {
     if (!ipfs) return;
@@ -244,7 +242,7 @@
   }
 
   $effect(() => {
-    if (uploadStore.uploadCollection) {
+    if (uploadStore.fileList) {
       uploadCollection();
     }
   });
@@ -258,7 +256,7 @@
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 flex flex-col gap-4">
     <div class="mb-8">
-      <FileUpload bind:files={uploadStore.uploadCollection} />
+      <FileUpload bind:files={uploadStore.fileList} />
     </div>
 
     <div class="flex items-center justify-end gap-4">
