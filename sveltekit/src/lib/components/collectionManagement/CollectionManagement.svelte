@@ -19,6 +19,18 @@
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
   import type ArrowUp_0_1 from "lucide-svelte/icons/arrow-up-0-1";
 
+  let isModerator = $state<boolean>();
+
+  const refresh = async (): Promise<void> => {
+    if (!ipfs.ready) return;
+
+    isModerator = await ipfs.moderatorHas(ipfs.address);
+  };
+
+  $effect(() => {
+    refresh();
+  });
+
   let uploadStore = new UploadStore();
   let uploadInProgress = false;
 
@@ -44,24 +56,9 @@
 
   const ipfs: Ipfs = getContext("ipfs");
   const kubo = createKuboClient();
-  let isModerator = $state(false);
 
   onMount(async () => {
-    if (ipfs?.address) {
-      await ipfs.moderatorsGet();
-      isModerator = ipfs.isModeratorFunc(ipfs.address);
-      console.log("onMount - isModerator:", isModerator, "address:", ipfs.address);
-    }
     await loadCollections();
-  });
-
-  $effect(() => {
-    if (ipfs?.address) {
-      ipfs.moderatorsGet().then(() => {
-        isModerator = ipfs.isModeratorFunc(ipfs.address);
-        console.log("effect - isModerator:", isModerator, "address:", ipfs.address);
-      });
-    }
   });
 
   $inspect("Current isModerator state:", isModerator);

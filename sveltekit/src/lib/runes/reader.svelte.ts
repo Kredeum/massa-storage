@@ -4,6 +4,7 @@ import type { EmptyObject } from "$lib/ts/types";
 class Reader {
   #provider = $state<Provider | PublicProvider | undefined>();
   #network = $state<Network | undefined>();
+  #ready = $state<boolean>(false);
 
   get provider(): Provider | PublicProvider | EmptyObject {
     return this.#provider || {};
@@ -12,7 +13,7 @@ class Reader {
     return this.#network || {};
   }
   get ready(): boolean {
-    return Boolean(this.#provider && this.#network);
+    return this.#ready;
   }
   get networkName(): NetworkName | "???" {
     if (!this.ready) return "???";
@@ -23,20 +24,24 @@ class Reader {
     return this.#network!.chainId.toString();
   }
 
-  async initProvider(provider?: Provider | PublicProvider): Promise<boolean> {
+  async initialize(provider?: Provider | PublicProvider): Promise<boolean> {
     if (!provider) return false;
+    if (this.ready) return false;
+
     this.#provider = provider;
     try {
       this.#network = await this.#provider.networkInfos();
+      this.#ready = true;
     } catch (error) {
       console.error("Error while refreshing network:", error);
-      return false;
+      this.#ready = false;
     }
-    return true;
+
+    return this.#ready;
   }
 
   constructor(provider?: Provider | PublicProvider) {
-    this.initProvider(provider);
+    this.initialize(provider);
   }
 }
 

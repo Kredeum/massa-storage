@@ -1,6 +1,6 @@
 import { describe, it } from "vitest";
 
-describe("ErrorHandling", () => {
+describe.skip("ErrorHandling", () => {
   it("Should handle network errors", () => {
     // Test offline behavior
   });

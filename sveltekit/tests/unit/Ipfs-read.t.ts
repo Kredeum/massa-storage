@@ -21,7 +21,7 @@ describe("IPFS class", () => {
     provider = JsonRpcPublicProvider.buildnet();
 
     ipfs = new Ipfs();
-    await ipfs.initProvider(provider);
+    await ipfs.initialize(provider);
 
     target = ipfsAddress(await ipfs.chainId);
   });

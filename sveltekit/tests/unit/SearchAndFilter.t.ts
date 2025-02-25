@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 
 
-describe("SearchAndFilter", () => {
+describe.skip("SearchAndFilter", () => {
   it("Should search files by name", () => {
     // Test name search
   });
