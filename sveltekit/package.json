@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "all": "pnpm run setup && pnpm run format && pnpm run check && pnpm run build && pnpm run test && pnpm run dev",
-    "clean": "rm -rf node_modules .pnpm-lock.yaml .svelte-kit build",
+    "clean": "rm -rf node_modules .svelte-kit build",
     "setup": "pnpm run clean && pnpm install",
     "sync": "NODE_ENV=prod svelte-kit sync",
     "format": "prettier --write --list-different src",
@@ -54,7 +54,6 @@
     "it-foreach": "^2.1.1",
     "it-merge": "^3.0.5",
     "kubo-rpc-client": "^5.1.0",
-    "lucide-svelte": "^0.475.0",
     "multiformats": "^13.3.2",
     "prettier": "^3.5.1",
     "prettier-plugin-svelte": "^3.3.3",
@@ -80,6 +79,7 @@
     "helia": "^5.2.1",
     "ipfs-unixfs": "^11.2.0",
     "jszip": "^3.10.1",
+    "lucide-svelte": "0.344.0",
     "svelte-hot-french-toast": "^1.0.0",
     "svelte-portal": "^2.2.1"
   }

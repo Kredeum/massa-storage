@@ -46,6 +46,9 @@ importers:
       jszip:
         specifier: ^3.10.1
         version: 3.10.1
+      lucide-svelte:
+        specifier: 0.344.0
+        version: 0.344.0(svelte@5.20.3)
       svelte-hot-french-toast:
         specifier: ^1.0.0
         version: 1.0.0(svelte@5.20.3)
@@ -134,9 +137,6 @@ importers:
       kubo-rpc-client:
         specifier: ^5.1.0
         version: 5.1.0(undici@7.3.0)
-      lucide-svelte:
-        specifier: ^0.475.0
-        version: 0.475.0(svelte@5.20.3)
       multiformats:
         specifier: ^13.3.2
         version: 13.3.2
@@ -4214,8 +4214,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lucide-svelte@0.475.0:
-    resolution: {integrity: sha512-N5+hFTPHaZe9HhqJDxxxODfYuOmI6v+JIowzERcea/uxytN/JZlehVTcINBNp8wMo7l6ov1Jf5srrDbkI/WsJg==}
+  lucide-svelte@0.344.0:
+    resolution: {integrity: sha512-OB/iazftjl2w+vpH7WJqbhHONoMqUT6aaeYvu1BQSgvc7+CKXByu4xvbI7RMOJykaiF/u3LAhyd2ucYBj+rEZQ==}
     peerDependencies:
       svelte: ^3 || ^4 || ^5.0.0-next.42
 
@@ -11615,7 +11615,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lucide-svelte@0.475.0(svelte@5.20.3):
+  lucide-svelte@0.344.0(svelte@5.20.3):
     dependencies:
       svelte: 5.20.3
 

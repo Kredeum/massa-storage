@@ -7,10 +7,7 @@
 
   const ipfs: Ipfs = getContext("ipfs");
 
-  const refresh = async () => {
-    await ipfs?.moderatorsGet();
-  };
-  onMount(refresh);
+  const refresh = async () => await ipfs.moderatorsGet();
 
   let newModeratorAddress: string = $state("");
 
@@ -18,7 +15,7 @@
     event.preventDefault();
     const loadingToast = toast.loading("Adding moderator...");
     try {
-      await ipfs?.moderatorAdd(newModeratorAddress);
+      await ipfs.moderatorAdd(newModeratorAddress);
       newModeratorAddress = "";
       await refresh();
     } catch (error) {
@@ -31,7 +28,7 @@
 
   const deleteModerator = async (moderator: string) => {
     const loadingToast = toast.loading("Deleting moderator...");
-    await ipfs?.moderatorDelete(moderator);
+    await ipfs.moderatorDelete(moderator);
     await refresh();
     toast.dismiss(loadingToast);
   };
@@ -39,6 +36,8 @@
   const handleCopyAddress = async (address: string) => {
     await copyToClipboard(address, "Address copied!");
   };
+
+  onMount(refresh);
 </script>
 
 <div class="space-y-8">
@@ -71,28 +70,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
-          {#each ipfs?.mods as moderator}
-            <tr>
-              <td class="whitespace-nowrap px-6 py-4">
-                <div
-                  role="button"
-                  tabindex="0"
-                  class="font-mono text-sm text-gray-900 hover:text-gray-700 focus:outline-none"
-                  onclick={() => handleCopyAddress(moderator)}
-                  onkeydown={(e) => e.key === "Enter" && handleCopyAddress(moderator)}
-                >
-                  {moderator}
-                </div>
-              </td>
-
-              <td class="whitespace-nowrap px-6 py-4 text-center">
-                <button onclick={() => deleteModerator(moderator)} class="text-red-600 transition duration-200 hover:text-red-900" aria-label="Delete moderator">
-                  <Trash2 class="h-5 w-5" />
-                </button>
-              </td>
-            </tr>
-          {/each}
-          {#if ipfs?.mods.length === 0}
+          {#if ipfs.mods.length === 0}
             <tr>
               <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">
                 <div class="flex flex-col items-center space-y-2">
@@ -101,6 +79,28 @@
                 </div>
               </td>
             </tr>
+          {:else}
+            {#each ipfs.mods as moderator}
+              <tr>
+                <td class="whitespace-nowrap px-6 py-4">
+                  <div
+                    role="button"
+                    tabindex="0"
+                    class="font-mono text-sm text-gray-900 hover:text-gray-700 focus:outline-none"
+                    onclick={() => handleCopyAddress(moderator)}
+                    onkeydown={(e) => e.key === "Enter" && handleCopyAddress(moderator)}
+                  >
+                    {moderator}
+                  </div>
+                </td>
+
+                <td class="whitespace-nowrap px-6 py-4 text-center">
+                  <button onclick={() => deleteModerator(moderator)} class="text-red-600 transition duration-200 hover:text-red-900" aria-label="Delete moderator">
+                    <Trash2 class="h-5 w-5" />
+                  </button>
+                </td>
+              </tr>
+            {/each}
           {/if}
         </tbody>
       </table>

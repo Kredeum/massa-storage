@@ -69,7 +69,7 @@ class Writer extends Reader {
   }
 
   async refresh(): Promise<boolean> {
-    if (this.noProvider) return false;
+    if (!this.ready) return false;
     if (!("balance" in this.provider)) return true;
 
     try {
@@ -84,9 +84,8 @@ class Writer extends Reader {
 
   // CONNECT
   async connect(): Promise<boolean> {
-    console.log("connect ~ async connect():", this.noProvider, this.noConnect, this.#connected);
 
-    if (this.noProvider) return false;
+    if (!this.ready) return false;
     if (this.#connected) return true;
 
     this.#connected = this.noConnect || (await this.#wallet!.connect());
@@ -98,8 +97,7 @@ class Writer extends Reader {
 
   // DISCONNECT
   async disconnect(): Promise<boolean> {
-    console.log("disconnect ~ disconnect:", this.noProvider, this.#connected);
-    if (this.noProvider) return false;
+    if (!this.ready) return false;
     if (!this.#connected) return true;
 
     this.#connected = false;
@@ -108,17 +106,17 @@ class Writer extends Reader {
     return true;
   }
 
-  async setProviderWithType(provider: Provider) {
+  async initProviderWithType(provider: Provider) {
     this.#type = "Provider";
-    await super.setProvider(provider);
+    await this.initProvider(provider);
   }
 
-  async setProviderJsonRpcPublic(provider: PublicProvider) {
+  async initProviderJsonRpcPublic(provider: PublicProvider) {
     this.#type = "PublicProvider";
-    await super.setProvider(provider);
+    await this.initProvider(provider);
   }
 
-  async setProviderWallet(walletProvider: WalletProvider = {}): Promise<void> {
+  async initProviderWallet(walletProvider: WalletProvider = {}): Promise<void> {
     let wallet: Wallet | undefined;
 
     if (!walletProvider.walletName) {
@@ -140,18 +138,18 @@ class Writer extends Reader {
     this.#wallet = wallet;
     this.#accountNum = accountNum;
     this.#type = "Wallet";
-    await super.setProvider(provider);
+    await this.initProvider(provider);
 
     await this.connect();
   }
 
   // ONLY for testnet address
   // DO NOT use with address with real value on mainnet !!!
-  async setProviderPrivateKey(privateKeyProvider: PrivateKeyProvider): Promise<void> {
+  async initProviderPrivateKey(privateKeyProvider: PrivateKeyProvider): Promise<void> {
     const account = await Account.fromPrivateKey(privateKeyProvider.privateKey);
 
     this.#type = "PrivateKey";
-    await super.setProvider(JsonRpcProvider.buildnet(account));
+    await this.initProvider(JsonRpcProvider.buildnet(account));
 
     await this.connect();
   }
@@ -159,11 +157,11 @@ class Writer extends Reader {
   constructor(param?: Provider | PublicProvider | WalletProvider | PrivateKeyProvider) {
     super();
 
-    if (!param) this.setProviderWallet();
-    else if ("providerName" in param) this.setProviderWithType(param);
-    else if ("networkInfos" in param) this.setProviderJsonRpcPublic(param);
-    else if ("walletName" in param) this.setProviderWallet(param);
-    else if ("privateKey" in param) this.setProviderPrivateKey(param);
+    if (!param) this.initProviderWallet();
+    else if ("providerName" in param) this.initProviderWithType(param);
+    else if ("networkInfos" in param) this.initProviderJsonRpcPublic(param);
+    else if ("walletName" in param) this.initProviderWallet(param);
+    else if ("privateKey" in param) this.initProviderPrivateKey(param);
     else throw new Error("Invalid Writer constructor parameter");
   }
 }

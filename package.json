@@ -18,7 +18,7 @@
   "main": "index.js",
   "scripts": {
     "all": "pnpm run clean && pnpm install && turbo start",
-    "clean": "pnpm -r clean && rm -rf node_modules .turbo pnpm-lock.yaml",
+    "clean": "pnpm -r clean && rm -rf node_modules .turbo",
     "deploy": "pnpm run --filter wasm deploy"
   },
   "packageManager": "pnpm@10.4.0",

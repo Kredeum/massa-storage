@@ -10,12 +10,10 @@ describe.skip("IPFS class", () => {
   let target: string;
 
   beforeEach(async () => {
-    const account = await Account.fromEnv("PRIVATE_KEY_DEPLOYER");
-    provider = JsonRpcProvider.buildnet(account);
+    ipfs = new Ipfs();
+    await ipfs.initProviderPrivateKey({ privateKey: process.env.PRIVATE_KEY_DEPLOYER || "" });
 
-    ipfs = new Ipfs(provider);
-
-    target = ipfsAddress(await ipfs.fetchChainId());
+    target = ipfsAddress(await ipfs.chainId);
   });
 
   it("Should add then delete one moderator", async () => {
