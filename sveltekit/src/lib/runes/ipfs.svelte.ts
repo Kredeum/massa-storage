@@ -42,10 +42,9 @@ class Ipfs extends Writer {
 
     return has;
   };
-  isModeratorFunc = (moderator?: string): boolean =>
-    Boolean(moderator && this.#mods.includes(moderator));
-  moderatorHas = async (moderator: string): Promise<boolean | undefined> =>
-    await this.has(MODERATOR, moderator);
+  moderatorHas = async (moderator?: string): Promise<boolean | undefined> =>
+    Boolean(moderator && (await this.has(MODERATOR, moderator)));
+
   cidHas = async (cid: string): Promise<boolean | undefined> => await this.has(CID, cid);
 
   add = async (type: string, value: string) => {

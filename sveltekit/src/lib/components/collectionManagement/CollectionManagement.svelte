@@ -17,6 +17,7 @@
   import CollectionTable from "../collectionTable/CollectionTable.svelte";
 
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
+  import type ArrowUp_0_1 from "lucide-svelte/icons/arrow-up-0-1";
 
   let uploadStore = new UploadStore();
   let uploadInProgress = false;
@@ -174,6 +175,7 @@
   }
 
   async function uploadCollection() {
+    if (!((uploadStore.fileList?.length || 0) > 0)) return;
     if (!ipfs || uploadInProgress) return;
 
     try {
@@ -242,9 +244,7 @@
   }
 
   $effect(() => {
-    if (uploadStore.fileList) {
-      uploadCollection();
-    }
+    uploadCollection();
   });
 
   function setPage(page: number) {
