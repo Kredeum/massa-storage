@@ -29,9 +29,6 @@
     if (status == STATUS_PENDING) return;
 
     const id = type === "file" ? (item as FileItem).cid : (item as CollectionItem).collectionCid;
-    if (status == STATUS_APPROVED) await ipfs.cidValidate(id);
-    if (status == STATUS_REJECTED) await ipfs.cidReject(id);
-
     if (onModerate) {
       onModerate({ id, status });
     }
