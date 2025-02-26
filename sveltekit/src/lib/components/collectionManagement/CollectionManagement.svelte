@@ -151,6 +151,9 @@
     });
 
     filteredCollections = collections.filter((collection) => {
+      if (!(isModerator || collection.status === STATUS_APPROVED)) {
+        return false;
+      }
       return collectionFilters.status === "all" || collection.status === collectionFilters.status;
     });
     updatePagination();
@@ -247,6 +250,17 @@
 
   async function handlePin(cid: string) {
     try {
+      const collection = collections.find((c) => c.collectionCid === cid);
+      if (!collection) {
+        toast.error("Collection not found");
+        return;
+      }
+
+      if (collection.status !== STATUS_APPROVED) {
+        toast.error("Cannot pin: collection not approved");
+        return;
+      }
+
       const id = toast.loading("Pinning Collection ...");
       await kubo.pin(cid);
 
