@@ -18,6 +18,7 @@
 
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
   import type ArrowUp_0_1 from "lucide-svelte/icons/arrow-up-0-1";
+  import all from "it-all";
 
   let isModerator = $state<boolean>();
 
@@ -109,6 +110,15 @@
           return;
         }
 
+        // Vérifier si la collection est pinée
+        let isPinned = false;
+        try {
+          const pinnedItems = await all(kubo.ls(collectionCid));
+          isPinned = pinnedItems.length > 0;
+        } catch (error) {
+          console.error(`Error checking pin status for ${collectionCid}:`, error);
+        }
+
         const collectionItem: CollectionItem = {
           owner: attributes.owner,
           collectionCid: collectionCid,
@@ -117,7 +127,7 @@
           filesCount: filesCount,
           status: currentStatus,
           uploadDate: attributes.date,
-          isPinned: false
+          isPinned: isPinned
         };
 
         loadedCollections.push(collectionItem);
@@ -225,13 +235,19 @@
   }
 
   async function handlePin(cid: string) {
-    console.log("handlePin:", cid);
     try {
       const id = toast.loading("Pinning Collection ...");
-      console.log("AVANT kubo.pin:", cid);
-      const newCid = await kubo.pin(cid);
-      console.log("APRES kubo.pin:", cid);
-      console.log("Pin collection:", newCid);
+      await kubo.pin(cid);
+
+      // Mettre à jour l'état isPinned de la collection
+      collections = collections.map((collection) => {
+        if (collection.collectionCid === cid) {
+          return { ...collection, isPinned: true };
+        }
+        return collection;
+      });
+      updateFilteredCollections();
+
       toast.dismiss(id);
       toast.success("Collection pinned successfully");
     } catch (error) {
