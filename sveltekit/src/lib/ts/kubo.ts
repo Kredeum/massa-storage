@@ -20,11 +20,11 @@ const createKuboClient = () => {
     pinOptions?: PinAddOptions
   ): Promise<CID> => await ipfs.pin.add((await ipfs.add(data, addOptions)).cid, pinOptions);
 
-  const pins = async (options?: PinLsOptions): Promise<CID[]> => {
-    const cids: CID[] = [];
+  const pins = async (options?: PinLsOptions): Promise<string[]> => {
+    const cids: string[] = [];
     const pinList = ipfs.pin.ls(options);
     for await (const pin of pinList) {
-      cids.push(pin.cid);
+      cids.push(pin.cid.toString());
     }
     return cids;
   };
@@ -34,6 +34,7 @@ const createKuboClient = () => {
     addAll: ipfs.addAll,
     add: ipfs.add,
     pin: ipfs.pin.add,
+    rm: ipfs.pin.rm,
     cat: ipfs.cat,
     pins,
     addAndPin
