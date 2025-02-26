@@ -16,10 +16,9 @@
 
 {#if file.blob}
   <div
-    class="absolute z-[9999] rounded-lg border border-gray-200 bg-white shadow-lg"
+    class="absolute z-[9999]"
     style="bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 8px;"
-    class:p-2={file.type === "image" || file.type === "video"}
-    class:p-4={file.type === "audio" || file.type === "document"}
+
     class:h-[200px]={file.type === "image" || file.type === "video"}
     class:h-[100px]={file.type === "audio"}
     class:h-[150px]={file.type === "document"}
@@ -30,7 +29,7 @@
     {#if file.type === "image"}
       <img src={objectUrl} alt={file.name} class="h-full w-full object-contain" />
     {:else if file.type === "video"}
-      <video src={objectUrl} controls class="h-full w-full object-contain">
+      <video src={objectUrl} autoplay playsinline loop class="h-full w-full object-cover">
         <track kind="captions" />
       </video>
     {:else if file.type === "audio"}
@@ -38,7 +37,7 @@
         <track kind="captions" />
       </audio>
     {:else if file.type === "document"}
-      <div class="flex flex-col items-center justify-center gap-4 p-4 text-gray-600">
+      <div class="flex flex-col items-center justify-center gap-4 p-4 text-gray-300 bg-black rounded-lg">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             stroke-linecap="round"
