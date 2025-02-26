@@ -58,7 +58,7 @@
       const file = item as FileItem;
       if (file.blob) {
         const url = URL.createObjectURL(file.blob);
-        window.open(url, '_blank');
+        window.open(url, "_blank");
       } else {
         const chunks = [];
         for await (const chunk of kubo.cat(file.cid)) {
@@ -66,7 +66,7 @@
         }
         const blob = new Blob(chunks);
         const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
+        window.open(url, "_blank");
         URL.revokeObjectURL(url);
       }
     } catch (error) {
