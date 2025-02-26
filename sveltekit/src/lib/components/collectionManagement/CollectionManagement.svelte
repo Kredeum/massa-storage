@@ -164,7 +164,7 @@
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     paginatedCollections = filteredCollections.slice(startIndex, endIndex);
-    console.log('Pagination:', { currentPage, startIndex, endIndex, total: filteredCollections.length, showing: paginatedCollections.length });
+    console.log("Pagination:", { currentPage, startIndex, endIndex, total: filteredCollections.length, showing: paginatedCollections.length });
   }
 
   function handleSort(key: keyof CollectionItem) {
@@ -187,21 +187,23 @@
   }
 
   async function uploadCollection() {
-    if (!((uploadStore.fileList?.length || 0) > 0)) return;
+    const fileCount = uploadStore.fileList?.length || 0;
+    if (fileCount === 0) return;
     if (!ipfs || uploadInProgress) return;
+
+    const toastId = toast.loading(`Uploading ${fileCount} files...`);
 
     try {
       uploadInProgress = true;
       const newCids = await uploadStore.processUploadedCollections();
+      toast.success(`Successfully uploaded ${fileCount} files`);
       const validCids = newCids.filter((item): item is AddResult => {
         return typeof item !== "string";
       });
-      console.log("Processed files, got collection CIDs:", validCids.length);
 
       if (validCids.length > 0) {
         const lastCid = validCids[validCids.length - 1];
         const collectionCid = lastCid.cid.toString();
-        console.log("Processing collection:", { collectionCid });
 
         const attributes: CidDataType = {
           name: `Collection ${timestamp()}`,
@@ -221,10 +223,12 @@
       toast.error("Failed to create collection");
     } finally {
       uploadInProgress = false;
+      toast.dismiss(toastId);
     }
   }
 
   async function handleModerate(data: { id: string; status: StatusType }) {
+    const toastId = toast.loading(`Moderating collection ...`);
     try {
       if (data.status === STATUS_APPROVED) {
         await ipfs.cidValidate(data.id);
@@ -232,8 +236,10 @@
         await ipfs.cidReject(data.id);
       }
       await loadCollections();
+      toast.dismiss(toastId);
       toast.success(`Collection ${data.status === STATUS_APPROVED ? "approved" : "rejected"}`);
     } catch (error) {
+      toast.dismiss(toastId);
       console.error("Error moderating collection:", error);
       toast.error("Failed to moderate collection");
     }
@@ -244,7 +250,6 @@
       const id = toast.loading("Pinning Collection ...");
       await kubo.pin(cid);
 
-      // Mettre à jour l'état isPinned de la collection
       collections = collections.map((collection) => {
         if (collection.collectionCid === cid) {
           return { ...collection, isPinned: true };
