@@ -1,18 +1,9 @@
 <script lang="ts">
   import type { PropsFileTable } from "$lib/ts/types";
   import FileTableRow from "./FileTableRow.svelte";
-  import FileTooltip from "./FileTooltip.svelte";
   import FileTableHeader from "./FileTableHeader.svelte";
 
   let { files = [], paginatedFiles = [], sortConfig, handleSort, actions }: PropsFileTable = $props();
-
-  let tooltipContent = $state("");
-  let tooltip: FileTooltip;
-
-  function handleTooltipShow(content: string, event: MouseEvent) {
-    tooltipContent = content;
-    tooltip?.show(event);
-  }
 </script>
 
 <div class="relative w-full overflow-visible">
@@ -34,9 +25,8 @@
 
     <tbody class="divide-y divide-gray-200 bg-white">
       {#each paginatedFiles as file}
-        <FileTableRow {file} {actions} onTooltipShow={(content: string, event: MouseEvent) => handleTooltipShow(content, event)} onTooltipHide={() => tooltip?.hide()} />
+        <FileTableRow {file} {actions} />
       {/each}
     </tbody>
   </table>
-  <FileTooltip bind:this={tooltip} content={tooltipContent} />
 </div>

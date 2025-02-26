@@ -18,6 +18,7 @@
 
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
   import type ArrowUp_0_1 from "lucide-svelte/icons/arrow-up-0-1";
+  import all from "it-all";
 
   let isModerator = $state<boolean>();
 
@@ -109,6 +110,15 @@
           return;
         }
 
+        // Vérifier si la collection est pinée
+        let isPinned = false;
+        try {
+          const pinnedItems = await all(kubo.ls(collectionCid));
+          isPinned = pinnedItems.length > 0;
+        } catch (error) {
+          console.error(`Error checking pin status for ${collectionCid}:`, error);
+        }
+
         const collectionItem: CollectionItem = {
           owner: attributes.owner,
           collectionCid: collectionCid,
@@ -117,7 +127,7 @@
           filesCount: filesCount,
           status: currentStatus,
           uploadDate: attributes.date,
-          isPinned: false
+          isPinned: isPinned
         };
 
         loadedCollections.push(collectionItem);
@@ -147,9 +157,14 @@
   }
 
   function updatePagination() {
+    if (filteredCollections.length === 0) {
+      paginatedCollections = [];
+      return;
+    }
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     paginatedCollections = filteredCollections.slice(startIndex, endIndex);
+    console.log("Pagination:", { currentPage, startIndex, endIndex, total: filteredCollections.length, showing: paginatedCollections.length });
   }
 
   function handleSort(key: keyof CollectionItem) {
@@ -172,21 +187,23 @@
   }
 
   async function uploadCollection() {
-    if (!((uploadStore.fileList?.length || 0) > 0)) return;
+    const fileCount = uploadStore.fileList?.length || 0;
+    if (fileCount === 0) return;
     if (!ipfs || uploadInProgress) return;
+
+    const toastId = toast.loading(`Uploading ${fileCount} files...`);
 
     try {
       uploadInProgress = true;
       const newCids = await uploadStore.processUploadedCollections();
+      toast.success(`Successfully uploaded ${fileCount} files`);
       const validCids = newCids.filter((item): item is AddResult => {
         return typeof item !== "string";
       });
-      console.log("Processed files, got collection CIDs:", validCids.length);
 
       if (validCids.length > 0) {
         const lastCid = validCids[validCids.length - 1];
         const collectionCid = lastCid.cid.toString();
-        console.log("Processing collection:", { collectionCid });
 
         const attributes: CidDataType = {
           name: `Collection ${timestamp()}`,
@@ -206,10 +223,12 @@
       toast.error("Failed to create collection");
     } finally {
       uploadInProgress = false;
+      toast.dismiss(toastId);
     }
   }
 
   async function handleModerate(data: { id: string; status: StatusType }) {
+    const toastId = toast.loading(`Moderating collection ...`);
     try {
       if (data.status === STATUS_APPROVED) {
         await ipfs.cidValidate(data.id);
@@ -217,21 +236,28 @@
         await ipfs.cidReject(data.id);
       }
       await loadCollections();
+      toast.dismiss(toastId);
       toast.success(`Collection ${data.status === STATUS_APPROVED ? "approved" : "rejected"}`);
     } catch (error) {
+      toast.dismiss(toastId);
       console.error("Error moderating collection:", error);
       toast.error("Failed to moderate collection");
     }
   }
 
   async function handlePin(cid: string) {
-    console.log("handlePin:", cid);
     try {
       const id = toast.loading("Pinning Collection ...");
-      console.log("AVANT kubo.pin:", cid);
-      const newCid = await kubo.pin(cid);
-      console.log("APRES kubo.pin:", cid);
-      console.log("Pin collection:", newCid);
+      await kubo.pin(cid);
+
+      collections = collections.map((collection) => {
+        if (collection.collectionCid === cid) {
+          return { ...collection, isPinned: true };
+        }
+        return collection;
+      });
+      updateFilteredCollections();
+
       toast.dismiss(id);
       toast.success("Collection pinned successfully");
     } catch (error) {

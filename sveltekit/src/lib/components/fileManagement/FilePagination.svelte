@@ -3,13 +3,13 @@
   let { currentPage, totalPages, itemsPerPage, totalItems, setPage }: PropsFilePagination = $props();
 
   function handlePrevious() {
-    if (currentPage > 0) {
+    if (currentPage > 1) {
       setPage(currentPage - 1);
     }
   }
 
   function handleNext() {
-    if (currentPage < totalPages - 1) {
+    if (currentPage < totalPages) {
       setPage(currentPage + 1);
     }
   }
@@ -26,14 +26,14 @@
     <button
       onclick={handlePrevious}
       class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:cursor-pointer hover:bg-gray-50"
-      disabled={currentPage === 0}
+      disabled={currentPage === 1}
     >
       Previous
     </button>
     <button
       onclick={handleNext}
       class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:cursor-pointer hover:bg-gray-50"
-      disabled={currentPage === totalPages - 1}
+      disabled={currentPage === totalPages}
     >
       Next
     </button>
@@ -42,9 +42,9 @@
     <div>
       <p class="text-sm text-gray-700">
         Showing
-        <span class="font-medium">{currentPage * itemsPerPage + 1}</span>
+        <span class="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span>
         to
-        <span class="font-medium">{Math.min((currentPage + 1) * itemsPerPage, totalItems)}</span>
+        <span class="font-medium">{Math.min(currentPage * itemsPerPage, totalItems)}</span>
         of
         <span class="font-medium">{totalItems}</span>
         results
@@ -55,19 +55,19 @@
         <button
           onclick={handlePrevious}
           class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:cursor-pointer hover:bg-gray-50"
-          disabled={currentPage === 0}
+          disabled={currentPage === 1}
         >
           Previous
         </button>
         {#each Array(totalPages) as _, i}
-          <button onclick={() => handleGoToPage(i)} class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium {currentClass(i)}">
+          <button onclick={() => handleGoToPage(i + 1)} class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium {currentClass(i + 1)}">
             {i + 1}
           </button>
         {/each}
         <button
           onclick={handleNext}
           class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:cursor-pointer hover:bg-gray-50"
-          disabled={currentPage === totalPages - 1}
+          disabled={currentPage === totalPages}
         >
           Next
         </button>
