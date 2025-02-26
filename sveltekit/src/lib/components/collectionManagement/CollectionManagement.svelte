@@ -157,9 +157,14 @@
   }
 
   function updatePagination() {
+    if (filteredCollections.length === 0) {
+      paginatedCollections = [];
+      return;
+    }
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     paginatedCollections = filteredCollections.slice(startIndex, endIndex);
+    console.log('Pagination:', { currentPage, startIndex, endIndex, total: filteredCollections.length, showing: paginatedCollections.length });
   }
 
   function handleSort(key: keyof CollectionItem) {
