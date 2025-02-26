@@ -4,6 +4,7 @@ import {
   type ReadSCData,
   Args,
   ArrayTypes,
+  bytesToStr,
   JsonRpcProvider,
   JsonRpcPublicProvider,
   OperationStatus
@@ -44,6 +45,19 @@ class Ipfs extends Writer {
   };
   moderatorHas = async (moderator?: string): Promise<boolean | undefined> =>
     Boolean(moderator && (await this.has(MODERATOR, moderator)));
+
+  owner = async (): Promise<string> => {
+    const dataStoreVal = await this.provider.readStorage(
+      ipfsAddress(this.chainId),
+      ["OWNER"],
+      false
+    );
+    const owner = bytesToStr(dataStoreVal[0]);
+    console.log("owner :", owner);
+
+    return owner;
+  };
+  isOwner = async (address: string): Promise<boolean> => (await this.owner()) === address;
 
   cidHas = async (cid: string): Promise<boolean | undefined> => await this.has(CID, cid);
 
