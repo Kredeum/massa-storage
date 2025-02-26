@@ -8,11 +8,9 @@
   import TimeTooltip from "./TimeTooltip.svelte";
   import { STATUS_PENDING, STATUS_APPROVED, STATUS_REJECTED, statusLabel } from "@kredeum/massa-storage-common/src/constants";
 
-  let { file, actions, onTooltipShow, onTooltipHide } = $props<{
+  let { file, actions } = $props<{
     file: FileItem;
     actions?: import("svelte").Snippet<[FileItem]>;
-    onTooltipShow: (content: string, event: MouseEvent) => void;
-    onTooltipHide: () => void;
   }>();
 
   let hoveredPreview = $state(false);
@@ -85,7 +83,7 @@
       <td class="w-[15%] px-4 py-[18px] text-center text-sm text-gray-500">{file.type}</td>
     {:else if !column.key}
       <td class="w-[15%] px-4 py-[18px] text-center text-sm text-gray-500">
-        <FileCidCell cid={file.cid} fileName={file.name} {onTooltipShow} {onTooltipHide} />
+        <FileCidCell cid={file.cid} fileName={file.name} />
       </td>
     {/if}
   {/each}

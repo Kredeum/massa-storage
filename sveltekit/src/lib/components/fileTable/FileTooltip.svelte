@@ -21,16 +21,13 @@
   function updatePosition(e: MouseEvent) {
     if (tooltipElement) {
       const rect = tooltipElement.getBoundingClientRect();
+      const targetRect = (e.target as HTMLElement).getBoundingClientRect();
       const offset = 10;
 
-      let top = e.clientY - rect.height - offset;
-      let left = e.clientX - rect.width / 2;
-
-      if (top < 0) top = e.clientY + offset;
-      if (left < 0) left = offset;
-      if (left + rect.width > window.innerWidth) {
-        left = window.innerWidth - rect.width - offset;
-      }
+      // Position le tooltip au-dessus du texte
+      const top = targetRect.top - rect.height - offset;
+      // Centre le tooltip horizontalement par rapport au texte
+      const left = targetRect.left + (targetRect.width - rect.width) / 2;
 
       tooltipElement.style.top = `${top}px`;
       tooltipElement.style.left = `${left}px`;

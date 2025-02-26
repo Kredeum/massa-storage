@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { CollectionItem, SortConfig, StatusType } from "$lib/ts/types";
-  import { formatDate, formatSize, shortenString } from "$lib/ts/utils";
+  import { formatDate, formatSize } from "$lib/ts/utils";
   import { statusLabel, STATUS_APPROVED, STATUS_PENDING, STATUS_REJECTED } from "@kredeum/massa-storage-common/src/constants";
   import TimeTooltip from "$lib/components/fileTable/TimeTooltip.svelte";
+  import ShortenedTextTooltip from "$lib/components/common/ShortenedTextTooltip.svelte";
   import { ChevronDown, ChevronUp } from "lucide-svelte";
   import { columns } from "$lib/constants/collections";
   import ButtonActions from "$lib/components/common/ButtonActions.svelte";
@@ -98,10 +99,10 @@
             {formatSize(collection.totalSizeBytes)}
           </td>
           <td class="w-[10%] px-4 py-4 text-center text-sm text-gray-500">
-            {shortenString(collection.owner)}
+            <ShortenedTextTooltip text={collection.owner} label="Owner address" />
           </td>
           <td class="whitespace-nowrap px-6 py-4">
-            <div class="text-sm text-gray-500">{shortenString(collection.collectionCid)}</div>
+            <div class="text-sm text-gray-500"><ShortenedTextTooltip text={collection.collectionCid} label="Collection CID" /></div>
           </td>
           <td class="whitespace-nowrap px-6 py-4 text-center">
             <span
