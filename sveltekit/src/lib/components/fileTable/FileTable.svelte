@@ -15,31 +15,28 @@
   }
 </script>
 
-<div class="w-full">
-  <div class="min-w-full overflow-x-auto">
-    <table class="min-w-full divide-y divide-gray-200">
-      <colgroup>
-        <col class="w-[80%]" />
-        <!-- Name -->
-        <col class="w-[35%]" />
-        <!-- Size -->
-        <col class="w-[15%]" />
-        <!-- Type -->
-        <col class="w-[15%]" />
-        <!-- CID -->
-        <col class="w-[15%]" />
-        <!-- Actions -->
-      </colgroup>
+<div class="relative w-full overflow-visible">
+  <table class="min-w-full divide-y divide-gray-200">
+    <colgroup>
+      <col class="w-[80%]" />
+      <!-- Name -->
+      <col class="w-[35%]" />
+      <!-- Size -->
+      <col class="w-[15%]" />
+      <!-- Type -->
+      <col class="w-[15%]" />
+      <!-- CID -->
+      <col class="w-[15%]" />
+      <!-- Actions -->
+    </colgroup>
 
-      <FileTableHeader {sortConfig} {handleSort} />
+    <FileTableHeader {sortConfig} {handleSort} />
 
-      <tbody class="divide-y divide-gray-200 bg-white">
-        {#each paginatedFiles as file}
-          <FileTableRow {file} {actions} onTooltipShow={(content: string, event: MouseEvent) => handleTooltipShow(content, event)} onTooltipHide={() => tooltip?.hide()} />
-        {/each}
-      </tbody>
-    </table>
-  </div>
-
+    <tbody class="divide-y divide-gray-200 bg-white">
+      {#each paginatedFiles as file}
+        <FileTableRow {file} {actions} onTooltipShow={(content: string, event: MouseEvent) => handleTooltipShow(content, event)} onTooltipHide={() => tooltip?.hide()} />
+      {/each}
+    </tbody>
+  </table>
   <FileTooltip bind:this={tooltip} content={tooltipContent} />
 </div>
