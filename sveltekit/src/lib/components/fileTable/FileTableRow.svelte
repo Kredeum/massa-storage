@@ -1,14 +1,12 @@
 <script lang="ts">
   import type { FileItem } from "$lib/ts/types";
+  import { createFileUrl, formatSize, shortenString } from "$lib/ts/utils";
   import { columns } from "$lib/constants/files";
   import FileIcon from "./FileIcon.svelte";
   import FileCidCell from "./FileCidCell.svelte";
   import FilePreview from "$lib/components/fileTable/FilePreview.svelte";
   import TimeTooltip from "./TimeTooltip.svelte";
   import { STATUS_PENDING, STATUS_APPROVED, STATUS_REJECTED, statusLabel } from "@kredeum/massa-storage-common/src/constants";
-
-  import { shortenString } from "$lib/ts/utils";
-  import { formatSize } from "$lib/ts/utils";
 
   let { file, actions, onTooltipShow, onTooltipHide } = $props<{
     file: FileItem;
@@ -56,16 +54,19 @@
               class="ml-2 text-sm font-medium text-gray-600 hover:text-blue-600"
               onmouseenter={handleMouseEnter}
               onmouseleave={handleMouseLeave}
-              onclick={() => {
+              onclick={(e) => {
+                e.preventDefault();
                 if (file.type === "document" || file.type === "image" || file.type === "video" || file.type === "audio") {
-                  window.open(URL.createObjectURL(file.blob), "_blank");
+                  const url = createFileUrl(file);
+                  window.open(url, "_blank");
                 }
               }}
               onkeydown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
-                  if (file.type === "document" || file.type === "image" || file.type === "video") {
-                    window.open(URL.createObjectURL(file.blob), "_blank");
+                  if (file.type === "document" || file.type === "image" || file.type === "video" || file.type === "audio") {
+                    const url = URL.createObjectURL(file.blob);
+                    window.open(url, "_blank");
                   }
                 }
               }}

@@ -102,3 +102,29 @@ export function getFileTypeFromName(fileName: string): FileType {
 export function timestamp(): string {
   return Date.now().toString();
 }
+
+export function createFileUrl(file: { name: string; blob: Blob }): string {
+  let mimeType = file.blob.type;
+  const ext = file.name.toLowerCase().split('.').pop() || '';
+
+  // Audio types
+  if (ext === 'mp3') mimeType = 'audio/mpeg';
+  else if (ext === 'wav') mimeType = 'audio/wav';
+  else if (ext === 'ogg') mimeType = 'audio/ogg';
+  else if (ext === 'm4a') mimeType = 'audio/mp4';
+  
+  // Image types
+  else if (['jpg', 'jpeg'].includes(ext)) mimeType = 'image/jpeg';
+  else if (ext === 'png') mimeType = 'image/png';
+  else if (ext === 'gif') mimeType = 'image/gif';
+  else if (ext === 'webp') mimeType = 'image/webp';
+  
+  // Video types
+  else if (ext === 'mp4') mimeType = 'video/mp4';
+  else if (ext === 'webm') mimeType = 'video/webm';
+  
+  // Document types
+  else if (ext === 'pdf') mimeType = 'application/pdf';
+  
+  return URL.createObjectURL(new Blob([file.blob], { type: mimeType }));
+}

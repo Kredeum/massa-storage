@@ -1,6 +1,7 @@
 <script lang="ts">
-  import type { FileItem } from "$lib/ts/types";
   import { onDestroy } from "svelte";
+  import type { FileItem } from "$lib/ts/types";
+  import { createFileUrl } from "$lib/ts/utils";
 
   let { file, onPlay, onPause } = $props<{
     file: FileItem;
@@ -8,10 +9,17 @@
     onPause?: () => void;
   }>();
 
-  const objectUrl = URL.createObjectURL(file.blob);
+  let objectUrl = "";
+
+  function getUrl() {
+    if (!objectUrl) {
+      objectUrl = createFileUrl(file);
+    }
+    return objectUrl;
+  }
 
   onDestroy(() => {
-    if (file.blob) {
+    if (objectUrl) {
       URL.revokeObjectURL(objectUrl);
     }
   });
@@ -29,21 +37,21 @@
     class:w-[200px]={file.type === "document"}
   >
     {#if file.type === "image"}
-      <img src={objectUrl} alt={file.name} class="h-full w-full object-contain" />
+      <img src={getUrl()} alt={file.name} class="h-full w-full object-contain" />
     {:else if file.type === "video"}
-      <video src={objectUrl} autoplay playsinline loop class="h-full w-full object-cover">
+      <video src={getUrl()} autoplay playsinline loop class="h-full w-full object-cover">
         <track kind="captions" />
       </video>
     {:else if file.type === "audio"}
       <div class="flex flex-col items-center justify-center gap-4">
-        <audio src={objectUrl} controls autoplay class="w-full">
+        <audio src={getUrl()} controls autoplay class="w-full">
           <track kind="captions" />
         </audio>
       </div>
     {:else if file.type === "document"}
       {#if file.blob.type === "application/pdf"}
         <div class="h-full w-full overflow-hidden rounded-lg bg-white">
-          <embed src={objectUrl} type="application/pdf" class="h-full w-full rounded-lg" />
+          <embed src={getUrl()} type="application/pdf" class="h-full w-full rounded-lg" />
         </div>
       {:else}
         <div class="flex flex-col items-center justify-center gap-4 rounded-lg bg-black/80 p-4 text-gray-300 backdrop-blur">
