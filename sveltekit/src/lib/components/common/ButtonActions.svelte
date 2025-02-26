@@ -53,24 +53,25 @@
 
   const handleDownloadFile = async (e: MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     try {
       const file = item as FileItem;
-      const chunks = [];
-      for await (const chunk of kubo.cat(file.cid)) {
-        chunks.push(chunk);
+      if (file.blob) {
+        const url = URL.createObjectURL(file.blob);
+        window.open(url, "_blank");
+      } else {
+        const chunks = [];
+        for await (const chunk of kubo.cat(file.cid)) {
+          chunks.push(chunk);
+        }
+        const blob = new Blob(chunks);
+        const url = URL.createObjectURL(blob);
+        window.open(url, "_blank");
+        URL.revokeObjectURL(url);
       }
-      const blob = new Blob(chunks);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = file.name;
-      document.body.appendChild(a);
-      a.click();
-      URL.revokeObjectURL(url);
-      document.body.removeChild(a);
     } catch (error) {
-      console.error("Error downloading file:", error);
-      toast.error(`Error downloading file: ${getErrorMessage(error)}`);
+      console.error("Error opening file:", error);
+      toast.error(`Error opening file: ${getErrorMessage(error)}`);
     }
   };
 

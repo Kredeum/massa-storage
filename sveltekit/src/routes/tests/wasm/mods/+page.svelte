@@ -4,12 +4,20 @@
 
   const ipfs: Ipfs = getContext("ipfs");
 
+  let isMod = $state<boolean>();
+
   let mod = $state<string>("");
 
-  const refresh = async () => await ipfs.moderatorsGet();
+  const refresh = async () => {
+    if (!ipfs.ready) return;
+
+    isMod = await ipfs.moderatorHas(ipfs.address);
+    console.log("refresh ~ isMod:", isMod);
+    await ipfs.moderatorsGet();
+  };
 
   $effect(() => {
-    ipfs.provider && refresh();
+    ipfs.ready && refresh();
   });
 </script>
 

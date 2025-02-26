@@ -84,7 +84,6 @@ class Writer extends Reader {
 
   // CONNECT
   async connect(): Promise<boolean> {
-
     if (!this.ready) return false;
     if (this.#connected) return true;
 
@@ -108,12 +107,12 @@ class Writer extends Reader {
 
   async initProviderWithType(provider: Provider) {
     this.#type = "Provider";
-    await this.initProvider(provider);
+    await this.initialize(provider);
   }
 
   async initProviderJsonRpcPublic(provider: PublicProvider) {
     this.#type = "PublicProvider";
-    await this.initProvider(provider);
+    await this.initialize(provider);
   }
 
   async initProviderWallet(walletProvider: WalletProvider = {}): Promise<void> {
@@ -138,7 +137,7 @@ class Writer extends Reader {
     this.#wallet = wallet;
     this.#accountNum = accountNum;
     this.#type = "Wallet";
-    await this.initProvider(provider);
+    await this.initialize(provider);
 
     await this.connect();
   }
@@ -149,7 +148,7 @@ class Writer extends Reader {
     const account = await Account.fromPrivateKey(privateKeyProvider.privateKey);
 
     this.#type = "PrivateKey";
-    await this.initProvider(JsonRpcProvider.buildnet(account));
+    await this.initialize(JsonRpcProvider.buildnet(account));
 
     await this.connect();
   }

@@ -17,6 +17,19 @@
   import CollectionTable from "../collectionTable/CollectionTable.svelte";
 
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
+  import type ArrowUp_0_1 from "lucide-svelte/icons/arrow-up-0-1";
+
+  let isModerator = $state<boolean>();
+
+  const refresh = async (): Promise<void> => {
+    if (!ipfs.ready) return;
+
+    isModerator = await ipfs.moderatorHas(ipfs.address);
+  };
+
+  $effect(() => {
+    refresh();
+  });
 
   let uploadStore = new UploadStore();
   let uploadInProgress = false;
@@ -43,29 +56,12 @@
 
   const ipfs: Ipfs = getContext("ipfs");
   const kubo = createKuboClient();
-  let isModerator = $state(false);
 
   onMount(async () => {
-    if (ipfs?.address) {
-      await ipfs.moderatorsGet();
-      isModerator = ipfs.isModeratorFunc(ipfs.address);
-      console.log("onMount - isModerator:", isModerator, "address:", ipfs.address);
-    }
     await loadCollections();
   });
 
-  $effect(() => {
-    if (ipfs?.address) {
-      ipfs.moderatorsGet().then(() => {
-        isModerator = ipfs.isModeratorFunc(ipfs.address);
-        console.log("effect - isModerator:", isModerator, "address:", ipfs.address);
-      });
-    }
-  });
-
-  $effect(() => {
-    console.log("Current isModerator state:", isModerator);
-  });
+  $inspect("Current isModerator state:", isModerator);
 
   async function loadCollections() {
     if (!ipfs) return;
@@ -176,6 +172,7 @@
   }
 
   async function uploadCollection() {
+    if (!((uploadStore.fileList?.length || 0) > 0)) return;
     if (!ipfs || uploadInProgress) return;
 
     try {
@@ -227,22 +224,24 @@
     }
   }
 
-  // TODO: Implement pin functionality for collections
-
-  async function handlePin(id: string) {
-    // try {
-    // console.log("Pin collection:", id);
-    // toast.success("Collection pinned successfully");
-    // } catch (error) {
-    // console.error("Error pinning collection:", error);
-    // toast.error("Failed to pin collection");
-    // }
+  async function handlePin(cid: string) {
+    console.log("handlePin:", cid);
+    try {
+      const id = toast.loading("Pinning Collection ...");
+      console.log("AVANT kubo.pin:", cid);
+      const newCid = await kubo.pin(cid);
+      console.log("APRES kubo.pin:", cid);
+      console.log("Pin collection:", newCid);
+      toast.dismiss(id);
+      toast.success("Collection pinned successfully");
+    } catch (error) {
+      console.error("Error pinning collection:", error);
+      toast.error("Failed to pin collection");
+    }
   }
 
   $effect(() => {
-    if (uploadStore.uploadCollection) {
-      uploadCollection();
-    }
+    uploadCollection();
   });
 
   function setPage(page: number) {
@@ -254,7 +253,7 @@
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 flex flex-col gap-4">
     <div class="mb-8">
-      <FileUpload bind:files={uploadStore.uploadCollection} />
+      <FileUpload bind:files={uploadStore.fileList} />
     </div>
 
     <div class="flex items-center justify-end gap-4">

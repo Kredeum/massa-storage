@@ -3,18 +3,31 @@
   import { Check, X, Pin } from "lucide-svelte";
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
 
-  const ipfs: Ipfs = getContext("ipfs");
-
-  const isModerator = $derived.by(() => ipfs.isModeratorFunc(ipfs.address));
-
-  interface Props {
+  let {
+    selectedCount,
+    onApprove,
+    onReject,
+    onPin
+  }: {
     selectedCount: number;
     onApprove: () => void;
     onReject: () => void;
     onPin: () => void;
-  }
+  } = $props();
 
-  let { selectedCount, onApprove, onReject, onPin }: Props = $props();
+  const ipfs: Ipfs = getContext("ipfs");
+
+  let isModerator = $state<boolean>();
+
+  const refresh = async (): Promise<void> => {
+    if (!ipfs.ready) return;
+
+    isModerator = await ipfs.moderatorHas(ipfs.address);
+  };
+
+  $effect(() => {
+    refresh();
+  });
 </script>
 
 {#if selectedCount > 0}

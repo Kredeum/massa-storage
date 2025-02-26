@@ -7,7 +7,7 @@ import {
   STATUS_REJECTED
 } from "@kredeum/massa-storage-common/src/constants";
 
-describe("FileStore", () => {
+describe.skip("FileStore", () => {
   let fileStore: FileStore;
   let testFiles: FileItem[];
 

@@ -15,6 +15,7 @@
 
   import type { FileItem } from "$lib/ts/types";
   import { formatDate, getFileTypeFromName } from "$lib/ts/utils";
+  import all from "it-all";
 
   import { Ipfs } from "$lib/runes/ipfs.svelte";
 
@@ -38,6 +39,25 @@
       for await (const file of files) {
         console.log("Collection file:", file);
 
+        const type = getFileTypeFromName(file.name);
+        let blob;
+        const chunks = await all(kubo.cat(file.cid.toString()));
+        const content = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
+        let offset = 0;
+        for (const chunk of chunks) {
+          content.set(chunk, offset);
+          offset += chunk.length;
+        }
+
+        const mimeTypes = {
+          image: "image/*",
+          video: "video/*",
+          audio: "audio/*",
+          document: "application/pdf"
+        };
+
+        blob = new Blob([content], { type: mimeTypes[type] || "application/octet-stream" });
+
         const fileItem: FileItem = {
           cid: file.cid.toString(),
           name: file.name,
@@ -45,7 +65,8 @@
           status: STATUS_PENDING,
           isPinned: false,
           arrayBuffer: undefined,
-          type: getFileTypeFromName(file.name)
+          type,
+          blob
         };
 
         fileStore.files.push(fileItem);
