@@ -18,15 +18,29 @@
   }>();
 
   let hoveredPreview = $state(false);
+  let isPlaying = $state(false);
 
   function handleMouseEnter(e: MouseEvent) {
-    if (file.type === "image" || file.type === "video") {
+    if (file.type === "image" || file.type === "video" || file.type === "document" || file.type === "audio") {
       hoveredPreview = true;
     }
   }
 
   function handleMouseLeave() {
-    hoveredPreview = false;
+    if (file.type !== "audio" || !isPlaying) {
+      hoveredPreview = false;
+    }
+  }
+
+  function handleAudioPlay() {
+    isPlaying = true;
+  }
+
+  function handleAudioPause() {
+    isPlaying = false;
+    if (!hoveredPreview) {
+      hoveredPreview = false;
+    }
   }
 </script>
 
@@ -37,11 +51,29 @@
         <div class="flex items-center">
           <FileIcon type={file.type} />
           <div class="relative inline-block">
-            <div class="ml-2 cursor-pointer text-sm font-medium text-gray-600 hover:text-blue-600" role="button" tabindex="0" onmouseenter={handleMouseEnter} onmouseleave={handleMouseLeave}>
+            <button
+              type="button"
+              class="ml-2 text-sm font-medium text-gray-600 hover:text-blue-600"
+              onmouseenter={handleMouseEnter}
+              onmouseleave={handleMouseLeave}
+              onclick={() => {
+                if (file.type === "document" || file.type === "image" || file.type === "video" || file.type === "audio") {
+                  window.open(URL.createObjectURL(file.blob), "_blank");
+                }
+              }}
+              onkeydown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  if (file.type === "document" || file.type === "image" || file.type === "video") {
+                    window.open(URL.createObjectURL(file.blob), "_blank");
+                  }
+                }
+              }}
+            >
               {shortenString(file.name)}
-            </div>
-            {#if hoveredPreview && (file.type === "image" || file.type === "video")}
-              <FilePreview {file} />
+            </button>
+            {#if hoveredPreview && (file.type === "image" || file.type === "video" || file.type === "document" || file.type === "audio")}
+              <FilePreview {file} onPlay={handleAudioPlay} onPause={handleAudioPause} />
             {/if}
           </div>
         </div>
