@@ -1,8 +1,4 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-// import { Account, Web3Provider } from "@massalabs/massa-web3";
-// import { ipfsAddress } from "$lib/ts/config";
-// import { Ipfs } from "$lib/runes/ipfs.svelte";
-// import { createKuboClient } from "$lib/ts/kubo";
 
 import { UploadStore } from "$lib/runes/UploadStore.svelte";
 import { MAX_FILE_SIZE } from "$lib/constants/files";
@@ -19,12 +15,7 @@ vi.mock("svelte-hot-french-toast", () => ({
   }
 }));
 
-describe.skip("File Upload", () => {
-  //   let ipfs: Ipfs;
-  //   let provider: Web3Provider;
-  //   let chainId: string;
-  //   let target: string;
-  //   let kuboClient: ReturnType<typeof createKuboClient>;
+describe("File Upload", () => {
   let uploadStore: UploadStore;
 
   function createMockFileList(files: File[]): FileList {
@@ -40,66 +31,17 @@ describe.skip("File Upload", () => {
     };
     return fileList as unknown as FileList;
   }
-  //   async function connectAccount() {
-  //     const account = await Account.fromEnv();
-  //     provider = Web3Provider.buildnet(account);
-
-  //     const network = await provider.networkInfos();
-  //     chainId = network.chainId.toString();
-  //     target = ipfsAddress(chainId);
-  //     ipfs = new Ipfs(provider);
-  //   }
-
-  //   async function startIPFS() {
-  //     kuboClient = await createKuboClient();
-  //   }
 
   beforeEach(async () => {
     uploadStore = new UploadStore();
   });
 
   it("Should initialize with empty state", () => {
-    // startIPFS();
-    // connectAccount();
     expect(uploadStore.fileList).toBeUndefined();
     expect(uploadStore.cids).toEqual([]);
   });
 
-  //   it("Should not upload if not connected to account but IPFS", async () => {
-  //     // startIPFS();
-  //     const testFile = new File(["test content"], "test.txt");
-  //     const fileList = createMockFileList([testFile]);
-
-  //     uploadStore.fileList = fileList;
-  //     await uploadStore.processUploadedFiles();
-
-  //     expect(uploadStore.cids).toEqual([]);
-  //   });
-
-  //   it("Should not upload if not connected to IPFS but account", async () => {
-  //     // connectAccount();
-  //     const testFile = new File(["test content"], "test.txt");
-  //     const fileList = createMockFileList([testFile]);
-
-  //     uploadStore.fileList = fileList;
-  //     await uploadStore.processUploadedFiles();
-
-  //     expect(uploadStore.cids).toEqual([]);
-  //   });
-
-  //   it("Should not upload if not connected to IPFS and account", async () => {
-  //     const testFile = new File(["test content"], "test.txt");
-  //     const fileList = createMockFileList([testFile]);
-
-  //     uploadStore.fileList = fileList;
-  //     await uploadStore.processUploadedFiles();
-
-  //     expect(uploadStore.cids).toEqual([]);
-  //   });
-
   it("Should upload files", async () => {
-    // startIPFS();
-    // connectAccount();
     const validFile = new File(["test content"], "test.txt");
     const fileList = createMockFileList([validFile]);
 
@@ -111,8 +53,6 @@ describe.skip("File Upload", () => {
   });
 
   it("Should reject files exceeding maximum size", async () => {
-    // startIPFS();
-    // connectAccount();
     const largeFile = new File([new ArrayBuffer(MAX_FILE_SIZE + 1)], "large.txt");
     const fileList = createMockFileList([largeFile]);
 
@@ -129,8 +69,6 @@ describe.skip("File Upload", () => {
   });
 
   it("Should handle multiple files", async () => {
-    // startIPFS();
-    // connectAccount();
     const file1 = new File(["content1"], "test1.txt");
     const file2 = new File(["content2"], "test2.txt");
     const fileList = createMockFileList([file1, file2]);
