@@ -1,7 +1,7 @@
 import type { FileItem, FilterState, SortConfig, CollectionItem } from "$lib/ts/types";
 
 export class FilterStore {
-  currentPage = $state(0);
+  currentPage = $state(1);
   readonly itemsPerPage = 20;
   searchQuery = $state("");
 
@@ -23,7 +23,7 @@ export class FilterStore {
       ...this.filters,
       type
     };
-    this.currentPage = 0;
+    this.currentPage = 1;
   }
 
   setSortConfig(config: SortConfig) {
@@ -50,7 +50,7 @@ export class FilterStore {
   }
 
   getPaginatedFiles(files: FileItem[]): FileItem[] {
-    const startIndex = this.currentPage * this.itemsPerPage;
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     return files.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
