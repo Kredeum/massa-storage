@@ -82,6 +82,7 @@
         const collectionStats = await kubo.ls(collectionCid);
         let filesCount = 0;
         let totalSize = 0;
+        let isPinned = false;
 
         for await (const file of collectionStats) {
           filesCount++;
@@ -110,11 +111,12 @@
           return;
         }
 
-        // Vérifier si la collection est pinée
-        let isPinned = false;
+        const cidsPinned = await kubo.pins();
+        console.log(cidsPinned);
         try {
-          const pinnedItems = await all(kubo.ls(collectionCid));
-          isPinned = pinnedItems.length > 0;
+          if (cidsPinned.includes(collectionCid)) {
+            isPinned = true;
+          }
         } catch (error) {
           console.error(`Error checking pin status for ${collectionCid}:`, error);
         }
@@ -258,6 +260,11 @@
 
       if (collection.status !== STATUS_APPROVED) {
         toast.error("Cannot pin: collection not approved");
+        return;
+      }
+
+      if (collection.isPinned) {
+        toast.error("Cannot pin: collection is already pinned");
         return;
       }
 
