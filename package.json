@@ -27,7 +27,7 @@
     "pnpm": "^10"
   },
   "devDependencies": {
-    "turbo": "^2.4.2"
+    "turbo": "^2.4.4"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

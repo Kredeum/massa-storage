@@ -23,6 +23,7 @@ import { PrivateKeyProvider, Writer } from "./writer.svelte";
 class Ipfs extends Writer {
   #mods = $state<string[]>([]);
   #cids = $state<SvelteMap<string, CidDataType>>(new SvelteMap());
+  #owner = $state<string | undefined>();
 
   has = async (type: string, value: string): Promise<boolean | undefined> => {
     if (!("readSC" in this.provider)) return;
@@ -46,18 +47,29 @@ class Ipfs extends Writer {
   moderatorHas = async (moderator?: string): Promise<boolean | undefined> =>
     Boolean(moderator && (await this.has(MODERATOR, moderator)));
 
-  owner = async (): Promise<string> => {
-    const dataStoreVal = await this.provider.readStorage(
-      ipfsAddress(this.chainId),
-      ["OWNER"],
-      false
-    );
-    const owner = bytesToStr(dataStoreVal[0]);
-    console.log("owner :", owner);
+  get owner(): string | undefined {
+    return this.#owner;
+  }
 
-    return owner;
+  fetchOwner = async (): Promise<string> => {
+    try {
+      const dataStoreVal = await this.provider.readStorage(
+        ipfsAddress(this.chainId),
+        ["OWNER"],
+        false
+      );
+      const owner = bytesToStr(dataStoreVal[0]);
+      console.log("owner :", owner);
+
+      this.#owner = owner;
+
+      return this.#owner;
+    } catch (error) {
+      toast.error(`Error fetchOwner`);
+      console.error("Error:", error);
+      return "";
+    }
   };
-  isOwner = async (address: string): Promise<boolean> => (await this.owner()) === address;
 
   cidHas = async (cid: string): Promise<boolean | undefined> => await this.has(CID, cid);
 
