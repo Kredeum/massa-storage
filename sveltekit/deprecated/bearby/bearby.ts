@@ -14,33 +14,33 @@ const initBearby = async (): Promise<void> => {
 };
 
 const connect = async () => {
-  console.log(web3.wallet.installed);
+  console.info(web3.wallet.installed);
   const status = await web3.wallet.connect();
-  console.log(web3.wallet.installed);
-  console.log(status);
+  console.info(web3.wallet.installed);
+  console.info(status);
 };
 
 const disconnect = async () => {
   const status = await web3.wallet.disconnect();
-  console.log(status);
+  console.info(status);
 };
 
 const accountBalance = async () => {
   const account = web3.wallet.account.base58;
   const res = await web3.massa.getAddresses(account);
   const { final_balance, candidate_balance } = res.result[0];
-  console.log(final_balance, candidate_balance);
+  console.info(final_balance, candidate_balance);
 };
 
 const test_req_pub_key = async () => {
   const pubkey = await web3.wallet.requestPubKey();
-  console.log(pubkey);
+  console.info(pubkey);
 };
 
 const test_sign = async () => {
   const res = await web3.wallet.signMessage("test");
 
-  console.log(res);
+  console.info(res);
 };
 
 const tryReadContract = async () => {
@@ -54,7 +54,7 @@ const tryReadContract = async () => {
     parameter: [],
     callerAddress: account
   });
-  console.log(result);
+  console.info(result);
 };
 
 const tryReadContractWithUnsafeParams = async () => {
@@ -71,7 +71,7 @@ const tryReadContractWithUnsafeParams = async () => {
     targetFunction: "balanceOf",
     parameter: Array.from(unsafeParameters)
   });
-  console.log(result);
+  console.info(result);
 };
 
 const readBalance = async () => {
@@ -88,7 +88,7 @@ const readBalance = async () => {
       }
     ]
   });
-  console.log("readSmartContract", data.result[0]);
+  console.info("readSmartContract", data.result[0]);
 };
 
 const transfer = async () => {
@@ -118,12 +118,12 @@ const transfer = async () => {
     ]
   });
 
-  console.log(hash);
+  console.info(hash);
 };
 
 const getDatastoreEntries = async () => {
   const data = await web3.contract.getDatastoreEntries({ address: USDC, key: "SYMBOL" });
-  console.log("Datastore data:", data.result[0]);
+  console.info("Datastore data:", data.result[0]);
 };
 
 const testunsafe = async () => {
@@ -139,7 +139,7 @@ const testunsafe = async () => {
     ]
   });
 
-  console.log(hash);
+  console.info(hash);
 };
 
 const deploy = async () => {
@@ -173,11 +173,11 @@ const deploy = async () => {
     if (response && response.result && response.result[0] && response.result[0].data) {
       clearInterval(intr);
       window.contract = String(response.result[0].data).replace("Address:", "");
-      console.log(window.contract);
+      console.info(window.contract);
       alert(window.contract);
     }
 
-    console.log(response);
+    console.info(response);
 
     if (k > 10) {
       clearInterval(intr);
@@ -188,9 +188,9 @@ const deploy = async () => {
 
 const getNodesStatus = async () => {
   const network = await web3.wallet.network;
-  console.log("network", network);
+  console.info("network", network);
   const data = await web3.massa.getNodesStatus();
-  console.log("getNodesStatus", data);
+  console.info("getNodesStatus", data);
 };
 
 export {

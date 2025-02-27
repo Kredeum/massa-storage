@@ -16,7 +16,7 @@ describe("Public Provider", () => {
   it("Should get chainId", async () => {
     const networkInfo = await publicProvider.networkInfos();
     const chainId = networkInfo.chainId.toString();
-    console.log(`ChainId ${chainId}`);
+    console.info(`ChainId ${chainId}`);
 
     expect(chainId).toBeDefined();
     expect(Number(chainId)).toBeGreaterThan(0);
@@ -25,7 +25,7 @@ describe("Public Provider", () => {
   it("Should get network name", async () => {
     const networkInfo = await publicProvider.networkInfos();
     const name = networkInfo.name;
-    console.log(`Name '${name}'`);
+    console.info(`Name '${name}'`);
 
     expect(name).toBeDefined();
     expect(name.length).toBeGreaterThan(0);
@@ -39,7 +39,7 @@ describe("Public Provider", () => {
   it("Should have valid chainId", async () => {
     const networkInfo = await publicProvider.networkInfos();
     const chainId = networkInfo.chainId.toString();
-    console.log(`ChainId '${chainId}'`);
+    console.info(`ChainId '${chainId}'`);
 
     expect(chainId).toBeDefined();
     expect(typeof chainId).toBe("string");
@@ -57,7 +57,7 @@ describe("Provider", () => {
 
   it("Should have valid address", async () => {
     const address = provider.address;
-    console.log(`Address ${address}`);
+    console.info(`Address ${address}`);
 
     expect(address).toBeDefined();
     expect(typeof address).toBe("string");
@@ -71,7 +71,7 @@ describe("Provider", () => {
 
   it("Should get account balance", async () => {
     const balance = await provider.balance();
-    console.log(`Balance: ${balance} nanoMASS`);
+    console.info(`Balance: ${balance} nanoMASS`);
 
     expect(balance).toBeDefined();
     expect(typeof balance.toString()).toBe("string");

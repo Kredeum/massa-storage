@@ -14,11 +14,11 @@ const account = await Account.fromEnv(process.env.PRIVATE_KEY_DEPLOYER);
 const provider = Web3Provider.buildnet(account);
 
 const chainId = (await provider.networkInfos()).chainId.toString();
-console.log(`Deploying contract on ${chainId}...`);
+console.info(`Deploying contract on ${chainId}...`);
 
 const byteCode = getScByteCode('build', 'ipfs.wasm');
 const deployer = account.publicKey.toString();
-console.log('deployer:', deployer);
+console.info('deployer:', deployer);
 
 if (!deployer) {
   console.error('Deployer address not provided');
@@ -33,9 +33,9 @@ const events = await provider.getEvents({
   smartContractAddress: contract.address,
 });
 
-console.log('Contract deployed at:', contract.address);
+console.info('Contract deployed at:', contract.address);
 for (const event of events) {
-  console.log('Event message:', event.data);
+  console.info('Event message:', event.data);
 }
 
 await updateAddresses(chainId, contract.address);

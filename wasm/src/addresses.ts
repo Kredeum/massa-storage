@@ -19,5 +19,5 @@ export async function updateAddresses(
 
   fs.writeFileSync(addressesPath, JSON.stringify(addresses, null, 2));
 
-  console.log(`Address written to ${addressesPath}`);
+  console.info(`Address written to ${addressesPath}`);
 }

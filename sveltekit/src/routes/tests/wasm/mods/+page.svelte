@@ -12,7 +12,6 @@
     if (!ipfs.ready) return;
 
     isMod = await ipfs.moderatorHas(ipfs.address);
-    console.log("refresh ~ isMod:", isMod);
     await ipfs.moderatorsGet();
   };
 

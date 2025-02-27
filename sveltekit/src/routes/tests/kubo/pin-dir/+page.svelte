@@ -12,7 +12,6 @@
 
   const filesHandle = async () => {
     if (!(files && files.length > 0)) return;
-    console.log("filesHandle", files.length);
 
     try {
       let filesArray = [];
@@ -24,7 +23,6 @@
       }
 
       cids = await all(kubo.addAll(filesArray, { wrapWithDirectory: true }));
-      console.log("filesHandle ~ cids:", cids);
     } catch (error) {
       console.error("Error uploading file:", error);
     }

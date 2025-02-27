@@ -37,8 +37,6 @@
     try {
       const files = await kubo.ls(collectionCid);
       for await (const file of files) {
-        console.log("Collection file:", file);
-
         const type = getFileTypeFromName(file.name);
         let blob;
         const chunks = await all(kubo.cat(file.cid.toString()));

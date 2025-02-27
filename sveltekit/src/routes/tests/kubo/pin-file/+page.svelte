@@ -18,17 +18,14 @@
     try {
       const arrayBuffer = await file0.arrayBuffer();
       const content = new Uint8Array(arrayBuffer);
-      console.log("fileHandle ~ content:", content.length);
 
       cid = (await kubo.addAndPin(content)).toString();
-      console.log("fileHandle ~ cid:", cid);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
   };
 
   const fileRetreive = async () => {
-    console.log("fileRetreive:", cid);
     if (!cid) return "";
 
     try {

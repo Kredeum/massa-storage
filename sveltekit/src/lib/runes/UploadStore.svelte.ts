@@ -28,31 +28,26 @@ export class UploadStore {
     });
 
     try {
-      console.log(`Starting to process ${valideFiles.length} files`);
       const filesArray: { path: string; content: Uint8Array }[] = [];
 
       // Process all files first
       await Promise.all(
         valideFiles.map(async (file) => {
-          console.log(`Processing file:`, file.name);
           const arrayBuffer = await file.arrayBuffer();
           const content = new Uint8Array(arrayBuffer);
           filesArray.push({
             path: file.name,
             content: content
           });
-          console.log(`Added file:`, file.name);
         })
       );
 
       // Add all files in a single transaction
       if (filesArray.length > 0) {
-        console.log(`Starting IPFS upload...`);
         this.cids = await all(this.#kubo.addAll(filesArray, { wrapWithDirectory: true }));
-        console.log(`IPFS upload complete, CIDs:`, this.cids.length);
+        console.info(`IPFS upload complete, CIDs:`, this.cids.length);
       }
 
-      console.log(`dir-cids:`, this.cids);
       this.fileList = undefined;
       return this.cids;
     } catch (error) {

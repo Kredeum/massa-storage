@@ -68,8 +68,6 @@
     if (!ipfs) return;
     await ipfs.cidsGet();
     const collectionCids = ipfs.cids;
-    console.log("collectionCids", collectionCids);
-
     const loadedCollections: CollectionItem[] = [];
 
     collectionCids.forEach(async (attributes, collectionCid) => {
@@ -168,7 +166,6 @@
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     paginatedCollections = filteredCollections.slice(startIndex, endIndex);
-    console.log("Pagination:", { currentPage, startIndex, endIndex, total: filteredCollections.length, showing: paginatedCollections.length });
   }
 
   function handleSort(key: keyof CollectionItem) {
@@ -216,7 +213,6 @@
           status: STATUS_PENDING
         };
 
-        console.log("Setting attributes:", attributes);
         const attributesString = JSON.stringify(attributes);
         await ipfs.cidSet(collectionCid, attributesString);
         toast.success("Collection created successfully");
