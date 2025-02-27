@@ -112,7 +112,6 @@
         }
 
         const cidsPinned = await kubo.pins();
-        console.log(cidsPinned);
         try {
           if (cidsPinned.includes(collectionCid)) {
             isPinned = true;
