@@ -309,8 +309,7 @@
     <!-- Collection Table -->
     {#if filteredCollections.length === 0 && collectionFilters.status !== "all"}
       <div class="flex flex-col items-center justify-center py-8 text-gray-500">
-        <p class="text-lg font-medium">No {collectionFilters.status.toLowerCase()} collections found</p>
-        <p class="mt-2">There are no collections with {collectionFilters.status.toLowerCase()} status</p>
+        <p class="text-lg font-medium">No collections found</p>
       </div>
     {:else}
       <CollectionTable collections={paginatedCollections} {sortConfig} {handleSort} handleClick={handleCollectionClick} onModerate={isModerator ? handleModerate : undefined} onPin={handlePin} />
