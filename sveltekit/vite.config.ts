@@ -13,7 +13,7 @@ export default defineConfig({
   },
   server: { open: true },
   optimizeDeps: {
-    include: ['jszip'],
+    include: ["jszip"],
     esbuildOptions: {
       define: {
         global: "globalThis"
@@ -26,7 +26,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       external: ["lodash"]
-    }
+    },
+    chunkSizeWarningLimit: 800
   },
   assetsInclude: ["**/*.svg"]
 });

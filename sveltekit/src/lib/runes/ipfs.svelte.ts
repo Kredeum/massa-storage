@@ -5,14 +5,11 @@ import {
   Args,
   ArrayTypes,
   bytesToStr,
-  JsonRpcProvider,
-  JsonRpcPublicProvider,
   OperationStatus
 } from "@massalabs/massa-web3";
 
 import { ipfsAddress } from "$lib/ts/config";
 
-import type { Wallet, WalletName } from "@massalabs/wallet-provider";
 import toast from "svelte-hot-french-toast";
 import { shortenString } from "$lib/ts/utils";
 import { MODERATOR, CID, STATUS_APPROVED, STATUS_REJECTED } from "../../../../common/src/constants";
