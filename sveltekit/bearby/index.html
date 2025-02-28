@@ -39,26 +39,26 @@
       const USDC = "AS12k8viVmqPtRuXzCm6rKXjLgpQWqbuMjc37YHhB452KSUUb9FgL";
 
       async function connect() {
-        console.log(await bearby.wallet.connect());
+        console.info(await bearby.wallet.connect());
       }
       async function disconnect() {
         const status = await bearby.wallet.disconnect();
-        console.log(status);
+        console.info(status);
       }
       async function accountBalance() {
         const account = bearby.wallet.account.base58;
         const res = await bearby.massa.getAddresses(account);
         const { final_balance, candidate_balance } = res.result[0];
-        console.log(final_balance, candidate_balance);
+        console.info(final_balance, candidate_balance);
       }
       async function test_req_pub_key() {
         const pubkey = await bearby.wallet.requestPubKey();
-        console.log(pubkey);
+        console.info(pubkey);
       }
       async function test_sign() {
         const res = await bearby.wallet.signMessage("test");
 
-        console.log(res);
+        console.info(res);
       }
 
       async function tryReadContract() {
@@ -72,7 +72,7 @@
           parameter: [],
           callerAddress: account
         });
-        console.log(result);
+        console.info(result);
       }
       async function tryReadContractWithUnsafeParams() {
         const account = bearby.wallet.account.base58;
@@ -88,7 +88,7 @@
           targetFunction: "balanceOf",
           parameter: Array.from(unsafeParameters)
         });
-        console.log(result);
+        console.info(result);
       }
       async function readBalance() {
         const data = await bearby.contract.readSmartContract({
@@ -104,7 +104,7 @@
             }
           ]
         });
-        console.log("readSmartContract", data[0].result[0]);
+        console.info("readSmartContract", data[0].result[0]);
       }
 
       async function transfer() {
@@ -133,12 +133,12 @@
           ]
         });
 
-        console.log(hash);
+        console.info(hash);
       }
 
       async function getDatastoreEntries() {
         const data = await bearby.contract.getDatastoreEntries({ address: USDC, key: "SYMBOL" });
-        console.log("Datastore data:", data[0].result[0]);
+        console.info("Datastore data:", data[0].result[0]);
       }
 
       async function testunsafe() {
@@ -154,7 +154,7 @@
           ]
         });
 
-        console.log(hash);
+        console.info(hash);
       }
 
       async function deploy() {
@@ -188,11 +188,11 @@
           if (response && response.result && response.result[0] && response.result[0].data) {
             clearInterval(intr);
             window.contract = String(response.result[0].data).replace("Address:", "");
-            console.log(window.contract);
+            console.info(window.contract);
             alert(window.contract);
           }
 
-          console.log(response);
+          console.info(response);
 
           if (k > 10) {
             clearInterval(intr);
@@ -203,12 +203,12 @@
 
       async function getNodesStatus() {
         const network = await bearby.wallet.network;
-        console.log("network", network);
+        console.info("network", network);
         const data = await bearby.massa.getNodesStatus();
-        console.log("getNodesStatus", data);
+        console.info("getNodesStatus", data);
       }
 
-      console.log(bearby);
+      console.info(bearby);
     </script>
   </body>
 </html>

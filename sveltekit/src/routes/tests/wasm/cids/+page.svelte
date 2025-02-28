@@ -12,8 +12,6 @@
 
   const refresh = async () => {
     await ipfs.cidsGet();
-
-    console.log("cids", JSON.stringify(ipfs.cids.keys(), null, 2), JSON.stringify(ipfs.cids.values(), null, 2));
   };
 
   $inspect("PAGE cids", ipfs.cids, ipfs.cids.keys(), ipfs.cids.values());

@@ -7,7 +7,7 @@ import {
   STATUS_REJECTED
 } from "@kredeum/massa-storage-common/src/constants";
 
-describe.skip("FileStore", () => {
+describe("FileStore", () => {
   let fileStore: FileStore;
   let testFiles: FileItem[];
 
@@ -71,8 +71,4 @@ describe.skip("FileStore", () => {
     expect(fileStore.files[1].status).toBe(STATUS_REJECTED);
     expect(fileStore.selectedFiles).toHaveLength(0);
   });
-});
-
-it("Should bulk approve/reject files", () => {
-  // Test multiple file status changes
 });

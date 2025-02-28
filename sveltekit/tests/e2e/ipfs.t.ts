@@ -5,7 +5,7 @@ import { URL_APP } from "./common";
 test("can add and remove moderator", async ({ page }) => {
   const account: Account = await Account.generate();
   const testAddress = account.address.toString();
-  console.log("testAddress:", testAddress);
+  console.info("testAddress:", testAddress);
 
   const url = `${URL_APP}/moderators?key=${process.env.PRIVATE_KEY_DEPLOYER}`;
 

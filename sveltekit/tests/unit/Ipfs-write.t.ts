@@ -4,7 +4,7 @@ import { ipfsAddress } from "$lib/ts/config";
 import { Ipfs } from "$lib/runes/ipfs.svelte";
 import { create } from "kubo-rpc-client";
 
-describe.skip("IPFS class", () => {
+describe("IPFS class", () => {
   let ipfs: Ipfs;
   let provider: JsonRpcProvider;
   let target: string;
@@ -19,7 +19,7 @@ describe.skip("IPFS class", () => {
   it("Should add then delete one moderator", async () => {
     const account: Account = await Account.generate();
     const address = account.address.toString();
-    console.log("Add moderator:", address);
+    console.info("Add moderator:", address);
 
     await ipfs.moderatorAdd(address);
     const isModerator = await ipfs.moderatorHas(address);
@@ -35,7 +35,7 @@ describe.skip("IPFS class", () => {
     const ipfsClient = create();
     const { cid } = await ipfsClient.add(testString, { onlyHash: true });
     const testCid = cid.toString();
-    console.log("Add CID:", testCid, "for string:", testString);
+    console.info("Add CID:", testCid, "for string:", testString);
 
     await ipfs.cidAdd(testCid);
     const hasCid = await ipfs.cidHas(testCid);

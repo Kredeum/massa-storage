@@ -40,7 +40,7 @@ class Ipfs extends Writer {
     }
 
     const has = new Args(result.value).nextBool();
-    console.log(`${type}Has ${value}: ${has}`);
+    console.info(`${type}Has ${value}: ${has}`);
 
     return has;
   };
@@ -59,7 +59,7 @@ class Ipfs extends Writer {
         false
       );
       const owner = bytesToStr(dataStoreVal[0]);
-      console.log("owner :", owner);
+      console.info("owner :", owner);
 
       this.#owner = owner;
 
@@ -86,8 +86,8 @@ class Ipfs extends Writer {
 
       const txHash = op.id;
       toast.success(`Transaction sent: ${shortenString(txHash)}`);
-      console.log(`https://massexplo.io/tx/${txHash}`);
-      // console.log(`https://explorer.massa.net/mainnet/operation/${txHash}`);
+      console.info(`https://massexplo.io/tx/${txHash}`);
+      // console.info(`https://explorer.massa.net/mainnet/operation/${txHash}`);
 
       const status = await op.waitSpeculativeExecution();
       if (status !== OperationStatus.SpeculativeSuccess) {
@@ -121,8 +121,8 @@ class Ipfs extends Writer {
 
       const txHash = op.id;
       toast.success("Transaction sent: " + shortenString(txHash));
-      console.log(`https://massexplo.io/tx/${txHash}`);
-      // console.log(`https://explorer.massa.net/mainnet/operation/${txHash}`);
+      console.info(`https://massexplo.io/tx/${txHash}`);
+      // console.info(`https://explorer.massa.net/mainnet/operation/${txHash}`);
 
       const status = await op.waitSpeculativeExecution();
       if (status !== OperationStatus.SpeculativeSuccess) {
@@ -192,8 +192,8 @@ class Ipfs extends Writer {
 
       const txHash = op.id;
       toast.success("Transaction sent: " + shortenString(txHash));
-      console.log(`https://massexplo.io/tx/${txHash}`);
-      // console.log(`https://explorer.massa.net/mainnet/operation/${txHash}`);
+      console.info(`https://massexplo.io/tx/${txHash}`);
+      // console.info(`https://explorer.massa.net/mainnet/operation/${txHash}`);
 
       const status = await op.waitSpeculativeExecution();
       if (status !== OperationStatus.SpeculativeSuccess) return toast.error(`Failed to ${type}Del`);
@@ -220,14 +220,14 @@ class Ipfs extends Writer {
       parameter: new Args().addString("").serialize()
     });
     if (result.info.error) {
-      console.log(`${func} ERROR ${result.info.error}`);
+      console.info(`${func} ERROR ${result.info.error}`);
       toast.error(`${func} ERROR`);
       return;
     }
 
     const args = new Args(result.value);
     const keys: string[] = args.nextArray(ArrayTypes.STRING);
-    // console.log(`${func} ${keys}`);
+    // console.info(`${func} ${keys}`);
 
     if (type === MODERATOR) {
       this.#mods = keys;

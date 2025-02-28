@@ -37,7 +37,7 @@ describe("IPFS class", () => {
     const dataStoreVal = await provider.readStorage(target, ["OWNER"], false);
 
     const owner = bytesToStr(dataStoreVal[0]);
-    console.log("Owner:", owner);
+    console.info("Owner:", owner);
 
     expect(owner).toBe(deployer);
   });
@@ -99,7 +99,6 @@ describe("IPFS class", () => {
       console.error("Failed to get attributes for CID:", cid);
       return;
     }
-    console.log("cid attributes:", attributes, cid, attributes.status);
     expect(attributes).toBeDefined();
     expect(attributes.name).toBeDefined();
     expect(attributes.owner).toBeDefined();

@@ -37,7 +37,6 @@
     try {
       const arrayBuffer = await file0.arrayBuffer();
       const content = new Uint8Array(arrayBuffer);
-      console.log("fileHandle ~ content:", content);
       const _cid = await fs.addFile({
         path: file0.name,
         content
@@ -70,7 +69,6 @@
   };
 
   const inputHandle = async () => {
-    console.log("inputHandle ~ cid:", cid);
     await fileHandle();
     await fileRetreive();
   };

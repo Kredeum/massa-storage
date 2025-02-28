@@ -11,7 +11,6 @@ interface MockIpfs {
 
 type ModeratorPageComponent = () => Promise<void>;
 
-// Mock ModeratorPage pour simuler le composant sans le charger
 vi.mock("../../src/routes/app/moderators/+page.svelte", () => ({
   default: vi.fn()
 }));
