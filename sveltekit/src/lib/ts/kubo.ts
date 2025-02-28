@@ -1,5 +1,5 @@
 import {
-  CID,
+  type CID,
   create,
   type AddOptions,
   type ImportCandidate,

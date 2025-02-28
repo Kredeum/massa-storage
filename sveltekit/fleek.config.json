@@ -1,0 +1,8 @@
+{
+  "sites": [
+    {
+      "slug": "fat-cricket-straight",
+      "distDir": "build"
+    }
+  ]
+}
