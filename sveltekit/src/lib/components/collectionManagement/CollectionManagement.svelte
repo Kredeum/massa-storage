@@ -17,29 +17,18 @@
   import CollectionTable from "../collectionTable/CollectionTable.svelte";
 
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
-  import type ArrowUp_0_1 from "lucide-svelte/icons/arrow-up-0-1";
-  import all from "it-all";
+  import { SvelteMap } from "svelte/reactivity";
+
+  const ITEMS_PER_PAGE = 10;
 
   let isModerator = $state<boolean>();
-
-  const refresh = async (): Promise<void> => {
-    if (!ipfs.ready) return;
-
-    isModerator = await ipfs.moderatorHas(ipfs.address);
-  };
-
-  $effect(() => {
-    refresh();
-  });
-
   let uploadStore = new UploadStore();
   let uploadInProgress = false;
 
-  let collections: CollectionItem[] = [];
-  let filteredCollections: CollectionItem[] = $state([]);
-  let paginatedCollections: CollectionItem[] = $state([]);
+  let allCollections: SvelteMap<string, CollectionItem> = $state(new SvelteMap());
+  let filteredCollections: SvelteMap<string, CollectionItem> = $state(new SvelteMap());
+  let paginatedCollections: SvelteMap<string, CollectionItem> = $state(new SvelteMap());
   let currentPage = $state(1);
-  let itemsPerPage = $state(10);
 
   let collectionFilters = $state<CollectionFilterState>({
     status: "all"
@@ -58,117 +47,132 @@
   const ipfs: Ipfs = getContext("ipfs");
   const kubo = createKuboClient();
 
-  onMount(async () => {
+  const refresh = async (): Promise<void> => {
+    if (!ipfs.ready) return;
+
+    isModerator = await ipfs.moderatorHas(ipfs.address);
+
     await loadCollections();
+  };
+
+  $effect(() => {
+    refresh();
   });
 
-  $inspect("Current isModerator state:", isModerator);
-
-  async function loadCollections() {
+  const loadCollections = async () => {
     if (!ipfs) return;
-    await ipfs.cidsGet();
-    const collectionCids = ipfs.cids;
-    const loadedCollections: CollectionItem[] = [];
 
-    collectionCids.forEach(async (attributes, collectionCid) => {
-      if (!collectionCid) return;
+    const collectionCids = await ipfs.cidsGet();
+    console.log("loadCollections ~ collectionCids.size:", collectionCids.size);
 
-      try {
-        const result = await ipfs.cidGet(collectionCid);
-        if (result === undefined) return;
+    const cidsPinned = await kubo.pins();
+    console.log("loadCollections ~ cidsPinned:", cidsPinned.length);
 
-        const collectionStats = await kubo.ls(collectionCid);
-        let filesCount = 0;
-        let totalSize = 0;
-        let isPinned = false;
+    await Promise.all(
+      Array.from(collectionCids.entries()).map(async ([collectionCid, attributes]) => {
+        if (!collectionCid) return;
 
-        for await (const file of collectionStats) {
-          filesCount++;
-          totalSize += file.size;
-        }
-
-        // Determine the current status
-        let currentStatus: StatusType = STATUS_PENDING;
         try {
-          if (!attributes || !attributes.status) return;
-          switch (attributes.status) {
-            case STATUS_APPROVED:
-              currentStatus = STATUS_APPROVED;
-              break;
-            case STATUS_REJECTED:
-              currentStatus = STATUS_REJECTED;
-              break;
-            case STATUS_PENDING:
-              currentStatus = STATUS_PENDING;
-              break;
-            default:
-              console.error(`Unknown status value: ${attributes.status}`);
+          const result = await ipfs.cidGet(collectionCid);
+          if (result === undefined) return;
+
+          // const collectionStats = await kubo.ls(collectionCid);
+          // let filesCount = 0;
+          // let totalSize = 0;
+
+          // for await (const file of collectionStats) {
+          //   filesCount++;
+          //   totalSize += file.size;
+          // }
+
+          let isPinned = false;
+          // Determine the current status
+          let currentStatus: StatusType = STATUS_PENDING;
+          try {
+            if (!attributes || !attributes.status) return;
+            switch (attributes.status) {
+              case STATUS_APPROVED:
+                currentStatus = STATUS_APPROVED;
+                break;
+              case STATUS_REJECTED:
+                currentStatus = STATUS_REJECTED;
+                break;
+              case STATUS_PENDING:
+                currentStatus = STATUS_PENDING;
+                break;
+              default:
+                console.error(`Unknown status value: ${attributes.status}`);
+            }
+          } catch (error) {
+            console.error(`Error determining status for CID ${collectionCid}:`, error);
+            return;
           }
-        } catch (error) {
-          console.error(`Error determining status for CID ${collectionCid}:`, error);
-          return;
-        }
 
-        const cidsPinned = await kubo.pins();
-        try {
-          if (cidsPinned.includes(collectionCid)) {
-            isPinned = true;
+
+          try {
+            if (cidsPinned.includes(collectionCid)) {
+              isPinned = true;
+            }
+          } catch (error) {
+            console.error(`Error checking pin status for ${collectionCid}:`, error);
           }
+
+          const collectionItem: CollectionItem = {
+            collectionCid,
+            owner: attributes.owner,
+            name: attributes.name,
+            totalSizeBytes: 1,
+            filesCount: 1,
+            status: currentStatus,
+            uploadDate: attributes.date,
+            isPinned
+          };
+
+          console.log("collectionCids.forEach ~ collectionCid:", collectionCid);
+          allCollections.set(collectionCid, collectionItem);
+          console.log("loadCollections1 ~ allCollections.size:", allCollections.size);
         } catch (error) {
-          console.error(`Error checking pin status for ${collectionCid}:`, error);
+          console.error(`Error loading collection ${collectionCid}:`, error);
         }
+      })
+    );
+    console.log("loadCollections2 final ~ allCollections.size:", allCollections.size);
+    updateFilteredCollections();
+  };
 
-        const collectionItem: CollectionItem = {
-          owner: attributes.owner,
-          collectionCid: collectionCid,
-          name: attributes.name,
-          totalSizeBytes: totalSize,
-          filesCount: filesCount,
-          status: currentStatus,
-          uploadDate: attributes.date,
-          isPinned: isPinned
-        };
+  const updateFilteredCollections = () => {
+    filteredCollections = new SvelteMap(
+      Array.from(allCollections)
+        .sort(([_, a], [__, b]) => {
+          const aValue = a[sortConfig.key];
+          const bValue = b[sortConfig.key];
+          const modifier = sortConfig.direction === "asc" ? 1 : -1;
 
-        loadedCollections.push(collectionItem);
-        collections = [...loadedCollections];
-        updateFilteredCollections();
-      } catch (error) {
-        console.error(`Error loading collection ${collectionCid}:`, error);
-      }
-    });
-  }
-
-  function updateFilteredCollections() {
-    collections.sort((a, b) => {
-      const aValue = a[sortConfig.key];
-      const bValue = b[sortConfig.key];
-      const modifier = sortConfig.direction === "asc" ? 1 : -1;
-
-      if (aValue < bValue) return -1 * modifier;
-      if (aValue > bValue) return 1 * modifier;
-      return 0;
-    });
-
-    filteredCollections = collections.filter((collection) => {
-      if (!(isModerator || collection.status === STATUS_APPROVED)) {
-        return false;
-      }
-      return collectionFilters.status === "all" || collection.status === collectionFilters.status;
-    });
+          if (aValue < bValue) return -1 * modifier;
+          if (aValue > bValue) return 1 * modifier;
+          return 0;
+        })
+        .filter(([_, collection]) => {
+          if (!(isModerator || collection.status === STATUS_APPROVED)) {
+            return false;
+          }
+          return collectionFilters.status === "all" || collection.status === collectionFilters.status;
+        })
+    );
     updatePagination();
-  }
+  };
 
-  function updatePagination() {
-    if (filteredCollections.length === 0) {
-      paginatedCollections = [];
+  const updatePagination = () => {
+    if (filteredCollections.size === 0) {
+      paginatedCollections = new SvelteMap();
       return;
     }
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    paginatedCollections = filteredCollections.slice(startIndex, endIndex);
-  }
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE - 1;
+    paginatedCollections = new SvelteMap(Array.from(filteredCollections).slice(startIndex, endIndex));
+  };
 
-  function handleSort(key: keyof CollectionItem) {
+  const handleSort = (key: keyof CollectionItem) => {
     if (sortConfig.key === key) {
       sortConfig.direction = sortConfig.direction === "asc" ? "desc" : "asc";
     } else {
@@ -176,19 +180,21 @@
       sortConfig.direction = "asc";
     }
     updateFilteredCollections();
-  }
+  };
 
-  function handleCollectionClick(collectionCid: string) {
+  const handleCollectionClick = (collectionCid: string) => {
     goto(`/app/collection/${collectionCid}`);
-  }
+  };
 
-  function handleStatusFilter(status: StatusType | "all") {
+  const handleStatusFilter = (status: StatusType | "all") => {
     collectionFilters.status = status;
     updateFilteredCollections();
-  }
+  };
 
-  async function uploadCollection() {
+  const uploadCollection = async () => {
     const fileCount = uploadStore.fileList?.length || 0;
+    console.log("uploadCollection ~ fileCount:", fileCount);
+
     if (fileCount === 0) return;
     if (!ipfs || uploadInProgress) return;
 
@@ -225,9 +231,9 @@
       uploadInProgress = false;
       toast.dismiss(toastId);
     }
-  }
+  };
 
-  async function handleModerate(data: { id: string; status: StatusType }) {
+  const handleModerate = async (data: { id: string; status: StatusType }) => {
     const toastId = toast.loading(`Moderating collection ...`);
     try {
       if (data.status === STATUS_APPROVED) {
@@ -243,11 +249,11 @@
       console.error("Error moderating collection:", error);
       toast.error("Failed to moderate collection");
     }
-  }
+  };
 
-  async function handlePin(cid: string) {
+  const handlePin = async (cid: string) => {
     try {
-      const collection = collections.find((c) => c.collectionCid === cid);
+      const collection = allCollections.get(cid);
       if (!collection) {
         toast.error("Collection not found");
         return;
@@ -266,12 +272,9 @@
       const id = toast.loading("Pinning Collection ...");
       await kubo.pin(cid);
 
-      collections = collections.map((collection) => {
-        if (collection.collectionCid === cid) {
-          return { ...collection, isPinned: true };
-        }
-        return collection;
-      });
+      collection.isPinned = true;
+      allCollections.set(cid, collection);
+
       updateFilteredCollections();
 
       toast.dismiss(id);
@@ -280,16 +283,16 @@
       console.error("Error pinning collection:", error);
       toast.error("Failed to pin collection");
     }
-  }
+  };
 
   $effect(() => {
     uploadCollection();
   });
 
-  function setPage(page: number) {
+  const setPage = (page: number) => {
     currentPage = page;
     updatePagination();
-  }
+  };
 </script>
 
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
@@ -303,16 +306,23 @@
     </div>
 
     <!-- Collection Table -->
-    {#if filteredCollections.length === 0 && collectionFilters.status !== "all"}
+    {#if filteredCollections.size === 0 && collectionFilters.status !== "all"}
       <div class="flex flex-col items-center justify-center py-8 text-gray-500">
         <p class="text-lg font-medium">No collections found</p>
       </div>
     {:else}
-      <CollectionTable collections={paginatedCollections} {sortConfig} {handleSort} handleClick={handleCollectionClick} onModerate={isModerator ? handleModerate : undefined} onPin={handlePin} />
+      <CollectionTable
+        collections={[...paginatedCollections.values()]}
+        {sortConfig}
+        {handleSort}
+        handleClick={handleCollectionClick}
+        onModerate={isModerator ? handleModerate : undefined}
+        onPin={handlePin}
+      />
     {/if}
 
     <div class="mt-4">
-      <FilePagination {currentPage} totalPages={Math.ceil(filteredCollections.length / itemsPerPage)} {itemsPerPage} totalItems={filteredCollections.length} {setPage} />
+      <FilePagination {currentPage} totalPages={Math.ceil(filteredCollections.size / ITEMS_PER_PAGE)} itemsPerPage={ITEMS_PER_PAGE} totalItems={filteredCollections.size} {setPage} />
     </div>
   </div>
 </div>
