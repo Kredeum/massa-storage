@@ -93,10 +93,10 @@
             {/if}
           </td>
           <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
-            {collection.filesCount}
+            {collection.filesCount === -1 ? "?" : collection.filesCount}
           </td>
           <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
-            {formatSize(collection.totalSizeBytes)}
+            {collection.totalSizeBytes === -1 ? "?" : formatSize(collection.totalSizeBytes)}
           </td>
           <td class="w-[10%] px-4 py-4 text-center text-sm text-gray-500">
             <ShortenedTextTooltip text={collection.owner} label="Owner address" />

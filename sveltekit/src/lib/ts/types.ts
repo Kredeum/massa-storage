@@ -34,6 +34,7 @@ export interface CollectionItem {
   status: StatusType;
   uploadDate: string;
   isPinned: boolean;
+  isLocal: boolean;
 }
 
 export interface FilterState {
@@ -46,6 +47,11 @@ export interface CollectionFilterState {
 
 export interface SortConfig {
   key: keyof FileItem | keyof CollectionItem;
+  direction: "asc" | "desc";
+}
+
+export interface CollectionSortConfig {
+  key: keyof CollectionItem;
   direction: "asc" | "desc";
 }
 
@@ -67,7 +73,7 @@ export interface PropsCollectionTable {
   directories: CollectionItem[];
   paginatedDirectories: CollectionItem[];
   selectedDirectories?: string[];
-  sortConfig: SortConfig;
+  sortConfig: CollectionSortConfig;
   handleSort: (key: keyof CollectionItem) => void;
   onSelectionChange: (selected: string[]) => void;
   onFilterChange: (status: StatusType | "all") => void;
@@ -89,3 +95,5 @@ export type CidDataType = {
   status: string;
   date: string;
 };
+
+export type CidDataTypePlus = CidDataType & { isPinned?: boolean; isLocal?: boolean };

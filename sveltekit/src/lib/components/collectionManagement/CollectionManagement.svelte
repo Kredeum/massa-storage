@@ -3,7 +3,7 @@
   import { createKuboClient } from "$lib/ts/kubo";
   import type { AddResult } from "kubo-rpc-client";
   import { STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING } from "@kredeum/massa-storage-common/src/constants";
-  import type { CollectionItem, StatusType, CidDataType, CollectionFilterState } from "$lib/ts/types";
+  import type { CollectionItem, StatusType, CollectionSortConfig, CidDataType, CidDataTypePlus, CollectionFilterState } from "$lib/ts/types";
   import { goto } from "$app/navigation";
   import { toast } from "svelte-hot-french-toast";
 
@@ -25,6 +25,9 @@
   let uploadStore = new UploadStore();
   let uploadInProgress = false;
 
+  let cidsOnchain = $state<SvelteMap<string, CidDataTypePlus>>(new SvelteMap());
+  let cidsPinned = $state<Array<string>>([]);
+
   let allCollections: SvelteMap<string, CollectionItem> = $state(new SvelteMap());
   let filteredCollections: SvelteMap<string, CollectionItem> = $state(new SvelteMap());
   let paginatedCollections: SvelteMap<string, CollectionItem> = $state(new SvelteMap());
@@ -34,14 +37,9 @@
     status: "all"
   });
 
-  type SortConfig = {
-    key: keyof CollectionItem;
-    direction: "asc" | "desc";
-  };
-
-  let sortConfig: SortConfig = $state({
-    key: "uploadDate" as keyof CollectionItem,
-    direction: "desc" as const
+  let sortConfig: CollectionSortConfig = $state({
+    key: "uploadDate",
+    direction: "desc"
   });
 
   const ipfs: Ipfs = getContext("ipfs");
@@ -59,33 +57,52 @@
     refresh();
   });
 
+  const isPinned = (cid: string): boolean => {
+    return cidsPinned.includes(cid);
+  };
+
   const loadCollections = async () => {
     if (!ipfs) return;
 
-    const collectionCids = await ipfs.cidsGet();
-    console.log("loadCollections ~ collectionCids.size:", collectionCids.size);
+    cidsOnchain = await ipfs.cidsGet();
+    cidsPinned = await kubo.pins();
 
-    const cidsPinned = await kubo.pins();
+    console.log("loadCollections ~ cidsOnchain.size:", cidsOnchain.size);
     console.log("loadCollections ~ cidsPinned:", cidsPinned.length);
 
+    const isLocal = async (cid: string): Promise<boolean> => {
+      // console.log("isLocal ~ cid:", cid);
+      try {
+        const stat = await kubo.stat(`/ipfs/${cid}`, { timeout: 1000, withLocal: true });
+        // console.log("isLocal ~ size, local:", stat.local, stat.cumulativeSize);
+        return Boolean(stat.local);
+      } catch (error) {
+        return false;
+      }
+    };
+
     await Promise.all(
-      Array.from(collectionCids.entries()).map(async ([collectionCid, attributes]) => {
+      Array.from(cidsOnchain.entries()).map(async ([collectionCid, attributes]) => {
         if (!collectionCid) return;
 
         try {
-          const result = await ipfs.cidGet(collectionCid);
-          if (result === undefined) return;
+          attributes.isPinned = isPinned(collectionCid);
+          attributes.isLocal = await isLocal(collectionCid);
 
-          // const collectionStats = await kubo.ls(collectionCid);
-          // let filesCount = 0;
-          // let totalSize = 0;
+          const UNKNOWN_VALUE = -1;
+          let filesCount = 0;
+          let totalSize = 0;
 
-          // for await (const file of collectionStats) {
-          //   filesCount++;
-          //   totalSize += file.size;
-          // }
+          for await (const file of kubo.ls(collectionCid)) {
+            if (attributes.isLocal) {
+              filesCount++;
+              totalSize += file.size;
+            } else {
+              filesCount = UNKNOWN_VALUE;
+              totalSize = UNKNOWN_VALUE;
+            }
+          }
 
-          let isPinned = false;
           // Determine the current status
           let currentStatus: StatusType = STATUS_PENDING;
           try {
@@ -104,33 +121,24 @@
                 console.error(`Unknown status value: ${attributes.status}`);
             }
           } catch (error) {
-            console.error(`Error determining status for CID ${collectionCid}:`, error);
+            console.error(`Error determining attributes for CID ${collectionCid}:`, error);
             return;
-          }
-
-
-          try {
-            if (cidsPinned.includes(collectionCid)) {
-              isPinned = true;
-            }
-          } catch (error) {
-            console.error(`Error checking pin status for ${collectionCid}:`, error);
           }
 
           const collectionItem: CollectionItem = {
             collectionCid,
             owner: attributes.owner,
             name: attributes.name,
-            totalSizeBytes: 1,
-            filesCount: 1,
+            totalSizeBytes: totalSize,
+            filesCount: filesCount,
             status: currentStatus,
             uploadDate: attributes.date,
-            isPinned
+            isPinned: attributes.isPinned,
+            isLocal: attributes.isLocal
           };
 
-          console.log("collectionCids.forEach ~ collectionCid:", collectionCid);
+          // console.log("cidsOnchain.forEach ~ collectionCid:", collectionCid);
           allCollections.set(collectionCid, collectionItem);
-          console.log("loadCollections1 ~ allCollections.size:", allCollections.size);
         } catch (error) {
           console.error(`Error loading collection ${collectionCid}:`, error);
         }
@@ -193,7 +201,6 @@
 
   const uploadCollection = async () => {
     const fileCount = uploadStore.fileList?.length || 0;
-    console.log("uploadCollection ~ fileCount:", fileCount);
 
     if (fileCount === 0) return;
     if (!ipfs || uploadInProgress) return;
@@ -272,8 +279,12 @@
       const id = toast.loading("Pinning Collection ...");
       await kubo.pin(cid);
 
-      collection.isPinned = true;
-      allCollections.set(cid, collection);
+      cidsPinned = await kubo.pins();
+      if (isPinned(cid)) {
+        collection.isPinned = true;
+        allCollections.set(cid, collection);
+        await loadCollections();
+      }
 
       updateFilteredCollections();
 
