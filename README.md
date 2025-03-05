@@ -4,6 +4,43 @@ This project is a decentralized storage solution that enables users to store and
 
 The main goal of this project is to provide a user-friendly interface for storing files off-chain while leveraging Massa's blockchain capabilities for access control and file management.
 
+⚠️ Prerequisites:
+
+- An IPFS server running on your machine is required to use this DApp
+
+## 🔄 System Architecture
+
+![Massa Storage Architecture](images/architecture.png)
+
+👥 User Roles:
+
+1. **File Uploader**
+
+   - Can upload collections containing files
+   - Collections are added and pinned to their local IPFS server
+   - Can only view collections approved by moderators
+   - Collection CIDs are registered in the smart contract with metadata (upload date, owner, name, moderation status)
+
+2. **Moderator**
+
+   - Designated by the smart contract owner
+   - Access to moderation controls on collections page
+   - Can approve or reject collections
+   - Can view all collections (approved, pending, rejected)
+   - Only owner can assign moderators through a dedicated page
+
+3. **Node Runner**
+   - Can view all approved collections from the smart contract (unless also a moderator)
+   - Can see local pinning status of collections
+   - Can pin approved collections to their IPFS server
+
+📂 Collection Features:
+
+- View collection contents in a dedicated page
+- Preview, open in new tab, or download individual files
+- Download entire collection as ZIP
+- Pinning status indicators for all users
+
 🔑 Key Features:
 
 - File Upload: Upload and store files on IPFS
@@ -40,6 +77,15 @@ This will:
   - `src/lib/components/` - Reusable UI components
   - `src/lib/ts/` - TypeScript utilities and types
   - `src/lib/runes/` - Svelte stores and state management
+
+- `wasm/` - Smart Contract code written in AssemblyScript
+  - `assembly/` - Main contract code
+    - `contracts/` - Smart contract implementation
+      - `cids.ts` - Collection CIDs management
+      - `ipfs.ts` - IPFS integration
+      - `map.ts` - Storage mapping functions
+      - `mods.ts` - Moderator management
+    - `__tests__/` - Contract test files
 
 ## 🛠️ Technologies Used
 
