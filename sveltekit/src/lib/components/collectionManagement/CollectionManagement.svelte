@@ -61,6 +61,17 @@
     return cidsPinned.includes(cid);
   };
 
+  const isLocal = async (cid: string): Promise<boolean> => {
+    // console.log("isLocal ~ cid:", cid);
+    try {
+      const stat = await kubo.stat(`/ipfs/${cid}`, { timeout: 1000, withLocal: true });
+      // console.log("isLocal ~ size, local:", stat.local, stat.cumulativeSize);
+      return Boolean(stat.local);
+    } catch (error) {
+      return false;
+    }
+  };
+
   const loadCollections = async () => {
     if (!ipfs) return;
 
@@ -69,17 +80,6 @@
 
     console.log("loadCollections ~ cidsOnchain.size:", cidsOnchain.size);
     console.log("loadCollections ~ cidsPinned:", cidsPinned.length);
-
-    const isLocal = async (cid: string): Promise<boolean> => {
-      // console.log("isLocal ~ cid:", cid);
-      try {
-        const stat = await kubo.stat(`/ipfs/${cid}`, { timeout: 1000, withLocal: true });
-        // console.log("isLocal ~ size, local:", stat.local, stat.cumulativeSize);
-        return Boolean(stat.local);
-      } catch (error) {
-        return false;
-      }
-    };
 
     await Promise.all(
       Array.from(cidsOnchain.entries()).map(async ([collectionCid, attributes]) => {
@@ -93,14 +93,14 @@
           let filesCount = 0;
           let totalSize = 0;
 
-          for await (const file of kubo.ls(collectionCid)) {
-            if (attributes.isLocal) {
+          if (attributes.isLocal) {
+            for await (const file of kubo.ls(collectionCid)) {
               filesCount++;
               totalSize += file.size;
-            } else {
-              filesCount = UNKNOWN_VALUE;
-              totalSize = UNKNOWN_VALUE;
             }
+          } else {
+            filesCount = UNKNOWN_VALUE;
+            totalSize = UNKNOWN_VALUE;
           }
 
           // Determine the current status
