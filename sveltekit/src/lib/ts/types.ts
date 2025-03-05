@@ -32,7 +32,7 @@ export interface CollectionItem {
   totalSizeBytes: number;
   filesCount: number;
   status: StatusType;
-  uploadDate: string;
+  timestamp: number;
   isPinned: boolean;
   isLocal: boolean;
 }
@@ -93,7 +93,7 @@ export type CidDataType = {
   name: string;
   owner: string;
   status: string;
-  date: string;
+  timestamp: number;
 };
 
 export type CidDataTypePlus = CidDataType & { isPinned?: boolean; isLocal?: boolean };

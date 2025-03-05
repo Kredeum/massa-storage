@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext, onMount } from "svelte";
+  import { getContext} from "svelte";
   import { createKuboClient } from "$lib/ts/kubo";
   import type { AddResult } from "kubo-rpc-client";
   import { STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING } from "@kredeum/massa-storage-common/src/constants";
@@ -13,7 +13,7 @@
 
   import { UploadStore } from "$lib/runes/UploadStore.svelte";
 
-  import { formatDate, timestamp } from "$lib/ts/utils";
+  import { timestamp } from "$lib/ts/utils";
   import CollectionTable from "../collectionTable/CollectionTable.svelte";
 
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
@@ -38,7 +38,7 @@
   });
 
   let sortConfig: CollectionSortConfig = $state({
-    key: "uploadDate",
+    key: "timestamp",
     direction: "desc"
   });
 
@@ -132,7 +132,7 @@
             totalSizeBytes: totalSize,
             filesCount: filesCount,
             status: currentStatus,
-            uploadDate: attributes.date,
+            timestamp: attributes.timestamp,
             isPinned: attributes.isPinned,
             isLocal: attributes.isLocal
           };
@@ -221,7 +221,7 @@
 
         const attributes: CidDataType = {
           name: `Collection ${timestamp()}`,
-          date: formatDate(),
+          timestamp: Date.now(),
           owner: ipfs.address || "",
           status: STATUS_PENDING
         };

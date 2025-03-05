@@ -86,8 +86,9 @@
             <div class="text-sm font-medium text-gray-600">{collection.name}</div>
           </td>
           <td class="w-[15%] px-4 py-4 text-center text-sm text-gray-500">
-            {#if collection.uploadDate && collection.uploadDate.includes(" ")}
-              <TimeTooltip text={collection.uploadDate.split(" ")[0].split("-").reverse().join("/")} tooltip={collection.uploadDate.split(" ")[1]} />
+            {#if collection.timestamp}
+              {@const formattedDate = formatDate(collection.timestamp)}
+              <TimeTooltip text={formattedDate.split(" ")[0]} tooltip={formattedDate.split(" ")[1]} />
             {:else}
               <span>No Date Available</span>
             {/if}
