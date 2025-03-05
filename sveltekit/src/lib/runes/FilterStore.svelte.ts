@@ -57,7 +57,9 @@ export class FilterStore {
   sortItems<T extends FileItem | CollectionItem>(items: T[]): T[] {
     return [...items].sort((a, b) => {
       if (this.sortConfig.key === "timestamp" && "timestamp" in a && "timestamp" in b) {
-        return this.sortConfig.direction === "desc" ? b.timestamp - a.timestamp : a.timestamp - b.timestamp;
+        return this.sortConfig.direction === "desc"
+          ? b.timestamp - a.timestamp
+          : a.timestamp - b.timestamp;
       }
 
       if (

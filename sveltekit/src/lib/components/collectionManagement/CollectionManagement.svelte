@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext} from "svelte";
+  import { getContext } from "svelte";
   import { createKuboClient } from "$lib/ts/kubo";
   import type { AddResult } from "kubo-rpc-client";
   import { STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING } from "@kredeum/massa-storage-common/src/constants";
@@ -19,7 +19,9 @@
   import type { Ipfs } from "$lib/runes/ipfs.svelte";
   import { SvelteMap } from "svelte/reactivity";
 
+  const TIMEOUT_VALUE = 1000;
   const ITEMS_PER_PAGE = 10;
+  const UNKNOWN_VALUE = -1;
 
   let isModerator = $state<boolean>();
   let uploadStore = new UploadStore();
@@ -64,7 +66,7 @@
   const isLocal = async (cid: string): Promise<boolean> => {
     // console.log("isLocal ~ cid:", cid);
     try {
-      const stat = await kubo.stat(`/ipfs/${cid}`, { timeout: 1000, withLocal: true });
+      const stat = await kubo.stat(`/ipfs/${cid}`, { timeout: TIMEOUT_VALUE, withLocal: true });
       // console.log("isLocal ~ size, local:", stat.local, stat.cumulativeSize);
       return Boolean(stat.local);
     } catch (error) {
@@ -89,7 +91,6 @@
           attributes.isPinned = isPinned(collectionCid);
           attributes.isLocal = await isLocal(collectionCid);
 
-          const UNKNOWN_VALUE = -1;
           let filesCount = 0;
           let totalSize = 0;
 
