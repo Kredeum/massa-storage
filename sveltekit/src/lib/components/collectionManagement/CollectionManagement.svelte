@@ -177,7 +177,7 @@
       return;
     }
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE - 1;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
     paginatedCollections = new SvelteMap(Array.from(filteredCollections).slice(startIndex, endIndex));
   };
 
