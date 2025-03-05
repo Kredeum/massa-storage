@@ -12,6 +12,8 @@ The main goal of this project is to provide a user-friendly interface for storin
 
 ![Massa Storage Architecture](images/architecture.png)
 
+![Massa Storage Architecture](images/architecture002.png)
+
 👥 User Roles:
 
 1. **File Uploader**
@@ -74,6 +76,7 @@ This will:
 ## 📁 Project Structure
 
 - `sveltekit/` - Frontend application built with SvelteKit
+
   - `src/lib/components/` - Reusable UI components
   - `src/lib/ts/` - TypeScript utilities and types
   - `src/lib/runes/` - Svelte stores and state management
