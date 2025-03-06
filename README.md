@@ -12,8 +12,6 @@ The main goal of this project is to provide a user-friendly interface for storin
 
 ![Massa Storage Architecture](images/architecture.png)
 
-![Massa Storage Architecture](images/architecture002.png)
-
 👥 User Roles:
 
 1. **File Uploader**

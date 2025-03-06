@@ -51,8 +51,7 @@ export class FilterStore {
 
   getPaginatedFiles(files: FileItem[]): FileItem[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    return files.slice(startIndex, endIndex);
+    return files.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
   sortItems<T extends FileItem | CollectionItem>(items: T[]): T[] {
