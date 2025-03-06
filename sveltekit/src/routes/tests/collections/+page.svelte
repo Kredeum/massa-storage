@@ -15,8 +15,25 @@
 
   let loaded = $state<boolean>(false);
 
-  let cidsOnchain = $state<SvelteMap<string, CidDataType>>(new SvelteMap());
+  type CidDataTypePlus = CidDataType & { isPinned?: boolean; isLocal?: boolean };
+
+  let cidsOnchain = $state<SvelteMap<string, CidDataTypePlus>>(new SvelteMap());
   let cidsPinned = $state<Array<string>>([]);
+
+  const isPinned = (cid: string): boolean => {
+    return cidsPinned.includes(cid);
+  };
+
+  const isLocal = async (cid: string): Promise<boolean> => {
+    console.log("isLocal ~ cid:", cid);
+    try {
+      const stat = await kubo.stat(`/ipfs/${cid}`, { timeout: 1000, withLocal: true });
+      console.log("isLocal ~ size, local:", stat.local, stat.cumulativeSize);
+      return Boolean(stat.local);
+    } catch (error) {
+      return false;
+    }
+  };
 
   const refresh = async () => {
     if (!ipfs.ready) return;
@@ -26,6 +43,11 @@
     cidsOnchain = await ipfs.cidsGet();
 
     cidsPinned = await kubo.pins();
+
+    for await (const [cid, value] of cidsOnchain) {
+      value.isPinned = isPinned(cid);
+      value.isLocal = await isLocal(cid);
+    }
 
     loaded = true;
   };
@@ -48,16 +70,17 @@
       {#if loaded}
         {#if cidsOnchain.size > 0}
           {#each [...cidsOnchain.entries()] as [_cid, _value]}
-            <p class="cid-status {statusLabel(_value.status)}">
-              {#if cidsPinned.includes(_cid)}
-                <span class="bg-blue-100 p-1">{_cid}</span>
-              {:else}
-                {_cid}
-              {/if}
+            <p
+              class="cid-status
+              {statusLabel(_value.status)}
+              {_value?.isPinned ? 'Pinned' : ''}
+              {_value?.isLocal ? 'Local' : ''}"
+            >
+              {_cid}
             </p>
           {/each}
         {:else}
-          <p>No one found!</p>
+          <p>None found!</p>
         {/if}
       {:else}
         <p>Loading...</p>
@@ -79,6 +102,7 @@
     padding: 0.5em;
     margin-bottom: 0.5em;
     background-color: #fafafa;
+    @apply rounded-md;
   }
   .cid-status.Approved {
     @apply text-green-600;
@@ -88,5 +112,11 @@
   }
   .cid-status.Pending {
     @apply text-yellow-600;
+  }
+  .cid-status.Pinned {
+    @apply bg-blue-100;
+  }
+  .cid-status.Local {
+    @apply border border-blue-800;
   }
 </style>

@@ -86,17 +86,18 @@
             <div class="text-sm font-medium text-gray-600">{collection.name}</div>
           </td>
           <td class="w-[15%] px-4 py-4 text-center text-sm text-gray-500">
-            {#if collection.uploadDate && collection.uploadDate.includes(" ")}
-              <TimeTooltip text={collection.uploadDate.split(" ")[0].split("-").reverse().join("/")} tooltip={collection.uploadDate.split(" ")[1]} />
+            {#if collection.timestamp}
+              {@const formattedDate = formatDate(collection.timestamp)}
+              <TimeTooltip text={formattedDate.split(" ")[0]} tooltip={formattedDate.split(" ")[1]} />
             {:else}
               <span>No Date Available</span>
             {/if}
           </td>
           <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
-            {collection.filesCount}
+            {collection.filesCount >= 0 ? collection.filesCount : "?"}
           </td>
           <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
-            {formatSize(collection.totalSizeBytes)}
+            {collection.totalSizeBytes >= 0 ? formatSize(collection.totalSizeBytes) : "?"}
           </td>
           <td class="w-[10%] px-4 py-4 text-center text-sm text-gray-500">
             <ShortenedTextTooltip text={collection.owner} label="Owner address" />

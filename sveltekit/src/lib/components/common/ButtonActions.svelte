@@ -20,7 +20,7 @@
   }: {
     item: FileItem | CollectionItem;
     onModerate?: (data: { id: string; status: StatusType }) => void;
-    onPin?: (id: string) => void;
+    onPin?: (cid: string) => void;
     type?: "file" | "collection";
   } = $props();
 
@@ -35,9 +35,9 @@
   };
 
   const handlePin = () => {
-    const id = type === "file" ? (item as FileItem).cid : (item as CollectionItem).collectionCid;
+    const cid = type === "file" ? (item as FileItem).cid : (item as CollectionItem).collectionCid;
     if (onPin) {
-      onPin(id);
+      onPin(cid);
     }
   };
 

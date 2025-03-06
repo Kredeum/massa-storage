@@ -103,11 +103,11 @@ describe("IPFS class", () => {
     expect(attributes.name).toBeDefined();
     expect(attributes.owner).toBeDefined();
     expect(attributes.status).toBeDefined();
-    expect(attributes.date).toBeDefined();
+    expect(attributes.timestamp).toBeDefined();
 
     expect(attributes.name.length).toBeGreaterThan(0);
     expect(attributes.owner.length).toBeGreaterThan(0);
     expect(attributes.status.length).toBeGreaterThan(0);
-    expect(attributes.date.length).toBeGreaterThan(0);
+    expect(attributes.timestamp).toBeGreaterThan(0);
   });
 });

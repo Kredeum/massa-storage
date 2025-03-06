@@ -10,7 +10,7 @@ export class FilterStore {
   });
 
   sortConfig: SortConfig = $state({
-    key: "uploadDate",
+    key: "timestamp",
     direction: "desc"
   });
 
@@ -56,10 +56,10 @@ export class FilterStore {
 
   sortItems<T extends FileItem | CollectionItem>(items: T[]): T[] {
     return [...items].sort((a, b) => {
-      if (this.sortConfig.key === "uploadDate" && "uploadDate" in a && "uploadDate" in b) {
-        const dateA = new Date(a.uploadDate).getTime();
-        const dateB = new Date(b.uploadDate).getTime();
-        return this.sortConfig.direction === "desc" ? dateB - dateA : dateA - dateB;
+      if (this.sortConfig.key === "timestamp" && "timestamp" in a && "timestamp" in b) {
+        return this.sortConfig.direction === "desc"
+          ? b.timestamp - a.timestamp
+          : a.timestamp - b.timestamp;
       }
 
       if (
