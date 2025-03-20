@@ -28,21 +28,21 @@
 <div class="overflow-x-auto">
   <table class="min-w-full divide-y divide-gray-200">
     <colgroup>
-      <col class="w-[25%]" />
+      <col class="w-[25%] min-w-[120px]" />
       <!-- Name -->
-      <col class="w-[15%]" />
+      <col class="w-[15%] min-w-[100px]" />
       <!-- Date -->
-      <col class="w-[10%]" />
+      <col class="w-[10%] min-w-[60px]" />
       <!-- Files -->
-      <col class="w-[10%]" />
+      <col class="w-[10%] min-w-[60px]" />
       <!-- Size -->
-      <col class="w-[10%]" />
+      <col class="w-[10%] min-w-[80px]" />
       <!-- Owner -->
-      <col class="w-[10%]" />
+      <col class="w-[10%] min-w-[80px]" />
       <!-- Status -->
-      <col class="w-[15%]" />
+      <col class="w-[15%] min-w-[100px]" />
       <!-- CID -->
-      <col class="w-[5%]" />
+      <col class="sticky right-0 w-[5%] min-w-[100px]" />
       <!-- Actions -->
     </colgroup>
     <thead class="bg-gray-50">
@@ -76,7 +76,7 @@
             </button>
           </th>
         {/each}
-        <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
+        <th class="sticky right-0 bg-gray-50 px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">Actions</th>
       </tr>
     </thead>
     <tbody class="divide-y divide-gray-200 bg-white">
@@ -118,7 +118,7 @@
               {statusLabel(collection.status)}
             </span>
           </td>
-          <td class="whitespace-nowrap px-6 py-4">
+          <td class="sticky right-0 whitespace-nowrap bg-white px-6 py-4 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">
             <div class="flex items-center justify-end gap-2">
               <ButtonActions item={collection} {onModerate} {onPin} type="collection" />
             </div>

@@ -33,6 +33,16 @@ a:hover {
   box-sizing: border-box;
 }
 
+/* Table responsiveness */
+.overflow-x-auto {
+  position: relative;
+}
+
+/* Ensure action buttons are always visible */
+.sticky.right-0 {
+  z-index: 10;
+}
+
 /* Header styles */
 .header {
   padding: 1.5rem;
