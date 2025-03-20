@@ -121,7 +121,6 @@ class Writer extends Reader {
       const wallets = await getWallets();
       if (wallets.length === 0) throw new Error("No wallet installed");
       wallet = wallets[0];
-      console.log("async initProviderWallet ~ wallet:", wallet);
     } else {
       wallet = await getWallet(walletProvider.walletName);
       if (!wallet) throw new Error(`Wallet ${walletProvider.walletName} not found`);
@@ -132,7 +131,6 @@ class Writer extends Reader {
 
     const accountNum = walletProvider.accountNum ?? 0;
     const accounts = await wallet.accounts();
-    console.log("async initProviderWallet ~ accounts:", accounts);
 
     const provider = accounts[accountNum];
     if (!provider) {
