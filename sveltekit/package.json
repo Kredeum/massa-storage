@@ -21,9 +21,10 @@
     "start": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
+    "fleek": "pnpm run build && fleek sites deploy",
     "lint": "prettier --check src && eslint src",
     "test:unit": "vitest --run",
-    "test": "npm run test:unit && npm run test:e2e",
+    "test": "pnpm run test:unit && pnpm run test:e2e",
     "test:e2e": "playwright test"
   },
   "devDependencies": {
