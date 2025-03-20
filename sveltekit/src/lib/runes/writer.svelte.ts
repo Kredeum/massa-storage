@@ -84,7 +84,6 @@ class Writer extends Reader {
 
   // CONNECT
   async connect(): Promise<boolean> {
-    if (!this.ready) return false;
     if (this.#connected) return true;
 
     this.#connected = this.noConnect || (await this.#wallet!.connect());
@@ -122,24 +121,27 @@ class Writer extends Reader {
       const wallets = await getWallets();
       if (wallets.length === 0) throw new Error("No wallet installed");
       wallet = wallets[0];
+      console.log("async initProviderWallet ~ wallet:", wallet);
     } else {
       wallet = await getWallet(walletProvider.walletName);
       if (!wallet) throw new Error(`Wallet ${walletProvider.walletName} not found`);
     }
 
+    this.#wallet = wallet;
+    await this.connect();
+
     const accountNum = walletProvider.accountNum ?? 0;
     const accounts = await wallet.accounts();
+    console.log("async initProviderWallet ~ accounts:", accounts);
+
     const provider = accounts[accountNum];
     if (!provider) {
       throw new Error(`Wallet ${wallet.name()} Account #${accountNum} not found`);
     }
 
-    this.#wallet = wallet;
     this.#accountNum = accountNum;
     this.#type = "Wallet";
     await this.initialize(provider);
-
-    await this.connect();
   }
 
   // ONLY for testnet address
