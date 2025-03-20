@@ -80,6 +80,7 @@
     "ipfs-unixfs": "^11.2.1",
     "jszip": "^3.10.1",
     "lucide-svelte": "^0.476.0",
+    "pinata-web3": "^0.5.4",
     "svelte-hot-french-toast": "^1.0.0",
     "svelte-portal": "^2.2.1"
   }

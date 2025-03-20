@@ -2,7 +2,7 @@
 
 This project is a decentralized storage solution that enables users to store and manage files using IPFS through the Massa blockchain.
 
-The main goal of this project is to provide a user-friendly interface for storing files off-chain while leveraging Massa's blockchain capabilities for access control and file management.
+The main goal of this project is to provide a user-friendly interface for storing files off-chain using IPFS on Massa blockchain nodes, taking advantage of their available disk space.
 
 ⚠️ Prerequisites:
 
@@ -14,7 +14,7 @@ The main goal of this project is to provide a user-friendly interface for storin
 
 👥 User Roles:
 
-1. **File Uploader**
+1. **Content Uploader**
 
    - Can upload collections containing files
    - Collections are added and pinned to their local IPFS server
@@ -62,7 +62,7 @@ pnpm install
 To start the application:
 
 ```shell
-pnpm run all
+turbo start
 ```
 
 This will:

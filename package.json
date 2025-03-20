@@ -21,7 +21,7 @@
     "clean": "pnpm -r clean && rm -rf node_modules .turbo",
     "deploy": "pnpm run --filter wasm deploy"
   },
-  "packageManager": "pnpm@10.5.2",
+  "packageManager": "pnpm@10.6.5",
   "engines": {
     "node": "^22",
     "pnpm": "^10"
