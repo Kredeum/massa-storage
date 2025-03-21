@@ -4,7 +4,7 @@
     ".envrc"
   ],
   "globalPassThroughEnv": [
-    "PRIVATE_KEY",
+    "PRIVATE_KEY_DEPLOYER",
     "DEPLOYER_ADDRESS"
   ],
   "envMode": "strict",

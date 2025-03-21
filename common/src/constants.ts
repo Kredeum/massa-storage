@@ -1,8 +1,6 @@
 // common source to sveltekit typescript and wasm assemblyscript
 // BE CAREFULL: some typescript types not accepted by the wasm compiler
 
-const IPFS_API = localStorage?.getItem("ipfsApi") || "http://localhost:5001";
-
 const MODERATOR = "moderator";
 const CID = "cid";
 
@@ -17,4 +15,4 @@ function statusLabel(status: string): string {
   return "Unknown";
 }
 
-export { IPFS_API, MODERATOR, CID, STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING, statusLabel };
+export { MODERATOR, CID, STATUS_APPROVED, STATUS_REJECTED, STATUS_PENDING, statusLabel };

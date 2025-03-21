@@ -3,14 +3,8 @@
 // 2. Massa (https://github.com/massalabs/massa-as-sdk/blob/main/assembly/collections/persistentMap.ts)
 //
 
-import { generateEvent, Storage } from '@massalabs/massa-as-sdk';
-import {
-  stringToBytes,
-  boolToByte,
-  bytesToString,
-  byteToBool,
-  Args,
-} from '@massalabs/as-types';
+import { Storage } from '@massalabs/massa-as-sdk';
+import { stringToBytes, bytesToString } from '@massalabs/as-types';
 import { MODERATOR, CID } from '../../../common/src/constants';
 
 // PersistentMap : map of cid => string
@@ -82,7 +76,7 @@ class PersistentMap {
   }
 }
 
-// moderatorMap : map of moerator => "1"
+// moderatorMap : map of moderator => "1"
 const moderatorMap: PersistentMap = new PersistentMap(MODERATOR);
 
 // cidMap : map of cid => json

@@ -7,11 +7,11 @@ import {
 import { getScByteCode } from './utils';
 import { updateAddresses } from './addresses';
 
-const account = await Account.fromEnv(process.env.PRIVATE_KEY_DEPLOYER);
+const account = await Account.fromEnv('PRIVATE_KEY_DEPLOYER');
 
 // const provider = Web3Provider.fromRPCUrl('http://127.0.0.1:33035', account);
-// const provider = Web3Provider.mainnet(account);
-const provider = Web3Provider.buildnet(account);
+const provider = Web3Provider.mainnet(account);
+// const provider = Web3Provider.buildnet(account);
 
 const chainId = (await provider.networkInfos()).chainId.toString();
 console.info(`Deploying contract on ${chainId}...`);

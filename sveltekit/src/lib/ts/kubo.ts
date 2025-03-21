@@ -1,4 +1,3 @@
-import { IPFS_API } from "@kredeum/massa-storage-common/src/constants";
 import {
   type CID,
   create,
@@ -7,6 +6,8 @@ import {
   type PinAddOptions,
   type PinLsOptions
 } from "kubo-rpc-client";
+
+const IPFS_API = localStorage?.getItem("ipfsApi") || "http://localhost:5001";
 
 const createKuboClient = (url?: string) => {
   const ipfs = create(new URL(url || IPFS_API));
@@ -39,4 +40,4 @@ const createKuboClient = (url?: string) => {
   };
 };
 
-export { createKuboClient };
+export { IPFS_API, createKuboClient };

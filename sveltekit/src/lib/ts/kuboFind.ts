@@ -1,8 +1,7 @@
 /**
  * Fonctions pour interagir avec l'API IPFS (Kubo) pour trouver les pairs qui possèdent un CID
-*/
-import { IPFS_API } from "@kredeum/massa-storage-common/src/constants";
-
+ */
+import { IPFS_API } from "./kubo";
 
 /**
  * Vérifie si l'API IPFS est disponible
