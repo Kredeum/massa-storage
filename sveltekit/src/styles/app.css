@@ -1,0 +1,103 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* Common styles for the application */
+
+/* Typography */
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+    "Helvetica Neue", sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Links */
+a {
+  color: #333;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #666;
+}
+
+/* Layout */
+.container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem;
+  box-sizing: border-box;
+}
+
+/* Table responsiveness */
+.overflow-x-auto {
+  position: relative;
+}
+
+/* Ensure action buttons are always visible */
+.sticky.right-0 {
+  z-index: 10;
+}
+
+/* Header styles */
+.header {
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.header-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-nav a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.header-nav a:hover {
+  background-color: #e9ecef;
+  color: #1a1a1a;
+}
+
+/* Buttons */
+.button-standard {
+  @apply rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600;
+}
+
+/* Footer */
+.footer {
+  width: 100%;
+  height: 100px;
+  border-top: 1px solid #eaeaea;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3em;
+}
+
+.footer img {
+  width: 5em;
+  height: 5em;
+}
+
+.footer span {
+  font-size: 0.8em;
+}
+
+/* Common utility classes */
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -1,0 +1,10 @@
+{
+  "node_url": "https://mainnet.massa.net/api/v2",
+  "chunk_size": 64000,
+  "metadatas": {
+    "TITLE": "DeFiles",
+    "DESCRIPTION": "Archive your files on Massa",
+    "KEYWORD1": "defiles",
+    "KEYWORD2": "massa"
+  }
+}

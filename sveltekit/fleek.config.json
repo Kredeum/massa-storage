@@ -1,0 +1,8 @@
+{
+  "sites": [
+    {
+      "slug": "massa-demo",
+      "distDir": "build"
+    }
+  ]
+}

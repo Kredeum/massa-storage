@@ -1,0 +1,37 @@
+{
+  "extends": [
+    "//"
+  ],
+  "globalPassThroughEnv": [
+    "SOME_KEY"
+  ],
+  "tasks": {
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "inputs": [
+        "src/**"
+      ],
+      "outputLogs": "new-only"
+    },
+    "start": {
+      "dependsOn": [
+        "check"
+      ],
+      "cache": false,
+      "persistent": true,
+      "inputs": [
+        "src/**"
+      ],
+      "outputLogs": "new-only"
+    },
+    "preview": {
+      "dependsOn": [
+        "build"
+      ],
+      "cache": false,
+      "persistent": true,
+      "outputLogs": "new-only"
+    }
+  }
+}

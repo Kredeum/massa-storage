@@ -1,43 +1,40 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalPassThroughEnv": ["PUBLIC_BURNER_WALLET_KEY", "PUBLIC_COUNTER_ADDRESS"],
+  "globalDependencies": [
+    ".envrc"
+  ],
+  "globalPassThroughEnv": [
+    "PRIVATE_KEY_DEPLOYER",
+    "DEPLOYER_ADDRESS"
+  ],
   "envMode": "strict",
   "ui": "stream",
   "tasks": {
     "format": {
-      "inputs": ["src/**", "test/**"],
+      "inputs": [
+        "src/**",
+        "script/**",
+        "test/**"
+      ],
       "outputLogs": "new-only"
     },
     "check": {
-      "dependsOn": ["format"],
+      "dependsOn": [
+        "format"
+      ],
       "outputLogs": "new-only"
     },
     "build": {
-      "dependsOn": ["check"],
+      "dependsOn": [
+        "check"
+      ],
       "outputLogs": "new-only"
     },
     "test": {
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "cache": false,
-      "outputLogs": "new-only"
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true,
-      "inputs": ["src/**"],
-      "outputLogs": "new-only"
-    },
-    "start": {
-      "dependsOn": ["check"],
-      "cache": false,
-      "persistent": true,
-      "inputs": ["src/**"],
-      "outputLogs": "new-only"
-    },
-    "preview": {
-      "dependsOn": ["build"],
-      "cache": false,
-      "persistent": true,
       "outputLogs": "new-only"
     }
   }
