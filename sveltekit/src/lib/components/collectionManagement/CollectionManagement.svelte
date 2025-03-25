@@ -46,9 +46,12 @@
 
   const ipfs: Ipfs = getContext("ipfs");
   const kubo = createKuboClient();
+  let kuboReady = $state(false);
 
   const refresh = async (): Promise<void> => {
     if (!ipfs.ready) return;
+
+    kuboReady = await kubo.ready();
 
     isModerator = await ipfs.moderatorHas(ipfs.address);
 
@@ -76,8 +79,6 @@
 
   const loadCollections = async () => {
     if (!ipfs) return;
-
-    const kuboReady = await kubo.ready();
 
     cidsOnchain = await ipfs.cidsGet();
     if (kuboReady) {
@@ -287,9 +288,11 @@
 
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 flex flex-col gap-4">
-    <div class="mb-8">
-      <FileUpload bind:files={uploadStore.fileList} />
-    </div>
+    {#if ipfs.connected && kuboReady}
+      <div class="mb-8">
+        <FileUpload bind:files={uploadStore.fileList} />
+      </div>
+    {/if}
 
     <div class="flex items-center justify-end gap-4">
       <CollectionFilters filters={collectionFilters} onStatusFilter={handleStatusFilter} />
