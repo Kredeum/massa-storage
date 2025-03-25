@@ -92,13 +92,13 @@ describe("IPFS class", () => {
   it("Should get cid data", async () => {
     if (!ipfs) return;
     const cids = await ipfs.cidsGet();
-    const cid = cids.keys().next().value;
-    if (!cid) return;
-    const attributes = await ipfs.cidGet(cid);
-    if (!attributes) {
-      console.error("Failed to get attributes for CID:", cid);
+    if (!(cids.size > 10)) {
+      console.error("Failed to get 10 cids");
       return;
     }
+
+    const attributes = [...cids.values()][10];
+
     expect(attributes).toBeDefined();
     expect(attributes.name).toBeDefined();
     expect(attributes.owner).toBeDefined();

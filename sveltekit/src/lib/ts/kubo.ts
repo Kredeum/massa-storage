@@ -57,4 +57,4 @@ const createKuboClient = (url = IPFS_API) => {
  * @returns Promise that resolves to true if server is running, false otherwise
  */
 
-export { IPFS_API, createKuboClient, isIpfsServerRunning };
+export { IPFS_API, createKuboClient };
