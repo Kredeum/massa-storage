@@ -35,7 +35,9 @@
     }
   };
 
-  const handlePin = () => {
+  const handlePin = async () => {
+    if (!(await kubo.ready())) return;
+
     const cid = type === "file" ? (item as FileItem).cid : (item as CollectionItem).collectionCid;
     if (onPin) {
       onPin(cid);
@@ -50,6 +52,8 @@
   };
 
   const handleDownloadFile = async (e: MouseEvent) => {
+    if (!(await kubo.ready())) return;
+
     e.stopPropagation();
     e.preventDefault();
     try {
@@ -74,6 +78,8 @@
   };
 
   const handleDownloadZip = async (e: MouseEvent) => {
+    if (!(await kubo.ready())) return;
+
     e.stopPropagation();
     try {
       const collection = item as CollectionItem;

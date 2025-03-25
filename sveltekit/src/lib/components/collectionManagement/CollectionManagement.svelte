@@ -77,72 +77,51 @@
   const loadCollections = async () => {
     if (!ipfs) return;
 
+    const kuboReady = await kubo.ready();
+
     cidsOnchain = await ipfs.cidsGet();
-    cidsPinned = await kubo.pins();
+    if (kuboReady) {
+      cidsPinned = await kubo.pins();
+    }
 
     console.log("loadCollections ~ cidsOnchain.size:", cidsOnchain.size);
     console.log("loadCollections ~ cidsPinned:", cidsPinned.length);
 
     await Promise.all(
       Array.from(cidsOnchain.entries()).map(async ([collectionCid, attributes]) => {
-        if (!collectionCid) return;
+        let filesCount = 0;
+        let totalSize = 0;
 
-        try {
-          attributes.isPinned = isPinned(collectionCid);
-          attributes.isLocal = await isLocal(collectionCid);
-
-          let filesCount = 0;
-          let totalSize = 0;
-
-          if (attributes.isLocal) {
-            for await (const file of kubo.ls(collectionCid)) {
-              filesCount++;
-              totalSize += file.size;
-            }
-          } else {
-            filesCount = UNKNOWN_VALUE;
-            totalSize = UNKNOWN_VALUE;
-          }
-
-          // Determine the current status
-          let currentStatus: StatusType = STATUS_PENDING;
+        if (kuboReady) {
           try {
-            if (!attributes || !attributes.status) return;
-            switch (attributes.status) {
-              case STATUS_APPROVED:
-                currentStatus = STATUS_APPROVED;
-                break;
-              case STATUS_REJECTED:
-                currentStatus = STATUS_REJECTED;
-                break;
-              case STATUS_PENDING:
-                currentStatus = STATUS_PENDING;
-                break;
-              default:
-                console.error(`Unknown status value: ${attributes.status}`);
+            attributes.isPinned = isPinned(collectionCid);
+            attributes.isLocal = await isLocal(collectionCid);
+
+            if (attributes.isLocal) {
+              for await (const file of kubo.ls(collectionCid)) {
+                filesCount++;
+                totalSize += file.size;
+              }
             }
           } catch (error) {
-            console.error(`Error determining attributes for CID ${collectionCid}:`, error);
-            return;
+            console.error(`Error reading collection ${collectionCid}:`, error);
           }
-
-          const collectionItem: CollectionItem = {
-            collectionCid,
-            owner: attributes.owner,
-            name: attributes.name,
-            totalSizeBytes: totalSize,
-            filesCount: filesCount,
-            status: currentStatus,
-            timestamp: attributes.timestamp,
-            isPinned: attributes.isPinned,
-            isLocal: attributes.isLocal
-          };
-
-          // console.log("cidsOnchain.forEach ~ collectionCid:", collectionCid);
-          allCollections.set(collectionCid, collectionItem);
-        } catch (error) {
-          console.error(`Error loading collection ${collectionCid}:`, error);
         }
+
+        const collectionItem: CollectionItem = {
+          collectionCid,
+          owner: attributes.owner,
+          name: attributes.name,
+          totalSizeBytes: totalSize || UNKNOWN_VALUE,
+          filesCount: filesCount || UNKNOWN_VALUE,
+          status: (attributes.status || STATUS_PENDING) as StatusType,
+          timestamp: attributes.timestamp,
+          isPinned: attributes.isPinned || false,
+          isLocal: attributes.isLocal || false
+        };
+
+        // console.log("cidsOnchain.forEach ~ collectionCid:", collectionCid);
+        allCollections.set(collectionCid, collectionItem);
       })
     );
     console.log("loadCollections2 final ~ allCollections.size:", allCollections.size);
