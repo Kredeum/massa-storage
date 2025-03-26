@@ -1,4 +1,4 @@
-# 🎉 Massa Storage - Decentralized Storage Solution 🎉
+# 🎉 MassaFiles - Decentralized Storage Solution 🎉
 
 This project is a decentralized storage solution that enables users to store and manage files using IPFS through the Massa blockchain.
 
@@ -10,7 +10,7 @@ The main goal of this project is to provide a user-friendly interface for storin
 
 ## 🔄 System Architecture
 
-![Massa Storage Architecture](images/architecture.png)
+![MassaFiles Architecture](images/architecture.png)
 
 👥 User Roles:
 

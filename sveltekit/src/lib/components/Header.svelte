@@ -26,7 +26,7 @@
     <div class="flex items-center gap-8">
       <a href="{base}/app/collections" class="flex items-center gap-2 text-lg font-semibold text-gray-900">
         <img src={logoMassa} alt="Massa Logo" class="h-8 w-8" />
-        Massa Storage
+        MassaFiles
       </a>
       <a href="{base}/app/collections" class="text-sm text-gray-600 hover:text-gray-900">Collections</a>
       {#if isOwner}
@@ -40,3 +40,5 @@
     </div>
   </nav>
 </header>
+
+<div class="text-center text-2xl italic font-light my-4">Store all your Content on IPFS Decentralized Storage Secured by Massa Blockchain</div>
