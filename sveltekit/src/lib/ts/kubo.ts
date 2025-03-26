@@ -37,6 +37,19 @@ const createKuboClient = (url = IPFS_API) => {
     }
   };
 
+  const countPeers = async (cid: string, numProviders: number = 10): Promise<number> => {
+    let count = 0;
+    const peerList = await ipfs.routing.findProvs(cid, { numProviders });
+
+    console.log(cid, "refreshing");
+    for await (const peer of peerList) {
+      if (peer.name === "PROVIDER") count++;
+    }
+    console.log(cid, "refreshed", count);
+
+    return count;
+  };
+
   return {
     ls: ipfs.ls,
     addAll: ipfs.addAll,
@@ -47,6 +60,7 @@ const createKuboClient = (url = IPFS_API) => {
     stat: ipfs.files.stat,
     pins,
     ready,
+    countPeers,
     addAndPin
   };
 };

@@ -31,6 +31,7 @@ export interface CollectionItem {
   name: string;
   totalSizeBytes: number;
   filesCount: number;
+  peersCount?: number;
   status: StatusType;
   timestamp: number;
   isPinned: boolean;
@@ -96,4 +97,8 @@ export type CidDataType = {
   timestamp: number;
 };
 
-export type CidDataTypePlus = CidDataType & { isPinned?: boolean; isLocal?: boolean };
+export type CidDataTypePlus = CidDataType & {
+  isPinned?: boolean;
+  isLocal?: boolean;
+  peersCount?: number;
+};

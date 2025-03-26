@@ -7,6 +7,7 @@
   import { ChevronDown, ChevronUp } from "lucide-svelte";
   import { columns } from "$lib/constants/collections";
   import ButtonActions from "$lib/components/common/ButtonActions.svelte";
+  import { createKuboClient } from "$lib/ts/kubo";
 
   let {
     collections = [],
@@ -23,6 +24,10 @@
     onModerate?: (data: { id: string; status: StatusType }) => void;
     onPin: (id: string) => void;
   } = $props();
+
+  const kubo = createKuboClient();
+
+  const countPeers = async (cid: string) => await kubo.countPeers(cid);
 </script>
 
 <div class="overflow-x-auto">
@@ -34,6 +39,8 @@
       <!-- Date -->
       <col class="w-[10%] min-w-[60px]" />
       <!-- Files -->
+      <col class="w-[10%] min-w-[60px]" />
+      <!-- Peers -->
       <col class="w-[10%] min-w-[60px]" />
       <!-- Size -->
       <col class="w-[10%] min-w-[80px]" />
@@ -95,6 +102,15 @@
           </td>
           <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
             {collection.filesCount >= 0 ? collection.filesCount : "?"}
+          </td>
+          <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
+            {#await countPeers(collection.collectionCid)}
+              <span class="text-gray-500">?</span>
+            {:then count}
+              <span>{count}</span>
+            {:catch}
+              <span class="text-gray-500">X</span>
+            {/await}
           </td>
           <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
             {collection.totalSizeBytes >= 0 ? formatSize(collection.totalSizeBytes) : "?"}
