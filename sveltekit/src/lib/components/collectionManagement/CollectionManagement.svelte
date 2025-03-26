@@ -46,9 +46,12 @@
 
   const ipfs: Ipfs = getContext("ipfs");
   const kubo = createKuboClient();
+  let kuboReady = $state(false);
 
   const refresh = async (): Promise<void> => {
     if (!ipfs.ready) return;
+
+    kuboReady = await kubo.ready();
 
     isModerator = await ipfs.moderatorHas(ipfs.address);
 
@@ -78,71 +81,48 @@
     if (!ipfs) return;
 
     cidsOnchain = await ipfs.cidsGet();
-    cidsPinned = await kubo.pins();
+    if (kuboReady) {
+      cidsPinned = await kubo.pins();
+    }
 
     console.log("loadCollections ~ cidsOnchain.size:", cidsOnchain.size);
     console.log("loadCollections ~ cidsPinned:", cidsPinned.length);
 
     await Promise.all(
       Array.from(cidsOnchain.entries()).map(async ([collectionCid, attributes]) => {
-        if (!collectionCid) return;
+        let filesCount = 0;
+        let totalSize = 0;
 
-        try {
-          attributes.isPinned = isPinned(collectionCid);
-          attributes.isLocal = await isLocal(collectionCid);
-
-          let filesCount = 0;
-          let totalSize = 0;
-
-          if (attributes.isLocal) {
-            for await (const file of kubo.ls(collectionCid)) {
-              filesCount++;
-              totalSize += file.size;
-            }
-          } else {
-            filesCount = UNKNOWN_VALUE;
-            totalSize = UNKNOWN_VALUE;
-          }
-
-          // Determine the current status
-          let currentStatus: StatusType = STATUS_PENDING;
+        if (kuboReady) {
           try {
-            if (!attributes || !attributes.status) return;
-            switch (attributes.status) {
-              case STATUS_APPROVED:
-                currentStatus = STATUS_APPROVED;
-                break;
-              case STATUS_REJECTED:
-                currentStatus = STATUS_REJECTED;
-                break;
-              case STATUS_PENDING:
-                currentStatus = STATUS_PENDING;
-                break;
-              default:
-                console.error(`Unknown status value: ${attributes.status}`);
+            attributes.isPinned = isPinned(collectionCid);
+            attributes.isLocal = await isLocal(collectionCid);
+
+            if (attributes.isLocal) {
+              for await (const file of kubo.ls(collectionCid)) {
+                filesCount++;
+                totalSize += file.size;
+              }
             }
           } catch (error) {
-            console.error(`Error determining attributes for CID ${collectionCid}:`, error);
-            return;
+            console.error(`Error reading collection ${collectionCid}:`, error);
           }
-
-          const collectionItem: CollectionItem = {
-            collectionCid,
-            owner: attributes.owner,
-            name: attributes.name,
-            totalSizeBytes: totalSize,
-            filesCount: filesCount,
-            status: currentStatus,
-            timestamp: attributes.timestamp,
-            isPinned: attributes.isPinned,
-            isLocal: attributes.isLocal
-          };
-
-          // console.log("cidsOnchain.forEach ~ collectionCid:", collectionCid);
-          allCollections.set(collectionCid, collectionItem);
-        } catch (error) {
-          console.error(`Error loading collection ${collectionCid}:`, error);
         }
+
+        const collectionItem: CollectionItem = {
+          collectionCid,
+          owner: attributes.owner,
+          name: attributes.name,
+          totalSizeBytes: totalSize || UNKNOWN_VALUE,
+          filesCount: filesCount || UNKNOWN_VALUE,
+          status: (attributes.status || STATUS_PENDING) as StatusType,
+          timestamp: attributes.timestamp,
+          isPinned: attributes.isPinned || false,
+          isLocal: attributes.isLocal || false
+        };
+
+        // console.log("cidsOnchain.forEach ~ collectionCid:", collectionCid);
+        allCollections.set(collectionCid, collectionItem);
       })
     );
     console.log("loadCollections2 final ~ allCollections.size:", allCollections.size);
@@ -308,9 +288,11 @@
 
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 flex flex-col gap-4">
-    <div class="mb-8">
-      <FileUpload bind:files={uploadStore.fileList} />
-    </div>
+    {#if ipfs.connected && kuboReady}
+      <div class="mb-8">
+        <FileUpload bind:files={uploadStore.fileList} />
+      </div>
+    {/if}
 
     <div class="flex items-center justify-end gap-4">
       <CollectionFilters filters={collectionFilters} onStatusFilter={handleStatusFilter} />

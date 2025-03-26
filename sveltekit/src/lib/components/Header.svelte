@@ -12,6 +12,8 @@
   const refresh = async (): Promise<void> => {
     if (!client.ready) return;
 
+    await client.refresh();
+
     isOwner = (await client.fetchOwner()) === client.address;
   };
   $effect(() => {

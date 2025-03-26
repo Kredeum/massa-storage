@@ -9,8 +9,8 @@ import {
 
 const IPFS_API = localStorage?.getItem("ipfsApi") || "http://localhost:5001";
 
-const createKuboClient = (url?: string) => {
-  const ipfs = create(new URL(url || IPFS_API));
+const createKuboClient = (url = IPFS_API) => {
+  const ipfs = create(new URL(url));
 
   const addAndPin = async (
     data: ImportCandidate,
@@ -27,6 +27,16 @@ const createKuboClient = (url?: string) => {
     return cids;
   };
 
+  const ready = async (url?: string): Promise<boolean> => {
+    try {
+      const identity = await ipfs.id();
+      return Boolean(identity.id);
+    } catch (error) {
+      console.info("No IPFS server found on", IPFS_API);
+      return false;
+    }
+  };
+
   return {
     ls: ipfs.ls,
     addAll: ipfs.addAll,
@@ -36,8 +46,15 @@ const createKuboClient = (url?: string) => {
     cat: ipfs.cat,
     stat: ipfs.files.stat,
     pins,
+    ready,
     addAndPin
   };
 };
+
+/**
+ * Tests if the IPFS server (Kubo) is running
+ * @param url Optional URL to the IPFS API (defaults to IPFS_API)
+ * @returns Promise that resolves to true if server is running, false otherwise
+ */
 
 export { IPFS_API, createKuboClient };
