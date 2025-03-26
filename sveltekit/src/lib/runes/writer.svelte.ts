@@ -86,9 +86,13 @@ class Writer extends Reader {
   async connect(): Promise<boolean> {
     if (this.#connected) return true;
 
-    this.#connected = this.noConnect || (await this.#wallet!.connect());
-
-    await this.refresh();
+    try {
+      this.#connected = this.noConnect || (await this.#wallet!.connect());
+      await this.refresh();
+    } catch (error) {
+      console.info("Error while connecting:", error);
+      return false;
+    }
 
     return this.#connected;
   }
@@ -119,11 +123,13 @@ class Writer extends Reader {
 
     if (!walletProvider.walletName) {
       const wallets = await getWallets();
-      if (wallets.length === 0) throw new Error("No wallet installed");
-      wallet = wallets[0];
+      if (wallets.length > 0) wallet = wallets[0];
     } else {
       wallet = await getWallet(walletProvider.walletName);
-      if (!wallet) throw new Error(`Wallet ${walletProvider.walletName} not found`);
+    }
+    if (!wallet) {
+      console.info(`No Wallet found`);
+      return;
     }
 
     this.#wallet = wallet;
