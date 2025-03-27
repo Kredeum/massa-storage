@@ -294,8 +294,15 @@
       </div>
     {/if}
 
-    <div class="flex items-center justify-end gap-4">
-      <CollectionFilters filters={collectionFilters} onStatusFilter={handleStatusFilter} />
+    <div class="mb-4 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <input type="text" placeholder="Enter IPFS URL" class="flex-grow rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+        <button class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none">IPFS</button>
+      </div>
+
+      <div class="flex items-center justify-end gap-4">
+        <CollectionFilters filters={collectionFilters} onStatusFilter={handleStatusFilter} />
+      </div>
     </div>
 
     <!-- Collection Table -->
