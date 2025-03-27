@@ -281,7 +281,6 @@
 
   const handleIpfsUrlChange = async () => {
     const url = ipfsUrl || defaultIpfsUrl;
-    localStorage.setItem("ipfsApi", url);
     const toastId = toast.loading("Updating IPFS URL...");
 
     try {
@@ -289,6 +288,7 @@
       kuboReady = await newKubo.ready();
 
       if (kuboReady) {
+        localStorage.setItem("ipfsApi", url);
         toast.success("IPFS URL updated successfully");
       } else {
         toast.error("Could not connect to IPFS at this URL");
@@ -321,12 +321,7 @@
 
     <div class="mb-4 flex items-center justify-between gap-8">
       <div class="flex w-80 items-center gap-2">
-        <input
-          type="text"
-          oninput={(e) => (ipfsUrl = e.currentTarget.value)}
-          placeholder="Enter IPFS URL"
-          class="flex-grow rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-        />
+        <input type="text" bind:value={ipfsUrl} placeholder="Enter IPFS URL" class="flex-grow rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
         <button
           class="inline-flex items-center gap-2 rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-all hover:border-blue-500 hover:text-blue-600 hover:shadow-sm focus:outline-none active:bg-gray-50"
           onclick={handleIpfsUrlChange}
@@ -334,8 +329,6 @@
           IPFS
         </button>
       </div>
-
-      <div class="text-center text-sm text-gray-500">IPFS URL: {ipfsUrl || defaultIpfsUrl}</div>
 
       <div class="flex w-80 items-center justify-end">
         <CollectionFilters filters={collectionFilters} onStatusFilter={handleStatusFilter} />
