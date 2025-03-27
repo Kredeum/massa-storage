@@ -319,8 +319,8 @@
       </div>
     {/if}
 
-    <div class="mb-4 flex items-center justify-between gap-2">
-      <div class="flex items-center gap-2">
+    <div class="mb-4 flex items-center justify-between gap-8">
+      <div class="flex w-80 items-center gap-2">
         <input
           type="text"
           oninput={(e) => (ipfsUrl = e.currentTarget.value)}
@@ -335,9 +335,9 @@
         </button>
       </div>
 
-      <div class="text-sm text-gray-500">IPFS URL: {ipfsUrl || defaultIpfsUrl}</div>
+      <div class="text-center text-sm text-gray-500">IPFS URL: {ipfsUrl || defaultIpfsUrl}</div>
 
-      <div class="flex items-center justify-end gap-4">
+      <div class="flex w-80 items-center justify-end">
         <CollectionFilters filters={collectionFilters} onStatusFilter={handleStatusFilter} />
       </div>
     </div>
