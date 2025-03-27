@@ -7,9 +7,7 @@ import {
   type PinLsOptions
 } from "kubo-rpc-client";
 
-const IPFS_API = localStorage?.getItem("ipfsApi") || "http://localhost:5001";
-
-const createKuboClient = (url = IPFS_API) => {
+const createKuboClient = (url = localStorage.getItem("IPFS_API") || "http://localhost:5001") => {
   const ipfs = create(new URL(url));
 
   const addAndPin = async (
@@ -32,7 +30,7 @@ const createKuboClient = (url = IPFS_API) => {
       const identity = await ipfs.id();
       return Boolean(identity.id);
     } catch (error) {
-      console.info("No IPFS server found on", IPFS_API);
+      console.info("No IPFS server found on", url);
       return false;
     }
   };
@@ -65,10 +63,4 @@ const createKuboClient = (url = IPFS_API) => {
   };
 };
 
-/**
- * Tests if the IPFS server (Kubo) is running
- * @param url Optional URL to the IPFS API (defaults to IPFS_API)
- * @returns Promise that resolves to true if server is running, false otherwise
- */
-
-export { IPFS_API, createKuboClient };
+export { createKuboClient };

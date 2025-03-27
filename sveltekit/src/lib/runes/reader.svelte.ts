@@ -3,7 +3,7 @@ import type { EmptyObject } from "$lib/ts/types";
 import { JsonRpcPublicProvider } from "@massalabs/massa-web3";
 
 class Reader {
-  #provider = $state<Provider | PublicProvider| undefined>();
+  #provider = $state<Provider | PublicProvider | undefined>();
   #network = $state<Network | undefined>();
   #ready = $state<boolean>(false);
 
