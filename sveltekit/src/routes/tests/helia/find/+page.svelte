@@ -47,6 +47,6 @@
 </div>
 
 <div class="p-5 text-xl">
-  {cid} = 
+  {cid} =
   {count.get(cid)}
 </div>

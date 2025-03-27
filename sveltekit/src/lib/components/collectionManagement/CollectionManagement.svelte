@@ -48,8 +48,7 @@
   let kubo = createKuboClient();
   let kuboReady = $state(false);
 
-  let ipfsUrl = $state(localStorage?.getItem("ipfsApi") || "");
-  const defaultIpfsUrl = "http://localhost:5001";
+  let ipfsApi = $state(localStorage.getItem("IPFS_API"));
 
   const refresh = async (): Promise<void> => {
     if (!ipfs.ready) return;
@@ -141,7 +140,6 @@
           const modifier = sortConfig.direction === "asc" ? 1 : -1;
 
           if (aValue === undefined || bValue === undefined) return 0;
-
           if (aValue < bValue) return -1 * modifier;
           if (aValue > bValue) return 1 * modifier;
           return 0;
@@ -282,22 +280,21 @@
   };
 
   const handleIpfsUrlChange = async () => {
-    const url = ipfsUrl || defaultIpfsUrl;
-    const toastId = toast.loading("Updating IPFS URL...");
+    const toastId = toast.loading("Updating IPFS API URL...");
 
     try {
-      const newKubo = createKuboClient(url);
-      kuboReady = await newKubo.ready();
+      kubo = createKuboClient(ipfsApi!);
+      kuboReady = await kubo.ready();
 
       if (kuboReady) {
-        localStorage.setItem("ipfsApi", url);
-        toast.success("IPFS URL updated successfully");
+        localStorage.setItem("IPFS_API", ipfsApi!);
+        toast.success("IPFS API URL updated successfully");
       } else {
-        toast.error("Could not connect to IPFS at this URL");
+        toast.error("Could not connect to IPFS API at this URL");
       }
     } catch (error) {
-      console.error("Error updating IPFS URL:", error);
-      toast.error("Failed to update IPFS URL");
+      console.error("Failed to update IPFS API URL", error);
+      toast.error("Failed to update IPFS API URL");
     } finally {
       toast.dismiss(toastId);
     }
@@ -323,7 +320,7 @@
 
     <div class="mb-4 flex items-center justify-between gap-8">
       <div class="flex w-80 items-center gap-2">
-        <input type="text" bind:value={ipfsUrl} placeholder="Enter IPFS URL" class="flex-grow rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+        <input type="text" bind:value={ipfsApi} placeholder="Enter IPFS URL" class="flex-grow rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
         <button
           class="inline-flex items-center gap-2 rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-all hover:border-blue-500 hover:text-blue-600 hover:shadow-sm focus:outline-none active:bg-gray-50"
           onclick={handleIpfsUrlChange}

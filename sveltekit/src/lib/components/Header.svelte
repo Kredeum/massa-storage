@@ -41,4 +41,4 @@
   </nav>
 </header>
 
-<div class="text-center text-2xl italic font-light my-4">Store all your Content on IPFS Decentralized Storage Secured by Massa Blockchain</div>
+<div class="my-4 text-center text-2xl font-light italic">Store all your Content on IPFS Decentralized Storage Secured by Massa Blockchain</div>
