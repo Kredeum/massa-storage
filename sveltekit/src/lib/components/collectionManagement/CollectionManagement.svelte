@@ -140,6 +140,8 @@
           const bValue = b[sortConfig.key];
           const modifier = sortConfig.direction === "asc" ? 1 : -1;
 
+          if (aValue === undefined || bValue === undefined) return 0;
+
           if (aValue < bValue) return -1 * modifier;
           if (aValue > bValue) return 1 * modifier;
           return 0;
