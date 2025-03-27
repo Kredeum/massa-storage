@@ -45,8 +45,11 @@
   });
 
   const ipfs: Ipfs = getContext("ipfs");
-  const kubo = createKuboClient();
+  let kubo = createKuboClient();
   let kuboReady = $state(false);
+
+  let ipfsUrl = $state(localStorage?.getItem("ipfsApi") || "");
+  const defaultIpfsUrl = "http://localhost:5001";
 
   const refresh = async (): Promise<void> => {
     if (!ipfs.ready) return;
@@ -276,6 +279,28 @@
     }
   };
 
+  const handleIpfsUrlChange = async () => {
+    const url = ipfsUrl || defaultIpfsUrl;
+    localStorage.setItem("ipfsApi", url);
+    const toastId = toast.loading("Updating IPFS URL...");
+
+    try {
+      const newKubo = createKuboClient(url);
+      kuboReady = await newKubo.ready();
+
+      if (kuboReady) {
+        toast.success("IPFS URL updated successfully");
+      } else {
+        toast.error("Could not connect to IPFS at this URL");
+      }
+    } catch (error) {
+      console.error("Error updating IPFS URL:", error);
+      toast.error("Failed to update IPFS URL");
+    } finally {
+      toast.dismiss(toastId);
+    }
+  };
+
   $effect(() => {
     uploadCollection();
   });
@@ -296,9 +321,21 @@
 
     <div class="mb-4 flex items-center justify-between gap-2">
       <div class="flex items-center gap-2">
-        <input type="text" placeholder="Enter IPFS URL" class="flex-grow rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
-        <button class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none">IPFS</button>
+        <input
+          type="text"
+          oninput={(e) => (ipfsUrl = e.currentTarget.value)}
+          placeholder="Enter IPFS URL"
+          class="flex-grow rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+        />
+        <button
+          class="inline-flex items-center gap-2 rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-all hover:border-blue-500 hover:text-blue-600 hover:shadow-sm focus:outline-none active:bg-gray-50"
+          onclick={handleIpfsUrlChange}
+        >
+          IPFS
+        </button>
       </div>
+
+      <div class="text-sm text-gray-500">IPFS URL: {ipfsUrl || defaultIpfsUrl}</div>
 
       <div class="flex items-center justify-end gap-4">
         <CollectionFilters filters={collectionFilters} onStatusFilter={handleStatusFilter} />
