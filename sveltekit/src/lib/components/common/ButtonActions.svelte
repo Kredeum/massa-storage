@@ -55,28 +55,45 @@
   };
 
   const handleDownloadFile = async (e: MouseEvent) => {
-    if (!(await kubo.ready())) return;
-
     e.stopPropagation();
     e.preventDefault();
+
+    if (!(await kubo.ready())) {
+      toast.error("IPFS not available");
+      return;
+    }
+
     try {
       const file = item as FileItem;
       if (file.blob) {
         const url = URL.createObjectURL(file.blob);
-        window.open(url, "_blank");
-      } else {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else if (file.cid) {
         const chunks = [];
         for await (const chunk of kubo.cat(file.cid)) {
           chunks.push(chunk);
         }
         const blob = new Blob(chunks);
         const url = URL.createObjectURL(blob);
-        window.open(url, "_blank");
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
       }
     } catch (error) {
-      console.error("Error opening file:", error);
-      toast.error(`Error opening file: ${getErrorMessage(error)}`);
+      console.error("Error downloading file:", error);
+      toast.error(`Error downloading file: ${getErrorMessage(error)}`);
     }
   };
 
