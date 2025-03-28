@@ -285,16 +285,16 @@
     }
   };
 
-const handleIpfsApiChange = async () => {
+  const handleIpfsApiChange = async () => {
     if (!ipfsApi) return;
     ipfsApi = ipfsApi.trim();
 
-    let toastId="";
+    let toastId = "";
 
     if (ipfsApiOld === ipfsApi) {
       toast.success("Refreshing IPFS datas...");
     } else {
-      toastId = toast.loading("Updating IPFS API URL..." );
+      toastId = toast.loading("Updating IPFS API URL...");
       console.info("Updating ipfsApi:", ipfsApiOld, "=> ", ipfsApi);
 
       try {
@@ -315,7 +315,6 @@ const handleIpfsApiChange = async () => {
       } finally {
         toast.dismiss(toastId);
       }
-
     }
 
     await loadCollections();
@@ -339,17 +338,7 @@ const handleIpfsApiChange = async () => {
       </div>
     {/if}
 
-    <div class="mb-4 flex items-center justify-between gap-8">
-      <div class="flex w-80 items-center gap-2">
-        <input type="text" bind:value={ipfsApi} placeholder="Enter IPFS URL" class="flex-grow rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
-        <button
-          class="inline-flex items-center gap-2 rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-all hover:border-blue-500 hover:text-blue-600 hover:shadow-sm focus:outline-none active:bg-gray-50"
-        onclick={handleIpfsApiChange}
-        >
-          IPFS
-        </button>
-      </div>
-
+    <div class="mb-2 flex items-center justify-end gap-8">
       <div class="flex w-80 items-center justify-end">
         <CollectionFilters filters={collectionFilters} onStatusFilter={handleStatusFilter} />
       </div>
@@ -373,6 +362,16 @@ const handleIpfsApiChange = async () => {
 
     <div class="mt-4">
       <FilePagination {currentPage} totalPages={Math.ceil(filteredCollections.size / ITEMS_PER_PAGE)} itemsPerPage={ITEMS_PER_PAGE} totalItems={filteredCollections.size} {setPage} />
+    </div>
+
+    <div class="mt-6 flex items-center justify-center gap-2">
+      <input type="text" bind:value={ipfsApi} placeholder="Enter IPFS URL" class="w-80 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+      <button
+        class="inline-flex items-center gap-2 rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-all hover:border-blue-500 hover:text-blue-600 hover:shadow-sm focus:outline-none active:bg-gray-50"
+        onclick={handleIpfsApiChange}
+      >
+        IPFS
+      </button>
     </div>
   </div>
 </div>
