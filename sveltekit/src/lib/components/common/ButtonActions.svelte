@@ -82,23 +82,57 @@
 
   const handleDownloadZip = async (e: MouseEvent) => {
     e.stopPropagation();
+    if (!(await kubo.ready())) {
+      const url = `https://dweb.link/ipfs/${(item as CollectionItem).collectionCid}`;
+      window.open(url, "_blank");
+      return;
+    }
     try {
       const collection = item as CollectionItem;
 
-      // Get collection content from dweb.link
-      const response = await fetch(`https://dweb.link/ipfs/${collection.collectionCid}`);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      // Create a zip file containing all files in the collection
+      const files = [];
+      const collectionStats = await all(kubo.ls(collection.collectionCid));
+
+      if (!collectionStats || collectionStats.length === 0) {
+        toast.error("No files found in collection");
+        return;
+      }
+
+      for (const file of collectionStats) {
+        try {
+          const chunks = await all(kubo.cat(file.cid));
+          // Calculate total length
+          const totalLength = chunks.reduce((acc: number, chunk: Uint8Array) => acc + chunk.length, 0);
+          // Create a new Uint8Array with the total length
+          const content = new Uint8Array(totalLength);
+          // Copy all chunks into the new array
+          let offset = 0;
+          for (const chunk of chunks) {
+            content.set(chunk, offset);
+            offset += chunk.length;
+          }
+          files.push({
+            name: file.name,
+            content: content
+          });
+        } catch (error) {
+          console.error(`Failed to download file ${file.name}:`, error);
+          toast.error(`Failed to download file ${file.name}: ${getErrorMessage(error)}`);
+          // Continue with other files even if one fails
+        }
+      }
+
+      if (files.length === 0) {
+        toast.error("Failed to download any files from the collection");
+        return;
+      }
 
       // Create a zip file
       const zip = new JSZip();
-
-      // Get the filename from the Content-Disposition header if available
-      const contentDisposition = response.headers.get("content-disposition");
-      const filename = contentDisposition ? contentDisposition.split("filename=")[1]?.replace(/"/g, "") : "file";
-
-      // Add the file to the zip
-      const content = await response.arrayBuffer();
-      zip.file(filename, content);
+      files.forEach((file) => {
+        zip.file(file.name, file.content);
+      });
 
       // Generate and download the zip file
       const zipBlob = await zip.generateAsync({ type: "blob" });
