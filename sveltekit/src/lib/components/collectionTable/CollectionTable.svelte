@@ -90,7 +90,7 @@
       {#each collections as collection}
         <tr class="cursor-pointer hover:bg-gray-50" onclick={() => handleClick(collection.collectionCid)}>
           <td class="w-[25%] whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-600">
-            <ShortenedTextTooltip text={collection.name} label="Collection name" />
+            {collection.name}
           </td>
           <td class="w-[15%] px-4 py-4 text-center text-sm text-gray-500">
             {#if collection.timestamp}
