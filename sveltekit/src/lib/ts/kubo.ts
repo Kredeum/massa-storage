@@ -7,8 +7,8 @@ import {
   type PinLsOptions
 } from "kubo-rpc-client";
 
-const createKuboClient = (url = localStorage.getItem("IPFS_API") || "http://localhost:5001") => {
-  const ipfs = create(new URL(url));
+const createKuboClient = (url = localStorage.getItem("IPFS_API")) => {
+  const ipfs = create(new URL(url || ""));
 
   const addAndPin = async (
     data: ImportCandidate,
