@@ -36,7 +36,10 @@
   };
 
   const handlePin = async () => {
-    if (!(await kubo.ready())) return;
+    if (!(await kubo.ready())) {
+      toast.error("Server IPFS not available");
+      return;
+    }
 
     const cid = type === "file" ? (item as FileItem).cid : (item as CollectionItem).collectionCid;
     if (onPin) {

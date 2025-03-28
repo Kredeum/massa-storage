@@ -56,10 +56,10 @@
     kuboReady = await kubo.ready();
 
     isModerator = await ipfs.moderatorHas(ipfs.address);
-
+    
     await loadCollections();
   };
-
+  
   $effect(() => {
     refresh();
   });
