@@ -29,17 +29,17 @@
   });
 </script>
 
-<div class="group relative cursor-pointer">
-  <button class="text-gray-500 hover:text-gray-700 focus:outline-none" onclick={handleCopy} aria-label={label ? `Copy ${label}` : `Copy ${text}`}>
+<div class="relative">
+  <button class="group text-gray-500 hover:text-gray-700 focus:outline-none" onclick={handleCopy} aria-label={label ? `Copy ${label}` : `Copy ${text}`}>
     {shortenString(text)}
+    <span
+      class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-gray-700 px-3 py-2 text-sm text-white opacity-0 transition-opacity group-hover:opacity-100"
+    >
+      {#if copied}
+        Copied!
+      {:else}
+        {text}
+      {/if}
+    </span>
   </button>
-  <span
-    class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-gray-700 px-3 py-2 text-sm text-white opacity-0 transition-opacity group-hover:opacity-100"
-  >
-    {#if copied}
-      Copied!
-    {:else}
-      {text}
-    {/if}
-  </span>
 </div>
