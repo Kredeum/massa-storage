@@ -83,14 +83,14 @@
             </button>
           </th>
         {/each}
-        <th class="sticky right-0 bg-gray-50 px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">Actions</th>
+        <th class="sticky right-0 z-10 px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">Actions</th>
       </tr>
     </thead>
     <tbody class="divide-y divide-gray-200 bg-white">
       {#each collections as collection}
         <tr class="cursor-pointer hover:bg-gray-50" onclick={() => handleClick(collection.collectionCid)}>
-          <td class="w-[25%] px-4 py-4">
-            <div class="text-sm font-medium text-gray-600">{collection.name}</div>
+          <td class="w-[25%] whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-600">
+            <ShortenedTextTooltip text={collection.name} label="Collection name" />
           </td>
           <td class="w-[15%] px-4 py-4 text-center text-sm text-gray-500">
             {#if collection.timestamp}
@@ -134,7 +134,7 @@
               {statusLabel(collection.status)}
             </span>
           </td>
-          <td class="sticky right-0 whitespace-nowrap bg-white px-6 py-4 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">
+          <td class="sticky right-0 z-10 whitespace-nowrap px-6 py-4 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)] group-hover:bg-gray-50">
             <div class="flex items-center justify-end gap-2">
               <ButtonActions item={collection} {onModerate} {onPin} type="collection" />
             </div>
