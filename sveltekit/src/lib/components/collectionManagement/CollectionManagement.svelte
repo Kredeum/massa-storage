@@ -174,7 +174,12 @@
     updateFilteredCollections();
   };
 
-  const handleCollectionClick = (collectionCid: string) => {
+  const handleCollectionClick = async (collectionCid: string) => {
+    if (!(await kubo.ready())) {
+      const url = `https://dweb.link/ipfs/${collectionCid}`;
+      window.open(url, "_blank");
+      return;
+    }
     goto(`/app/collection/${collectionCid}`);
   };
 

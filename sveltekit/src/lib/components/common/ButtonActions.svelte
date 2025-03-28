@@ -36,7 +36,10 @@
   };
 
   const handlePin = async () => {
-    if (!(await kubo.ready())) return;
+    if (!(await kubo.ready())) {
+      toast.error("Server IPFS not available");
+      return;
+    }
 
     const cid = type === "file" ? (item as FileItem).cid : (item as CollectionItem).collectionCid;
     if (onPin) {
@@ -78,11 +81,15 @@
   };
 
   const handleDownloadZip = async (e: MouseEvent) => {
-    if (!(await kubo.ready())) return;
-
     e.stopPropagation();
+    if (!(await kubo.ready())) {
+      const url = `https://dweb.link/ipfs/${(item as CollectionItem).collectionCid}`;
+      window.open(url, "_blank");
+      return;
+    }
     try {
       const collection = item as CollectionItem;
+
       // Create a zip file containing all files in the collection
       const files = [];
       const collectionStats = await all(kubo.ls(collection.collectionCid));
@@ -137,6 +144,8 @@
       a.click();
       URL.revokeObjectURL(url);
       document.body.removeChild(a);
+
+      toast.success("Download completed");
     } catch (error) {
       console.error("Download failed:", error);
       toast.error(`Download failed: ${getErrorMessage(error)}`);
