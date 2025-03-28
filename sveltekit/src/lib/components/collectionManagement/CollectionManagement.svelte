@@ -49,6 +49,7 @@
   let kuboReady = $state(false);
 
   let ipfsApi = $state(localStorage.getItem("IPFS_API"));
+  let ipfsApiOld = $state(localStorage.getItem("IPFS_API"));
 
   const refresh = async (): Promise<void> => {
     if (!ipfs.ready) return;
@@ -279,25 +280,40 @@
     }
   };
 
-  const handleIpfsUrlChange = async () => {
-    const toastId = toast.loading("Updating IPFS API URL...");
+const handleIpfsApiChange = async () => {
+    if (!ipfsApi) return;
+    ipfsApi = ipfsApi.trim();
 
-    try {
-      kubo = createKuboClient(ipfsApi!);
-      kuboReady = await kubo.ready();
+    let toastId="";
 
-      if (kuboReady) {
-        localStorage.setItem("IPFS_API", ipfsApi!);
-        toast.success("IPFS API URL updated successfully");
-      } else {
-        toast.error("Could not connect to IPFS API at this URL");
+    if (ipfsApiOld === ipfsApi) {
+      toast.success("Refreshing IPFS datas...");
+    } else {
+      toastId = toast.loading("Updating IPFS API URL..." );
+      console.info("Updating ipfsApi:", ipfsApiOld, "=> ", ipfsApi);
+
+      try {
+        kubo = createKuboClient(ipfsApi);
+        kuboReady = await kubo.ready();
+
+        if (kuboReady) {
+          ipfsApiOld = ipfsApi;
+          localStorage.setItem("IPFS_API", ipfsApi);
+          toast.success("IPFS API URL updated successfully");
+        } else {
+          toast.error("Could not connect to IPFS API");
+          return;
+        }
+      } catch (error) {
+        console.error("Failed to update IPFS API URL", error);
+        toast.error("Failed to update IPFS API URL");
+      } finally {
+        toast.dismiss(toastId);
       }
-    } catch (error) {
-      console.error("Failed to update IPFS API URL", error);
-      toast.error("Failed to update IPFS API URL");
-    } finally {
-      toast.dismiss(toastId);
+
     }
+
+    await loadCollections();
   };
 
   $effect(() => {
@@ -323,7 +339,7 @@
         <input type="text" bind:value={ipfsApi} placeholder="Enter IPFS URL" class="flex-grow rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
         <button
           class="inline-flex items-center gap-2 rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-all hover:border-blue-500 hover:text-blue-600 hover:shadow-sm focus:outline-none active:bg-gray-50"
-          onclick={handleIpfsUrlChange}
+        onclick={handleIpfsApiChange}
         >
           IPFS
         </button>
