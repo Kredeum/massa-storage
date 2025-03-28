@@ -27,7 +27,8 @@
 
   const kubo = createKuboClient();
 
-  const countPeers = async (cid: string) => await kubo.countPeers(cid);
+  const countPeers = async (cid: string, max: number) => await kubo.countPeers(cid, max);
+  const maxPeers = 5;
 </script>
 
 <div class="overflow-x-auto">
@@ -104,10 +105,10 @@
             {collection.filesCount >= 0 ? collection.filesCount : "?"}
           </td>
           <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
-            {#await countPeers(collection.collectionCid)}
+            {#await countPeers(collection.collectionCid, maxPeers)}
               <span class="text-gray-500">?</span>
             {:then count}
-              <span>{count}</span>
+              <span>{count >= maxPeers ? count + "+" : count}</span>
             {:catch}
               <span class="text-gray-500">X</span>
             {/await}

@@ -19,7 +19,7 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "dev": "vite dev",
     "start": "vite dev",
-    "build": "vite build",
+    "build": "mv src/routes/tests tmp-test && vite build && mv tmp-test src/routes/tests",
     "preview": "vite preview",
     "fleek": "pnpm run build && fleek sites deploy",
     "lint": "prettier --check src && eslint src",
