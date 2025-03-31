@@ -102,9 +102,9 @@ class Ipfs extends Writer {
   moderatorAdd = async (moderator: string) => await this.add(MODERATOR, moderator);
   cidAdd = async (cid: string) => await this.add(CID, cid);
 
-  cidSet = async (cid: string, value: string) => {
-    if (!("callSC" in this.provider)) return;
-    if (!this.chainId) return;
+  cidSet = async (cid: string, value: string): Promise<boolean> => {
+    if (!("callSC" in this.provider)) return false;
+    if (!this.chainId) return false;
 
     try {
       const params = {
@@ -124,18 +124,19 @@ class Ipfs extends Writer {
       const status = await op.waitSpeculativeExecution();
       if (status !== OperationStatus.SpeculativeSuccess) {
         console.error(`Failed to cidSet ~ status: ${status}`);
-        return toast.error(`Failed to cidSet`);
+        return false;
       }
 
       await this.moderatorsGet();
-      toast.success(`Moderator cidSet ok`);
+      console.info(`Moderator cidSet ok`);
+      return true;
     } catch (error) {
-      toast.error(`Error cidSet`);
-      console.error("Error:", error);
+      console.info("Info:", error);
+      return false;
     }
   };
 
-  cidValidate = async (cid: string) => {
+  cidValidate = async (cid: string): Promise<boolean> => {
     try {
       // First, get the current attributes
       const attributes: CidDataType | null = await this.cidGet(cid);
@@ -146,16 +147,15 @@ class Ipfs extends Writer {
       attributes.status = STATUS_APPROVED;
 
       // Set the updated attributes
-      await this.cidSet(cid, JSON.stringify(attributes));
-
-      toast.success(`CID ${shortenString(cid)} validated successfully`);
+      const success = await this.cidSet(cid, JSON.stringify(attributes));
+      return success;
     } catch (error) {
-      toast.error(`Error validating CID ${shortenString(cid)}`);
       console.error("Error:", error);
+      return false;
     }
   };
 
-  cidReject = async (cid: string) => {
+  cidReject = async (cid: string): Promise<boolean> => {
     try {
       // First, get the current attributes
       const attributes: CidDataType | null = await this.cidGet(cid);
@@ -166,12 +166,11 @@ class Ipfs extends Writer {
       attributes.status = STATUS_REJECTED;
 
       // Set the updated attributes
-      await this.cidSet(cid, JSON.stringify(attributes));
-
-      toast.success(`CID ${shortenString(cid)} rejected successfully`);
+      const success = await this.cidSet(cid, JSON.stringify(attributes));
+      return success;
     } catch (error) {
-      toast.error(`Error rejecting CID ${shortenString(cid)}`);
       console.error("Error:", error);
+      return false;
     }
   };
 

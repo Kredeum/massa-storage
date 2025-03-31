@@ -232,14 +232,21 @@
   const handleModerate = async (data: { id: string; status: StatusType }) => {
     const toastId = toast.loading(`Moderating collection ...`);
     try {
+      let success = false;
       if (data.status === STATUS_APPROVED) {
-        await ipfs.cidValidate(data.id);
+        success = await ipfs.cidValidate(data.id);
       } else if (data.status === STATUS_REJECTED) {
-        await ipfs.cidReject(data.id);
+        success = await ipfs.cidReject(data.id);
       }
-      await loadCollections();
-      toast.dismiss(toastId);
-      toast.success(`Collection ${data.status === STATUS_APPROVED ? "approved" : "rejected"}`);
+
+      if (success) {
+        await loadCollections();
+        toast.dismiss(toastId);
+        toast.success(`Collection ${data.status === STATUS_APPROVED ? "approved" : "rejected"}`);
+      } else {
+        toast.dismiss(toastId);
+        toast.error("Failed to moderate collection");
+      }
     } catch (error) {
       toast.dismiss(toastId);
       console.error("Error moderating collection:", error);
