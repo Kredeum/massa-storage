@@ -1,5 +1,5 @@
 <script lang="ts">
-  // @ts-nocheck - Ce fichier utilise des modules avec des définitions de types problématiques
+  // @ts-nocheck - This file uses modules with problematic type definitions
   import { getContext } from "svelte";
   import type { FileItem, CollectionItem, StatusType } from "$lib/ts/types";
   import { Check, X, Pin, Download } from "lucide-svelte";

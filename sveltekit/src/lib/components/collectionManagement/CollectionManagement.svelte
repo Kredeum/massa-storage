@@ -54,9 +54,9 @@
   const refresh = async (): Promise<void> => {
     if (!ipfs.ready) return;
 
-    kuboReady = await kubo.ready();
-
     isModerator = await ipfs.moderatorHas(ipfs.address);
+
+    kuboReady = await kubo.ready();
 
     await loadCollections();
   };
