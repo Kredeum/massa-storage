@@ -194,12 +194,11 @@
     if (fileCount === 0) return;
     if (!ipfs || uploadInProgress) return;
 
-    const toastId = toast.loading(`Uploading ${fileCount} files...`);
+    const toastId = toast.loading(`Uploading ${fileCount} file${fileCount > 1 ? "s" : ""}...`);
 
     try {
       uploadInProgress = true;
       const newCids = await uploadStore.processUploadedCollections();
-      toast.success(`Successfully uploaded ${fileCount} files`);
       const validCids = newCids.filter((item): item is AddResult => {
         return typeof item !== "string";
       });
@@ -216,9 +215,14 @@
         };
 
         const attributesString = JSON.stringify(attributes);
-        await ipfs.cidSet(collectionCid, attributesString);
-        toast.success("Collection created successfully");
-        await loadCollections();
+        const success = await ipfs.cidSet(collectionCid, attributesString);
+
+        if (success) {
+          toast.success("Collection created successfully");
+          await loadCollections();
+        } else {
+          toast.error("Failed to create collection");
+        }
       }
     } catch (error) {
       console.error("Failed to add collection:", error);
