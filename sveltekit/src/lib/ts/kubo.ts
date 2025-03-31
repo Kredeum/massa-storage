@@ -39,11 +39,9 @@ const createKuboClient = (url = localStorage.getItem("IPFS_API")) => {
     let count = 0;
     const peerList = await ipfs.routing.findProvs(cid, { numProviders });
 
-    console.log(cid, "refreshing");
     for await (const peer of peerList) {
       if (peer.name === "PROVIDER") count++;
     }
-    console.log(cid, "refreshed", count);
 
     return count;
   };

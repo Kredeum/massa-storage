@@ -70,10 +70,8 @@
   };
 
   const isLocal = async (cid: string): Promise<boolean> => {
-    // console.log("isLocal ~ cid:", cid);
     try {
       const stat = await kubo.stat(`/ipfs/${cid}`, { timeout: TIMEOUT_VALUE, withLocal: true });
-      // console.log("isLocal ~ size, local:", stat.local, stat.cumulativeSize);
       return Boolean(stat.local);
     } catch (error) {
       return false;
@@ -87,9 +85,6 @@
     if (kuboReady) {
       cidsPinned = await kubo.pins();
     }
-
-    console.log("loadCollections ~ cidsOnchain.size:", cidsOnchain.size);
-    console.log("loadCollections ~ cidsPinned:", cidsPinned.length);
 
     await Promise.all(
       Array.from(cidsOnchain.entries()).map(async ([collectionCid, attributes]) => {
@@ -124,11 +119,9 @@
           isLocal: attributes.isLocal || false
         };
 
-        // console.log("cidsOnchain.forEach ~ collectionCid:", collectionCid);
         allCollections.set(collectionCid, collectionItem);
       })
     );
-    console.log("loadCollections2 final ~ allCollections.size:", allCollections.size);
     updateFilteredCollections();
   };
 
