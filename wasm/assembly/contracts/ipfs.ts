@@ -20,6 +20,7 @@ function constructor(_: StaticArray<u8>): void {
 
 export {
   constructor,
+  ownership,
   moderatorAdd,
   moderatorDelete,
   moderatorHas,
