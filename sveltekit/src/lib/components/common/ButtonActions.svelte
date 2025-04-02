@@ -1,5 +1,5 @@
 <script lang="ts">
-  // @ts-nocheck - Ce fichier utilise des modules avec des définitions de types problématiques
+  // @ts-nocheck - This file uses modules with problematic type definitions
   import { getContext } from "svelte";
   import type { FileItem, CollectionItem, StatusType } from "$lib/ts/types";
   import { Check, X, Pin, Download } from "lucide-svelte";
@@ -35,7 +35,12 @@
     }
   };
 
-  const handlePin = () => {
+  const handlePin = async () => {
+    if (!(await kubo.ready())) {
+      toast.error("Server IPFS not available");
+      return;
+    }
+
     const cid = type === "file" ? (item as FileItem).cid : (item as CollectionItem).collectionCid;
     if (onPin) {
       onPin(cid);
@@ -52,31 +57,56 @@
   const handleDownloadFile = async (e: MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
+
+    if (!(await kubo.ready())) {
+      toast.error("IPFS not available");
+      return;
+    }
+
     try {
       const file = item as FileItem;
       if (file.blob) {
         const url = URL.createObjectURL(file.blob);
-        window.open(url, "_blank");
-      } else {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else if (file.cid) {
         const chunks = [];
         for await (const chunk of kubo.cat(file.cid)) {
           chunks.push(chunk);
         }
         const blob = new Blob(chunks);
         const url = URL.createObjectURL(blob);
-        window.open(url, "_blank");
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
       }
     } catch (error) {
-      console.error("Error opening file:", error);
-      toast.error(`Error opening file: ${getErrorMessage(error)}`);
+      console.error("Error downloading file:", error);
+      toast.error(`Error downloading file: ${getErrorMessage(error)}`);
     }
   };
 
   const handleDownloadZip = async (e: MouseEvent) => {
     e.stopPropagation();
+    if (!(await kubo.ready())) {
+      const url = `https://dweb.link/ipfs/${(item as CollectionItem).collectionCid}`;
+      window.open(url, "_blank");
+      return;
+    }
     try {
       const collection = item as CollectionItem;
+
       // Create a zip file containing all files in the collection
       const files = [];
       const collectionStats = await all(kubo.ls(collection.collectionCid));
@@ -131,6 +161,8 @@
       a.click();
       URL.revokeObjectURL(url);
       document.body.removeChild(a);
+
+      toast.success("Download completed");
     } catch (error) {
       console.error("Download failed:", error);
       toast.error(`Download failed: ${getErrorMessage(error)}`);

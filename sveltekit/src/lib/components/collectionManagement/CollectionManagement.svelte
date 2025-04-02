@@ -45,12 +45,18 @@
   });
 
   const ipfs: Ipfs = getContext("ipfs");
-  const kubo = createKuboClient();
+  let kubo = createKuboClient();
+  let kuboReady = $state(false);
+
+  let ipfsApi = $state(localStorage.getItem("IPFS_API"));
+  let ipfsApiOld = $state(localStorage.getItem("IPFS_API"));
 
   const refresh = async (): Promise<void> => {
     if (!ipfs.ready) return;
 
     isModerator = await ipfs.moderatorHas(ipfs.address);
+
+    kuboReady = await kubo.ready();
 
     await loadCollections();
   };
@@ -64,10 +70,8 @@
   };
 
   const isLocal = async (cid: string): Promise<boolean> => {
-    // console.log("isLocal ~ cid:", cid);
     try {
       const stat = await kubo.stat(`/ipfs/${cid}`, { timeout: TIMEOUT_VALUE, withLocal: true });
-      // console.log("isLocal ~ size, local:", stat.local, stat.cumulativeSize);
       return Boolean(stat.local);
     } catch (error) {
       return false;
@@ -78,74 +82,46 @@
     if (!ipfs) return;
 
     cidsOnchain = await ipfs.cidsGet();
-    cidsPinned = await kubo.pins();
-
-    console.log("loadCollections ~ cidsOnchain.size:", cidsOnchain.size);
-    console.log("loadCollections ~ cidsPinned:", cidsPinned.length);
+    if (kuboReady) {
+      cidsPinned = await kubo.pins();
+    }
 
     await Promise.all(
       Array.from(cidsOnchain.entries()).map(async ([collectionCid, attributes]) => {
-        if (!collectionCid) return;
+        let filesCount = 0;
+        let totalSize = 0;
 
-        try {
-          attributes.isPinned = isPinned(collectionCid);
-          attributes.isLocal = await isLocal(collectionCid);
-
-          let filesCount = 0;
-          let totalSize = 0;
-
-          if (attributes.isLocal) {
-            for await (const file of kubo.ls(collectionCid)) {
-              filesCount++;
-              totalSize += file.size;
-            }
-          } else {
-            filesCount = UNKNOWN_VALUE;
-            totalSize = UNKNOWN_VALUE;
-          }
-
-          // Determine the current status
-          let currentStatus: StatusType = STATUS_PENDING;
+        if (kuboReady) {
           try {
-            if (!attributes || !attributes.status) return;
-            switch (attributes.status) {
-              case STATUS_APPROVED:
-                currentStatus = STATUS_APPROVED;
-                break;
-              case STATUS_REJECTED:
-                currentStatus = STATUS_REJECTED;
-                break;
-              case STATUS_PENDING:
-                currentStatus = STATUS_PENDING;
-                break;
-              default:
-                console.error(`Unknown status value: ${attributes.status}`);
+            attributes.isPinned = isPinned(collectionCid);
+            attributes.isLocal = await isLocal(collectionCid);
+
+            if (attributes.isLocal) {
+              for await (const file of kubo.ls(collectionCid)) {
+                filesCount++;
+                totalSize += file.size;
+              }
             }
           } catch (error) {
-            console.error(`Error determining attributes for CID ${collectionCid}:`, error);
-            return;
+            console.error(`Error reading collection ${collectionCid}:`, error);
           }
-
-          const collectionItem: CollectionItem = {
-            collectionCid,
-            owner: attributes.owner,
-            name: attributes.name,
-            totalSizeBytes: totalSize,
-            filesCount: filesCount,
-            status: currentStatus,
-            timestamp: attributes.timestamp,
-            isPinned: attributes.isPinned,
-            isLocal: attributes.isLocal
-          };
-
-          // console.log("cidsOnchain.forEach ~ collectionCid:", collectionCid);
-          allCollections.set(collectionCid, collectionItem);
-        } catch (error) {
-          console.error(`Error loading collection ${collectionCid}:`, error);
         }
+
+        const collectionItem: CollectionItem = {
+          collectionCid,
+          owner: attributes.owner,
+          name: attributes.name,
+          totalSizeBytes: totalSize || UNKNOWN_VALUE,
+          filesCount: filesCount || UNKNOWN_VALUE,
+          status: (attributes.status || STATUS_PENDING) as StatusType,
+          timestamp: attributes.timestamp,
+          isPinned: attributes.isPinned || false,
+          isLocal: attributes.isLocal || false
+        };
+
+        allCollections.set(collectionCid, collectionItem);
       })
     );
-    console.log("loadCollections2 final ~ allCollections.size:", allCollections.size);
     updateFilteredCollections();
   };
 
@@ -157,6 +133,7 @@
           const bValue = b[sortConfig.key];
           const modifier = sortConfig.direction === "asc" ? 1 : -1;
 
+          if (aValue === undefined || bValue === undefined) return 0;
           if (aValue < bValue) return -1 * modifier;
           if (aValue > bValue) return 1 * modifier;
           return 0;
@@ -190,7 +167,12 @@
     updateFilteredCollections();
   };
 
-  const handleCollectionClick = (collectionCid: string) => {
+  const handleCollectionClick = async (collectionCid: string) => {
+    if (!(await kubo.ready())) {
+      const url = `https://dweb.link/ipfs/${collectionCid}`;
+      window.open(url, "_blank");
+      return;
+    }
     goto(`/app/collection/${collectionCid}`);
   };
 
@@ -205,12 +187,11 @@
     if (fileCount === 0) return;
     if (!ipfs || uploadInProgress) return;
 
-    const toastId = toast.loading(`Uploading ${fileCount} files...`);
+    const toastId = toast.loading(`Uploading ${fileCount} file${fileCount > 1 ? "s" : ""}...`);
 
     try {
       uploadInProgress = true;
       const newCids = await uploadStore.processUploadedCollections();
-      toast.success(`Successfully uploaded ${fileCount} files`);
       const validCids = newCids.filter((item): item is AddResult => {
         return typeof item !== "string";
       });
@@ -227,9 +208,14 @@
         };
 
         const attributesString = JSON.stringify(attributes);
-        await ipfs.cidSet(collectionCid, attributesString);
-        toast.success("Collection created successfully");
-        await loadCollections();
+        const success = await ipfs.cidSet(collectionCid, attributesString);
+
+        if (success) {
+          toast.success("Collection created successfully");
+          await loadCollections();
+        } else {
+          toast.error("Failed to create collection");
+        }
       }
     } catch (error) {
       console.error("Failed to add collection:", error);
@@ -243,14 +229,21 @@
   const handleModerate = async (data: { id: string; status: StatusType }) => {
     const toastId = toast.loading(`Moderating collection ...`);
     try {
+      let success = false;
       if (data.status === STATUS_APPROVED) {
-        await ipfs.cidValidate(data.id);
+        success = await ipfs.cidValidate(data.id);
       } else if (data.status === STATUS_REJECTED) {
-        await ipfs.cidReject(data.id);
+        success = await ipfs.cidReject(data.id);
       }
-      await loadCollections();
-      toast.dismiss(toastId);
-      toast.success(`Collection ${data.status === STATUS_APPROVED ? "approved" : "rejected"}`);
+
+      if (success) {
+        await loadCollections();
+        toast.dismiss(toastId);
+        toast.success(`Collection ${data.status === STATUS_APPROVED ? "approved" : "rejected"}`);
+      } else {
+        toast.dismiss(toastId);
+        toast.error("Failed to moderate collection");
+      }
     } catch (error) {
       toast.dismiss(toastId);
       console.error("Error moderating collection:", error);
@@ -296,6 +289,41 @@
     }
   };
 
+  const handleIpfsApiChange = async () => {
+    if (!ipfsApi) return;
+    ipfsApi = ipfsApi.trim();
+
+    let toastId = "";
+
+    if (ipfsApiOld === ipfsApi) {
+      toast.success("Refreshing IPFS datas...");
+    } else {
+      toastId = toast.loading("Updating IPFS API URL...");
+      console.info("Updating ipfsApi:", ipfsApiOld, "=> ", ipfsApi);
+
+      try {
+        kubo = createKuboClient(ipfsApi);
+        kuboReady = await kubo.ready();
+
+        if (kuboReady) {
+          ipfsApiOld = ipfsApi;
+          localStorage.setItem("IPFS_API", ipfsApi);
+          toast.success("IPFS API URL updated successfully");
+        } else {
+          toast.error("Could not connect to IPFS API");
+          return;
+        }
+      } catch (error) {
+        console.error("Failed to update IPFS API URL", error);
+        toast.error("Failed to update IPFS API URL");
+      } finally {
+        toast.dismiss(toastId);
+      }
+    }
+
+    await loadCollections();
+  };
+
   $effect(() => {
     uploadCollection();
   });
@@ -308,12 +336,16 @@
 
 <div class="mx-auto max-w-7xl rounded-lg bg-white p-6 shadow-lg">
   <div class="mb-6 flex flex-col gap-4">
-    <div class="mb-8">
-      <FileUpload bind:files={uploadStore.fileList} />
-    </div>
+    {#if ipfs.connected && kuboReady}
+      <div class="mb-8">
+        <FileUpload bind:files={uploadStore.fileList} />
+      </div>
+    {/if}
 
-    <div class="flex items-center justify-end gap-4">
-      <CollectionFilters filters={collectionFilters} onStatusFilter={handleStatusFilter} />
+    <div class="mb-2 flex items-center justify-end gap-8">
+      <div class="flex w-80 items-center justify-end">
+        <CollectionFilters filters={collectionFilters} onStatusFilter={handleStatusFilter} />
+      </div>
     </div>
 
     <!-- Collection Table -->
@@ -334,6 +366,16 @@
 
     <div class="mt-4">
       <FilePagination {currentPage} totalPages={Math.ceil(filteredCollections.size / ITEMS_PER_PAGE)} itemsPerPage={ITEMS_PER_PAGE} totalItems={filteredCollections.size} {setPage} />
+    </div>
+
+    <div class="mt-6 flex items-center justify-center gap-2">
+      <input type="text" bind:value={ipfsApi} placeholder="Enter IPFS URL" class="w-80 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+      <button
+        class="inline-flex items-center gap-2 rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-all hover:border-blue-500 hover:text-blue-600 hover:shadow-sm focus:outline-none active:bg-gray-50"
+        onclick={handleIpfsApiChange}
+      >
+        IPFS
+      </button>
     </div>
   </div>
 </div>

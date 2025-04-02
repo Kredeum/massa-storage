@@ -6,7 +6,7 @@
   let { children } = $props();
 </script>
 
-<title>Massa Storage</title>
+<title>MassaFiles</title>
 
 <Toaster />
 <div class="w-full">

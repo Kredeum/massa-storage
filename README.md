@@ -1,20 +1,62 @@
-# 🎉 Massa Storage - Decentralized Storage Solution 🎉
+# 🚀 MassaFiles
 
-This project is a decentralized storage solution that enables users to store and manage files using IPFS through the Massa blockchain.
+## 🌟 Why?
 
-The main goal of this project is to provide a user-friendly interface for storing files off-chain using IPFS on Massa blockchain nodes, taking advantage of their available disk space.
+To bring a  new decentralized feature to the Massa ecosystem: scalable, community-driven storage.
 
-⚠️ Prerequisites:
+## 🎯 What?
 
-- An IPFS server running on your machine is required to use this DApp
+- **Decentralized Storage for Large Files**: A system designed for big data — decentralized, but not eternal.
+- **Complementary to DeWeb**: Works alongside DeWeb (eternal and decentralized) to handle larger content types —
+- **Ideal for videos, datasets, and archives** that go beyond DeWeb’s file size scope.
 
-## 🔄 System Architecture
+## 🛠 How?
 
-![Massa Storage Architecture](images/architecture.png)
+- **Leverage Unused Disk Space**: Tap into underutilized storage across Massa Nodes.
+- **Use IPFS for Data Archival**: Collections of files are grouped and referenced by a single IPFS CID.
+- **Anchor Metadata on Massa Blockchain**: CIDs are stored and retrieved securely using Massa smart contracts.
+
+## 🔄 Workflow
+
+1. Content Provider uploads a file collection to a Massa Node.
+2. Moderator reviews and approves the content.
+3. Node Runners opt in to host moderated collections on their local storage.
+
+# 🏗️ System Architecture
+
+<img src="images/architecture.png" alt="MassaFiles Architecture" width="800">
+
+
+## 🚀 Running the Application
+
+## Prerequisites:
+
+- An IPFS server running is required to take full advantage of this DApp
+- IPFS configuration has to be done to allow the application to connect to your IPFS server, typcally  like this
+```
+ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["GET", "POST"]'
+ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["https://defiles.deweb.half-red.net", "http://localhost:5173/"]'
+```
+
+You have 2 options to run MassaFiles  application, running it locally or on DeWeb
+
+You can enter the URL of your remote IPFS server in the configuration bar if not using default local value `http://127.0.0.1:5001`
+
+### DeWeb
+
+Just go to https://defiles.deweb.half-red.Network
+
+### Locally
+
+From the root of the project, run `pnpm install`
+
+Then from the `sveltekit` directory run `pnpm dev`
+
+The app will run on `http://localhost:5173`
 
 👥 User Roles:
 
-1. **Content Uploader**
+1. **Content Provider**
 
    - Can upload collections containing files
    - Collections are added and pinned to their local IPFS server
@@ -49,27 +91,8 @@ The main goal of this project is to provide a user-friendly interface for storin
 - IPFS Integration: Pin/unpin files and collections
 - User-friendly Interface: Modern SvelteKit-based UI
 
-## ⚙️ Installation Guide
 
-From the root of the project, run:
 
-```shell
-pnpm install
-```
-
-## 🚀 Running the Application
-
-To start the application:
-
-```shell
-turbo start
-```
-
-This will:
-
-1. Clean any previous builds
-2. Install dependencies
-3. Start the application using Turbo
 
 ## 📁 Project Structure
 

@@ -7,6 +7,7 @@
   import { ChevronDown, ChevronUp } from "lucide-svelte";
   import { columns } from "$lib/constants/collections";
   import ButtonActions from "$lib/components/common/ButtonActions.svelte";
+  import { createKuboClient } from "$lib/ts/kubo";
 
   let {
     collections = [],
@@ -23,6 +24,11 @@
     onModerate?: (data: { id: string; status: StatusType }) => void;
     onPin: (id: string) => void;
   } = $props();
+
+  const kubo = createKuboClient();
+
+  const countPeers = async (cid: string, max: number) => await kubo.countPeers(cid, max);
+  const maxPeers = 5;
 </script>
 
 <div class="overflow-x-auto">
@@ -34,6 +40,8 @@
       <!-- Date -->
       <col class="w-[10%] min-w-[60px]" />
       <!-- Files -->
+      <col class="w-[10%] min-w-[60px]" />
+      <!-- Peers -->
       <col class="w-[10%] min-w-[60px]" />
       <!-- Size -->
       <col class="w-[10%] min-w-[80px]" />
@@ -76,14 +84,14 @@
             </button>
           </th>
         {/each}
-        <th class="sticky right-0 bg-gray-50 px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">Actions</th>
+        <th class="sticky right-0 z-10 px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">Actions</th>
       </tr>
     </thead>
     <tbody class="divide-y divide-gray-200 bg-white">
       {#each collections as collection}
         <tr class="cursor-pointer hover:bg-gray-50" onclick={() => handleClick(collection.collectionCid)}>
-          <td class="w-[25%] px-4 py-4">
-            <div class="text-sm font-medium text-gray-600">{collection.name}</div>
+          <td class="w-[25%] whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-600">
+            {collection.name}
           </td>
           <td class="w-[15%] px-4 py-4 text-center text-sm text-gray-500">
             {#if collection.timestamp}
@@ -95,6 +103,15 @@
           </td>
           <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
             {collection.filesCount >= 0 ? collection.filesCount : "?"}
+          </td>
+          <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
+            {#await countPeers(collection.collectionCid, maxPeers)}
+              <span class="text-gray-500">?</span>
+            {:then count}
+              <span>{count >= maxPeers ? count + "+" : count}</span>
+            {:catch}
+              <span class="text-gray-500">X</span>
+            {/await}
           </td>
           <td class="w-[8%] px-4 py-4 text-center text-sm text-gray-500">
             {collection.totalSizeBytes >= 0 ? formatSize(collection.totalSizeBytes) : "?"}
@@ -118,7 +135,7 @@
               {statusLabel(collection.status)}
             </span>
           </td>
-          <td class="sticky right-0 whitespace-nowrap bg-white px-6 py-4 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)]">
+          <td class="sticky right-0 z-10 whitespace-nowrap px-6 py-4 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.05)] group-hover:bg-gray-50">
             <div class="flex items-center justify-end gap-2">
               <ButtonActions item={collection} {onModerate} {onPin} type="collection" />
             </div>

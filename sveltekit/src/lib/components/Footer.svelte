@@ -4,5 +4,5 @@
   <a href="https://labs.kredeum.com/" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center">
     <img src="/logo-kredeum.svg" alt="Kredeum labs" class="h-10 w-10" data-testid="kredeum-logo" />
   </a>
-  <span class="text-sm"> Massa Storage </span>
+  <span class="text-sm"> MassaFiles </span>
 </footer>

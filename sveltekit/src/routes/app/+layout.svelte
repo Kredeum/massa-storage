@@ -7,9 +7,11 @@
   import Footer from "$lib/components/Footer.svelte";
   import Header from "$lib/components/Header.svelte";
   import { PrivateKeyProvider } from "$lib/runes/writer.svelte";
+  import { IPFS_API_DEFAULT } from "@kredeum/massa-storage-common/src/constants";
+
+  if (!localStorage.getItem("IPFS_API")) localStorage.setItem("IPFS_API", IPFS_API_DEFAULT);
 
   const key = page.url.searchParams.get("key") || "";
-
   const ipfs = key ? new Ipfs(new PrivateKeyProvider(key)) : new Ipfs();
 
   setContext("ipfs", ipfs);
@@ -19,13 +21,6 @@
 
 <Header client={ipfs} />
 
-{#if ipfs.connected}
-  {@render children()}
-{:else}
-  <div class="flex flex-col items-center justify-center p-8 text-center">
-    <p id="text-log" class="mb-4 text-lg font-medium text-gray-700">Please Connect to enter the App</p>
-    <p class="text-sm text-gray-500">Use the "Connect" button at the top of the page to log in with your wallet</p>
-  </div>
-{/if}
+{@render children()}
 
 <Footer />

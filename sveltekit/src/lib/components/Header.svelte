@@ -12,6 +12,8 @@
   const refresh = async (): Promise<void> => {
     if (!client.ready) return;
 
+    await client.refresh();
+
     isOwner = (await client.fetchOwner()) === client.address;
   };
   $effect(() => {
@@ -24,13 +26,12 @@
     <div class="flex items-center gap-8">
       <a href="{base}/app/collections" class="flex items-center gap-2 text-lg font-semibold text-gray-900">
         <img src={logoMassa} alt="Massa Logo" class="h-8 w-8" />
-        Massa Storage
+        MassaFiles
       </a>
       <a href="{base}/app/collections" class="text-sm text-gray-600 hover:text-gray-900">Collections</a>
       {#if isOwner}
         <a href="{base}/app/moderators" class="text-sm text-gray-600 hover:text-gray-900">Admin</a>
       {/if}
-      <a href="{base}/tests" class="text-sm text-gray-600 hover:text-gray-900">Tests</a>
       <a href="https://github.com/kredeum/massa-storage" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-600 hover:text-gray-900">GitHub</a>
     </div>
     <div class="flex items-center">
@@ -38,3 +39,5 @@
     </div>
   </nav>
 </header>
+
+<div class="mb-2 mt-8 text-center text-xl font-light">Store your content on IPFS with the security of Massa Blockchain</div>

@@ -1,5 +1,6 @@
 import type { Network, NetworkName, Provider, PublicProvider } from "@massalabs/massa-web3";
 import type { EmptyObject } from "$lib/ts/types";
+import { JsonRpcPublicProvider } from "@massalabs/massa-web3";
 
 class Reader {
   #provider = $state<Provider | PublicProvider | undefined>();
@@ -25,16 +26,14 @@ class Reader {
   }
 
   async initialize(provider?: Provider | PublicProvider): Promise<boolean> {
-    if (!provider) return false;
-    if (this.ready) return false;
+    this.#ready = false;
 
-    this.#provider = provider;
+    this.#provider = provider || JsonRpcPublicProvider.mainnet();
     try {
       this.#network = await this.#provider.networkInfos();
       this.#ready = true;
     } catch (error) {
       console.error("Error while refreshing network:", error);
-      this.#ready = false;
     }
 
     return this.#ready;

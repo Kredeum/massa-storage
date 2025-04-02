@@ -7,10 +7,8 @@ import {
   type PinLsOptions
 } from "kubo-rpc-client";
 
-const IPFS_API = localStorage?.getItem("ipfsApi") || "http://localhost:5001";
-
-const createKuboClient = (url?: string) => {
-  const ipfs = create(new URL(url || IPFS_API));
+const createKuboClient = (url = localStorage.getItem("IPFS_API")) => {
+  const ipfs = create(new URL(url || ""));
 
   const addAndPin = async (
     data: ImportCandidate,
@@ -27,6 +25,27 @@ const createKuboClient = (url?: string) => {
     return cids;
   };
 
+  const ready = async (url?: string): Promise<boolean> => {
+    try {
+      const identity = await ipfs.id();
+      return Boolean(identity.id);
+    } catch (error) {
+      console.info("No IPFS server found on", url);
+      return false;
+    }
+  };
+
+  const countPeers = async (cid: string, numProviders: number = 10): Promise<number> => {
+    let count = 0;
+    const peerList = await ipfs.routing.findProvs(cid, { numProviders });
+
+    for await (const peer of peerList) {
+      if (peer.name === "PROVIDER") count++;
+    }
+
+    return count;
+  };
+
   return {
     ls: ipfs.ls,
     addAll: ipfs.addAll,
@@ -36,8 +55,10 @@ const createKuboClient = (url?: string) => {
     cat: ipfs.cat,
     stat: ipfs.files.stat,
     pins,
+    ready,
+    countPeers,
     addAndPin
   };
 };
 
-export { IPFS_API, createKuboClient };
+export { createKuboClient };
