@@ -44,7 +44,7 @@ You can enter the URL of your remote IPFS server in the configuration bar if not
 
 ### DeWeb
 
-Just go to https://defiles.deweb.half-red.Network
+Just go to https://defiles.deweb.half-red.net
 
 ### Locally
 
