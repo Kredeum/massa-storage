@@ -10,11 +10,7 @@ export class UploadStore {
   fileList = $state<FileList | undefined>();
   cids = $state<Array<string | AddResult>>([]);
 
-  #kubo: ReturnType<typeof createKuboClient>;
-
-  constructor() {
-    this.#kubo = createKuboClient();
-  }
+  #kubo = createKuboClient();
 
   async processUploadedCollections(): Promise<(string | AddResult)[]> {
     if (!this.fileList) return [];

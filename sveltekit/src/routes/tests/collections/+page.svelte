@@ -11,7 +11,7 @@
   import type { CID } from "multiformats";
 
   const ipfs = new Ipfs();
-  let kubo: ReturnType<typeof createKuboClient>;
+  const kubo = createKuboClient();
 
   let loaded = $state<boolean>(false);
 
@@ -37,8 +37,6 @@
 
   const refresh = async () => {
     if (!ipfs.ready) return;
-
-    kubo = await createKuboClient();
 
     cidsOnchain = await ipfs.cidsGet();
 
