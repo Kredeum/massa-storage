@@ -1,5 +1,5 @@
 import { SvelteMap } from "svelte/reactivity";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   Account,
   bytesToStr,
@@ -9,20 +9,47 @@ import {
 import { ipfsAddress } from "$lib/ts/config";
 import { Ipfs } from "$lib/runes/ipfs.svelte";
 
+const windowMock = {
+  addEventListener: () => {},
+  removeEventListener: () => {},
+};
+vi.stubGlobal('window', windowMock);
+
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => {
+      store[key] = value.toString();
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    },
+    get length() {
+      return Object.keys(store).length;
+    },
+    key: (index: number) => {
+      const keys = Object.keys(store);
+      return keys[index] || null;
+    }
+  };
+})();
+vi.stubGlobal('localStorage', localStorageMock);
+
 describe("IPFS class", () => {
   let ipfs: Ipfs;
   let provider: PublicProvider;
   let target: string;
-  let deployer: string;
+  const KNOWN_OWNER = "AU129GN1pGMpTy7ZL9LAHjsAFMNJb2YVyst5VyFjDiduxN3YamjHR";
+  const KNOWN_MODERATOR = "AU12DbCiyvWjMDoqZS4F73r1hFmvegxxLzSLSp5zcoP5QeVGfYhi4";
 
   beforeEach(async () => {
-    deployer = (await Account.fromEnv("PRIVATE_KEY_DEPLOYER")).address.toString();
-
     provider = JsonRpcPublicProvider.buildnet();
-
     ipfs = new Ipfs();
     await ipfs.initialize(provider);
-
     target = ipfsAddress(await ipfs.chainId);
   });
 
@@ -33,13 +60,13 @@ describe("IPFS class", () => {
     expect(ipfs.provider).toBe(provider);
   });
 
-  it.skip("Owner should be deployer", async () => {
+  it("Should read correct owner", async () => {
     const dataStoreVal = await provider.readStorage(target, ["OWNER"], false);
 
     const owner = bytesToStr(dataStoreVal[0]);
     console.info("Owner:", owner);
 
-    expect(owner).toBe(deployer);
+    expect(owner).toBe(KNOWN_OWNER);
   });
 
   it("Should get list of moderators as Array", async () => {
@@ -64,11 +91,19 @@ describe("IPFS class", () => {
     expect(cids.size).toBeGreaterThanOrEqual(0);
   });
 
-  it("Should check that owner is moderator", async () => {
+  it("Should check that owner is NOT moderator", async () => {
     const dataStoreVal = await provider.readStorage(target, ["OWNER"], false);
     const owner = bytesToStr(dataStoreVal[0]);
+    expect(owner).toBe(KNOWN_OWNER);
 
     const isModerator = await ipfs.moderatorHas(owner);
+    console.info(`Is owner (${owner}) a moderator: ${isModerator}`);
+    expect(isModerator).toBe(false);
+  });
+
+  it("Should check that known moderator IS moderator", async () => {
+    const isModerator = await ipfs.moderatorHas(KNOWN_MODERATOR);
+    console.info(`Is known moderator (${KNOWN_MODERATOR}) a moderator: ${isModerator}`);
     expect(isModerator).toBe(true);
   });
 
