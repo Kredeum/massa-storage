@@ -8,7 +8,7 @@
   let files = $state<FileList>();
   let cids = $state<AddResult[]>([]);
 
-  let kubo: ReturnType<typeof createKuboClient>;
+  const kubo = createKuboClient();
 
   const filesHandle = async () => {
     if (!(files && files.length > 0)) return;
@@ -30,10 +30,6 @@
 
   $effect(() => {
     filesHandle();
-  });
-
-  onMount(async () => {
-    kubo = await createKuboClient();
   });
 </script>
 

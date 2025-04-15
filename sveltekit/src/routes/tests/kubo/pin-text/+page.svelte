@@ -3,10 +3,9 @@
   import { createKuboClient } from "$lib/ts/kubo";
 
   const test = "Bonjour";
+  const kubo = createKuboClient();
 
   onMount(async () => {
-    const kubo = await createKuboClient();
-
     const cid = await kubo.addAndPin(test);
 
     const cids = await kubo.pins();

@@ -21,13 +21,13 @@
     "clean": "pnpm -r clean && rm -rf node_modules .turbo",
     "deploy": "pnpm run --filter wasm deploy"
   },
-  "packageManager": "pnpm@10.6.5",
+  "packageManager": "pnpm@10.8.1",
   "engines": {
     "node": "^22",
     "pnpm": "^10"
   },
   "devDependencies": {
-    "turbo": "^2.4.4"
+    "turbo": "^2.5.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -36,6 +36,9 @@
       "glob-promise",
       "node-datachannel",
       "utf-8-validate"
+    ],
+    "ignoredBuiltDependencies": [
+      "@ipshipyard/node-datachannel"
     ]
   }
 }

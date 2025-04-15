@@ -21,13 +21,12 @@
 
   const { collectionCid = null } = $props<{ collectionCid?: string | null }>();
 
-  let kubo: ReturnType<typeof createKuboClient>;
+  const kubo = createKuboClient();
   const fileStore = new FileStore();
   const filterStore = new FilterStore();
   const ipfs: Ipfs = getContext("ipfs");
 
   onMount(async () => {
-    kubo = await createKuboClient();
     await loadFiles();
   });
 

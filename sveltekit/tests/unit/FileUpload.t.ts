@@ -5,6 +5,32 @@ import { MAX_FILE_SIZE } from "$lib/constants/files";
 import { toast } from "svelte-hot-french-toast";
 import { formatSize } from "$lib/ts/utils";
 
+// Mock localStorage for the Node.js test environment
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => {
+      store[key] = value.toString();
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    },
+    get length() {
+      return Object.keys(store).length;
+    },
+    key: (index: number) => {
+      const keys = Object.keys(store);
+      return keys[index] || null;
+    }
+  };
+})();
+
+vi.stubGlobal('localStorage', localStorageMock);
+
 // Mock toast
 vi.mock("svelte-hot-french-toast", () => ({
   toast: {
@@ -32,8 +58,10 @@ describe("File Upload", () => {
     return fileList as unknown as FileList;
   }
 
-  beforeEach(async () => {
+  beforeEach(() => {
+    localStorageMock.setItem('IPFS_API', 'http://127.0.0.1:5001');
     uploadStore = new UploadStore();
+    vi.clearAllMocks();
   });
 
   it("Should initialize with empty state", () => {
