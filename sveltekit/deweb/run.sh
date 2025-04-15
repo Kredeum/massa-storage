@@ -1,7 +1,5 @@
 export KREDEUM_MASSA_ADDRESS=AS1XWJvC1PRym63Pb7ctaga1Wdvz34jXSuDxHBJQiddS6mkqRVVy
 
-# kredeum.massa addres should be $KREDEUM_MASSA_ADDRESS
-
 # ./deweb directory contains index.html static webpage
 
 # upload file on kredeum.massa

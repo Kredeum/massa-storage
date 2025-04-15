@@ -220,6 +220,11 @@ class Writer extends Reader {
 
     this.isLoadingAccounts = true;
     try {
+      // Request MetaMask Snap permissions if this is MetaMask
+      if (this.selectedWalletName === WalletName.Metamask) {
+        await this.#requestMetaMaskSnapPermissions();
+      }
+      
       const accounts = await selectedWalletInstance.accounts();
       this.availableAccounts = accounts;
       console.log(`Writer: Accounts loaded for ${this.selectedWalletName}:`, accounts);
@@ -254,6 +259,12 @@ class Writer extends Reader {
     this.isConnecting = true;
     let selectedWalletInstance: Wallet | undefined;
     try {
+      // For MetaMask Snap, explicitly request permissions first
+      // This is especially important for remote domains (non-localhost)
+      if (this.selectedWalletName === WalletName.Metamask) { // Use proper enum value
+        await this.#requestMetaMaskSnapPermissions();
+      }
+      
       // Find the selected wallet instance from the loaded list
       selectedWalletInstance = this.availableWallets.find(
         (w) => w.name() === this.selectedWalletName
@@ -316,6 +327,36 @@ class Writer extends Reader {
       return false;
     } finally {
       this.isConnecting = false;
+    }
+  }
+
+  // Private method to request MetaMask Snap permissions
+  async #requestMetaMaskSnapPermissions(): Promise<void> {
+    try {
+      // Check if window.ethereum exists (MetaMask is installed)
+      if (typeof window !== 'undefined' && 'ethereum' in window) {
+        // Define type for ethereum provider
+        interface EthereumProvider {
+          request: (args: {method: string; params?: Record<string, unknown>}) => Promise<unknown>;
+        }
+        
+        // Type-safe access to ethereum
+        const ethereum = (window as Window & { ethereum?: EthereumProvider }).ethereum;
+        if (ethereum && typeof ethereum.request === 'function') {
+          console.log("Requesting MetaMask Snap permissions...");
+          // Request permissions for the Massa Snap
+          await ethereum.request({
+            method: 'wallet_requestSnaps',
+            params: {
+              'npm:@massalabs/metamask-snap': {}
+            }
+          });
+          console.log("MetaMask Snap permissions granted");
+        }
+      }
+    } catch (snapError) {
+      console.error("Error requesting MetaMask Snap permissions:", snapError);
+      // Continue anyway - the wallet-provider library will handle further errors
     }
   }
 

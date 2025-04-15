@@ -26,17 +26,9 @@
         <span class="loading loading-spinner loading-xs ml-2"></span>
       {/if}
       <span>
-        {#if client.connected && client.selectedAccountNum >= 0 && selectedWallet}
-          <!-- Display account directly when connected -->
-          {#await selectedWallet.accounts() then accounts}
-            {#if accounts[client.selectedAccountNum]}
-              {#if accounts[client.selectedAccountNum].accountName && accounts[client.selectedAccountNum].accountName !== accounts[client.selectedAccountNum].address}
-                {accounts[client.selectedAccountNum].accountName}
-              {:else}
-                {accounts[client.selectedAccountNum].address.substring(0, 6)}...{accounts[client.selectedAccountNum].address.substring(accounts[client.selectedAccountNum].address.length - 4)}
-              {/if}
-            {/if}
-          {/await}
+        {#if client.connected && client.name}
+          <!-- Display account name directly when connected -->
+          {client.name}
         {:else}
           <!-- Show selection dropdown when not connected -->
           <AccountSelect
